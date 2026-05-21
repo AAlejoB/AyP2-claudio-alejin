@@ -876,26 +876,26 @@
     <div class="tp-group">
       <div class="tp-title" data-jump="parciales">
         <span>✅ Resueltos</span>
-        <span class="pill">3</span>
+        <span class="pill">6</span>
       </div>
       <ul class="ej-list">
         <li><a href="#parcial-2025">📌 2025 · 14/05</a></li>
         <li><a href="#parcial-2024">📌 2024 · 10/05</a></li>
         <li><a href="#parcial-recu-2022">📌 2022 · Recu (Ej 2)</a></li>
+        <li><a href="#parcial-aulas">📌 Aulas (Ej 2)</a></li>
+        <li><a href="#parcial-petrolera-2">📌 Petrolera v2 (Ej 2)</a></li>
+        <li><a href="#parcial-2023">📌 CC P1 2023 (Ej 2)</a></li>
       </ul>
     </div>
 
     <div class="tp-group">
       <div class="tp-title" data-jump="parciales">
         <span>📋 Modelos parcial</span>
-        <span class="pill">6</span>
+        <span class="pill">3</span>
       </div>
       <ul class="ej-list">
-        <li><a href="#parcial-2023">2023 · CC P1</a></li>
         <li><a href="#parcial-petrolera-1">Petrolera · v1</a></li>
-        <li><a href="#parcial-petrolera-2">Petrolera · v2 (moda)</a></li>
         <li><a href="#parcial-google">Visitantes Google</a></li>
-        <li><a href="#parcial-aulas">Reserva de aulas</a></li>
         <li><a href="#parcial-wpp">Set WhatsApp · 4 ej.</a></li>
       </ul>
     </div>
@@ -8205,7 +8205,7 @@ end;
            ============================================================ -->
       <div class="set-header">
         <h2>✅ Resueltos</h2>
-        <div class="set-meta">3 parciales · entrenamiento desglosado y completo</div>
+        <div class="set-meta">6 parciales · entrenamiento desglosado y completo</div>
         <div class="set-reglas">
           <b>Cómo leerlos:</b> primero el enunciado de la <b>Cátedra</b>, después la
           resolución con código <i>"parcial-ready"</i> (instanciaciones, módulos por
@@ -8722,12 +8722,383 @@ end Negativos_Recu_2022;
         </div>
       </article>
 
+      <!-- =============================================================
+           AULAS — Ej 2 RESUELTO · Matriz[Pila[Lista[Record]]]
+           ============================================================= -->
+      <article class="thread" id="parcial-aulas">
+        <div class="thread-header">
+          <h2>Aulas (Recuperatorio) — Ej 2 resuelto</h2>
+          <span class="tag good">resuelto</span>
+          <span class="tag">3 ejercicios</span>
+          <span class="tag warn">Matriz[Pila[Lista[Record]]] · base de pila</span>
+        </div>
+
+        <div class="post post-prof">
+          <div class="post-avatar">CÁ</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
+            <div class="post-text">
+              <ol>
+                <li><b>Aulas (lunes a viernes, 8-20hs):</b> retornar lista ordenada por cantidad de asientos de aulas vacías en un horario particular con cantidad de asientos mayor al promedio.</li>
+                <li><b>Matriz M con pila de listas de records:</b> retornar lista de números pares encontrados en la <b>base</b> de cada pila. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
+                <li><b>Tracing:</b> función recursiva <code>quehace(t)</code> sobre vector que suma todos los elementos. Traza con <code>t=(3,5,1,1,3,5)</code>. ¿Modifica el vector?</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · pares en base</span></div>
+            <div class="post-text">
+
+              <p><b>Estructura:</b> matriz 2D donde cada celda es una pila; cada elemento de la pila es una lista de records; cada record tiene un campo numérico. <b>Patrones:</b> 4 (base de pila) + 1 (recorrer lista con Aux). Asumo que el record tiene al menos un campo <code>Codigo : Integer</code>.</p>
+
+              <pre class="code"><span class="filename">aulas_pares_base.adb</span><code class="ada">with Listanoordenada;
+with Piladinamica;
+
+procedure Aulas_Pares_Base is
+
+   --  INCISO A — Tipos e instanciaciones
+   type Tiporecord is record
+      Codigo : Integer;
+      Otro   : Integer;     --  ejemplo de otro campo
+   end record;
+
+   package Lista_Recs  is new Listanoordenada (Tipoelem =&gt; Tiporecord);
+   package Pila_Listas is new Piladinamica   (Tipoelem =&gt; Lista_Recs.Tipolista);
+   package Lista_Pares is new Listanoordenada (Tipoelem =&gt; Integer);
+
+   subtype Indice is Integer range 1 .. 10;
+   type TipoMatriz is array (Indice, Indice) of Pila_Listas.Tipopiladinamica;
+
+   --  AUXILIAR — recorrer una lista de records y volcar códigos pares al Result
+   procedure Volcar_Pares
+     (L      : in     Lista_Recs.Tipolista;
+      Result : in out Lista_Pares.Tipolista)
+   is
+      Aux : Lista_Recs.Tipolista := L;
+      R   : Tiporecord;
+   begin
+      while not Lista_Recs.Vacia (Aux) loop
+         R := Lista_Recs.Info (Aux);
+         if R.Codigo mod 2 = 0 then
+            Lista_Pares.InsertarFin (Result, R.Codigo);
+         end if;
+         Aux := Lista_Recs.Sig (Aux);
+      end loop;
+   end Volcar_Pares;
+
+   --  INCISO B — Pares de la BASE de cada pila de la matriz.
+   --  Objetivo: armar lista con códigos pares de la lista que está
+   --            en la base (fondo) de cada pila no vacía.
+   --  Entrada:  M (in out por requisito técnico; queda idéntica)
+   --  Salida:   Result (lista de enteros)
+   --  Conserva: SÍ — pila restaurada con dos whiles (patrón 4),
+   --            lista recorrida con Aux (patrón 1).
+   procedure Pares_Base_Pilas
+     (M      : in out TipoMatriz;
+      Result :    out Lista_Pares.Tipolista)
+   is
+      AuxPila : Pila_Listas.Tipopiladinamica;
+      Base    : Lista_Recs.Tipolista;
+      X       : Lista_Recs.Tipolista;
+   begin
+      Lista_Pares.Crearlista (Result);
+
+      for I in M'Range(1) loop
+         for J in M'Range(2) loop
+            if not Pila_Listas.Vacia (M(I,J)) then
+               --  Patrón 4 · primera mitad: vaciar a AuxPila para hallar la base
+               Pila_Listas.Crearpila (AuxPila);
+               while not Pila_Listas.Vacia (M(I,J)) loop
+                  Pila_Listas.Sacar (M(I,J), Base);  --  el último Base es la BASE
+                  Pila_Listas.Meter (AuxPila, Base);
+               end loop;
+
+               --  Procesar la lista de la base (sólo lectura)
+               Volcar_Pares (Base, Result);
+
+               --  Patrón 4 · segunda mitad: restaurar M(I,J) desde AuxPila
+               while not Pila_Listas.Vacia (AuxPila) loop
+                  Pila_Listas.Sacar (AuxPila, X);
+                  Pila_Listas.Meter (M(I,J), X);
+               end loop;
+            end if;
+         end loop;
+      end loop;
+   end Pares_Base_Pilas;
+
+   --  INCISO C — Conservación:
+   --   * Matriz: solo se hace Sacar/Meter sobre cada celda → restaurada.
+   --   * Pila:   patrón 4 (dos whiles) → idéntica al inicio.
+   --   * Lista:  Volcar_Pares usa Aux interno (patrón 1).
+
+begin
+   null;
+end Aulas_Pares_Base;
+</code></pre>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>El error más común en este tipo de ejercicio:</b> olvidarse del segundo while
+                (restaurar la pila desde AuxPila). Si te olvidás, M(I,J) queda VACÍA después
+                del procesamiento. <b>Dos whiles, siempre.</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- =============================================================
+           PETROLERA v2 — Ej 2 RESUELTO · Vec[Cola[Lista[Int]]]
+           ============================================================= -->
+      <article class="thread" id="parcial-petrolera-2">
+        <div class="thread-header">
+          <h2>Petrolera v2 (moda) — Ej 2 resuelto</h2>
+          <span class="tag good">resuelto</span>
+          <span class="tag">3 ejercicios</span>
+          <span class="tag warn">Vec[Cola[Lista[Int]]] · frente de cola</span>
+        </div>
+
+        <div class="post post-prof">
+          <div class="post-avatar">CÁ</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
+            <div class="post-text">
+              <ol>
+                <li><b>Pozos petroleros (moda):</b> lista ordenada por producción de pozos cuya producción coincide con la <b>moda</b> de la categoría.</li>
+                <li><b>Mayor:</b> estructura <code>E</code> = vector de colas de listas de enteros. Sumar el mayor número de cada lista del <b>frente</b> de cada cola e imprimir el resultado. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
+                <li><b>Tracing:</b> función <code>queHace(j)</code> que invierte un string. Traza con <code>j = "0000011"</code>.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · suma de mayores del frente</span></div>
+            <div class="post-text">
+
+              <p><b>Estructura:</b> vector indexado donde cada celda es una cola; cada cola contiene listas de enteros. Patrones: <b>3</b> (vaciar cola a auxiliar para acceder al frente conservando) + <b>1</b> (Aux para recorrer lista).</p>
+
+              <p><b>Trampa específica:</b> el primer <code>Supcola</code> me da el frente. Lo capturo en una variable separada antes de seguir vaciando.</p>
+
+              <pre class="code"><span class="filename">petrolera_suma_mayores.adb</span><code class="ada">with Ada.Text_IO;
+with Ada.Integer_Text_IO;
+with Listanoordenada;
+with Coladinamica;
+
+procedure Petrolera_Suma_Mayores is
+
+   --  INCISO A — Tipos e instanciaciones
+   package Lista_Int    is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Cola_Listas  is new Coladinamica    (Tipoelem =&gt; Lista_Int.Tipolista);
+
+   subtype Indice is Integer range 1 .. 10;
+   type TipoVec is array (Indice) of Cola_Listas.Tipocoladinamica;
+
+   --  AUXILIAR — mayor entero de una lista (sólo lectura · patrón 1)
+   function Mayor_de (L : Lista_Int.Tipolista) return Integer is
+      Aux    : Lista_Int.Tipolista;
+      Mayor  : Integer;
+      Actual : Integer;
+   begin
+      Mayor := Lista_Int.Info (L);
+      Aux   := Lista_Int.Sig (L);
+      while not Lista_Int.Vacia (Aux) loop
+         Actual := Lista_Int.Info (Aux);
+         if Actual &gt; Mayor then
+            Mayor := Actual;
+         end if;
+         Aux := Lista_Int.Sig (Aux);
+      end loop;
+      return Mayor;
+   end Mayor_de;
+
+   --  INCISO B — Sumar mayor de la lista del FRENTE de cada cola e imprimir.
+   --  Objetivo: para cada cola del vector, tomar la lista del frente,
+   --            obtener su mayor, sumar todos esos mayores. Imprimir.
+   --  Entrada:  E (in out por requisito técnico; queda idéntica)
+   --  Salida:   imprime en pantalla.
+   --  Conserva: SÍ — patrón 3 en cola, patrón 1 en lista.
+   procedure Suma_Mayores_Frente (E : in out TipoVec) is
+      AuxCola : Cola_Listas.Tipocoladinamica;
+      Frente  : Lista_Int.Tipolista;
+      L       : Lista_Int.Tipolista;
+      Suma    : Integer := 0;
+   begin
+      for I in E'Range loop
+         if not Cola_Listas.Vacia (E(I)) then
+            --  Patrón 3: vaciar cola entera a auxiliar.
+            --  Capturo el PRIMERO sacado (es el frente).
+            Cola_Listas.Crearcola (AuxCola);
+            Cola_Listas.Supcola (E(I), Frente);
+            Cola_Listas.Inscola (AuxCola, Frente);
+            while not Cola_Listas.Vacia (E(I)) loop
+               Cola_Listas.Supcola (E(I), L);
+               Cola_Listas.Inscola (AuxCola, L);
+            end loop;
+            E(I) := AuxCola;     --  restauro la cola
+
+            --  Sumo el mayor de la lista del frente (patrón 1)
+            if not Lista_Int.Vacia (Frente) then
+               Suma := Suma + Mayor_de (Frente);
+            end if;
+         end if;
+      end loop;
+
+      --  Imprimir resultado (lo pide el enunciado).
+      Ada.Text_IO.Put ("Suma de mayores del frente: ");
+      Ada.Integer_Text_IO.Put (Suma, Width =&gt; 0);
+      Ada.Text_IO.New_Line;
+   end Suma_Mayores_Frente;
+
+   --  INCISO C — Conservación:
+   --   * Vector:  solo recorrido con for, no se toca.
+   --   * Cola:    patrón 3 (vaciar + reasignar) → idéntica.
+   --   * Lista:   Mayor_de usa Aux interno (patrón 1).
+
+begin
+   null;
+end Petrolera_Suma_Mayores;
+</code></pre>
+
+              <div class="callout" style="margin-top:12px">
+                <b>Detalle de oral:</b> el <code>Frente</code> es el PRIMER <code>Supcola</code>
+                de la cola — los siguientes son los del medio y final. Lo capturo aparte
+                porque después se mezcla con el resto en el vaciado. Es la diferencia entre
+                "ver el frente" y "ver el final" (que es el ÚLTIMO Supcola, no el primero).
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- =============================================================
+           CC P1 2023 — Ej 2 RESUELTO · Pila + Lista → Listaordenada
+           ============================================================= -->
+      <article class="thread" id="parcial-2023">
+        <div class="thread-header">
+          <h2>CC P1 2023 — Ej 2 resuelto</h2>
+          <span class="tag good">resuelto</span>
+          <span class="tag">3 ejercicios</span>
+          <span class="tag warn">Pila + Lista · Listaordenada invertida</span>
+        </div>
+
+        <div class="post post-prof">
+          <div class="post-avatar">CÁ</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
+            <div class="post-text">
+              <ol>
+                <li><b>Empresa de juegos:</b> almacena juegos/características y datos de clientes. a) Lista ordenada de clientes menores a <code>x</code> años; b) Lista ordenada de clientes con edad mayor al promedio; c) Conservar.</li>
+                <li><b>complemento_lista:</b> recibe pila de enteros y lista de enteros. Retorna lista con elementos de la pila <b>que NO están</b> en la lista, ordenados <b>mayor a menor</b>. Ej: P={3,4,9,1,12,15}, L={5,12,2,8,3} → R={15,9,4,1}. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
+                <li><b>Tracing recursivo</b> sobre string con <code>haceAlgo (p, x)</code> que imprime <code>x(p)</code> antes y después de la llamada recursiva. Traza con <code>p=1, x="abc123"</code>.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · complemento</span></div>
+            <div class="post-text">
+
+              <p><b>Truco principal:</b> "ordenado mayor a menor" → uso <code>Listaordenada</code>
+              pero le paso <code>"&gt;"</code> como función <b>menor</b>. Eso invierte el orden:
+              los grandes se insertan primero. Es el truco más limpio.</p>
+
+              <pre class="code"><span class="filename">complemento.adb</span><code class="ada">with Listanoordenada;
+with Listaordenada;
+with Piladinamica;
+
+procedure Complemento is
+
+   --  INCISO A — Tipos e instanciaciones
+
+   package Pila_Int  is new Piladinamica    (Tipoelem =&gt; Integer);
+   package Lista_Int is new Listanoordenada (Tipoelem =&gt; Integer);
+
+   --  TRUCO: para ordenar de MAYOR A MENOR, paso "&gt;" como función "menor".
+   --  Listaordenada usa "menor" para decidir el orden de inserción:
+   --  si menor(A,B)=true, A va antes que B. Si menor=">", los grandes
+   --  van antes → orden descendente.
+   function Mayor_Que (X, Y : Integer) return Boolean is
+   begin return X &gt; Y; end Mayor_Que;
+
+   function Menor_Que (X, Y : Integer) return Boolean is
+   begin return X &lt; Y; end Menor_Que;
+
+   package Lista_Ord is new Listaordenada
+     (Tipoelem =&gt; Integer,
+      menor    =&gt; Mayor_Que,    --  INVERTIDO ↓ descendente
+      mayor    =&gt; Menor_Que);
+
+
+   --  INCISO B — complemento_lista
+   --  Objetivo: lista ordenada (mayor a menor, sin repes) con elementos
+   --            de P que NO están en L.
+   --  Entrada:  P (in out por requisito; queda idéntica), L (sólo lectura)
+   --  Salida:   Result (Lista_Ord)
+   --  Conserva: SÍ — P restaurada con patrón 4; L nunca se toca.
+   procedure Complemento_Lista
+     (P      : in out Pila_Int.Tipopiladinamica;
+      L      : in     Lista_Int.Tipolista;
+      Result :    out Lista_Ord.Tipolista)
+   is
+      AuxPila : Pila_Int.Tipopiladinamica;
+      X       : Integer;
+   begin
+      Lista_Ord.Crearlistaordenada (Result);
+      Pila_Int.Crearpila (AuxPila);
+
+      --  Vaciar P en AuxPila procesando cada elemento (patrón 4 modificado)
+      while not Pila_Int.Vacia (P) loop
+         Pila_Int.Sacar (P, X);
+         --  Filtro: X no está en L y no está ya en Result
+         if not Lista_Int.Esta (L, X)
+           and then not Lista_Ord.Esta (Result, X) then
+            Lista_Ord.Insertar (Result, X);    --  inserta en orden descendente
+         end if;
+         Pila_Int.Meter (AuxPila, X);
+      end loop;
+
+      --  Restaurar P desde AuxPila
+      while not Pila_Int.Vacia (AuxPila) loop
+         Pila_Int.Sacar (AuxPila, X);
+         Pila_Int.Meter (P, X);
+      end loop;
+   end Complemento_Lista;
+
+   --  INCISO C — Conservación:
+   --   * Pila P: patrón 4 (dos whiles) → idéntica.
+   --   * Lista L: sólo lectura con función Esta del package.
+
+begin
+   null;
+end Complemento;
+</code></pre>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>El truco de Listaordenada invertida</b> es muy elegante y la cátedra lo
+                valora muchísimo. Si te animás a usarlo (sabiendo explicar por qué funciona),
+                ganás un punto extra de prolijidad. Alternativa más simple pero más fea:
+                usar <code>Listanoordenada</code> y al final ordenar manualmente.
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
       <!-- ============================================================
            GRUPO 2 · 📋 MODELOS PARA PRACTICAR
            ============================================================ -->
       <div class="set-header">
         <h2>📋 Modelos parcial</h2>
-        <div class="set-meta">6 parciales · sólo enunciados — para resolver en hoja antes del viernes</div>
+        <div class="set-meta">3 parciales · sólo enunciados — para resolver en hoja antes del viernes</div>
         <div class="set-reglas">
           <b>Estrategia sugerida:</b> ataca el <code>Ej 2</code> de cada uno
           (estructura compuesta) — es el patrón que más se repite. Después si
@@ -8739,27 +9110,6 @@ end Negativos_Recu_2022;
       <!-- =============================================================
            PARCIALES PENDIENTES — sólo enunciado para practicar
            ============================================================= -->
-
-      <article class="thread" id="parcial-2023">
-        <div class="thread-header">
-          <h2>CC P1 2023 — pendiente</h2>
-          <span class="tag warn">pendiente</span>
-          <span class="tag">3 ejercicios</span>
-        </div>
-        <div class="post post-prof">
-          <div class="post-avatar">CÁ</div>
-          <div class="post-body">
-            <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
-            <div class="post-text">
-              <ol>
-                <li><b>Empresa de juegos:</b> almacena juegos/características y datos de clientes. a) Lista ordenada de clientes menores a <code>x</code> años; b) Lista ordenada de clientes con edad mayor al promedio; c) Conservar.</li>
-                <li><b>complemento_lista:</b> recibe pila de enteros y lista de enteros. Retorna lista con elementos de la pila <b>que NO están</b> en la lista, ordenados <b>mayor a menor</b>. Ej: P={3,4,9,1,12,15}, L={5,12,2,8,3} → R={15,9,4,1}.</li>
-                <li><b>Tracing recursivo</b> sobre string con <code>haceAlgo (p, x)</code> que imprime <code>x(p)</code> antes y después de la llamada recursiva. Traza con <code>p=1, x="abc123"</code>.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      </article>
 
       <article class="thread" id="parcial-petrolera-1">
         <div class="thread-header">
@@ -8782,27 +9132,6 @@ end Negativos_Recu_2022;
         </div>
       </article>
 
-      <article class="thread" id="parcial-petrolera-2">
-        <div class="thread-header">
-          <h2>Compañía petrolera v2 (moda) — pendiente</h2>
-          <span class="tag warn">pendiente</span>
-          <span class="tag">3 ejercicios</span>
-        </div>
-        <div class="post post-prof">
-          <div class="post-avatar">CÁ</div>
-          <div class="post-body">
-            <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
-            <div class="post-text">
-              <ol>
-                <li><b>Pozos petroleros (moda):</b> lista ordenada por producción de pozos cuya producción coincide con la <b>moda</b> de la categoría (moda = el número que más se repite).</li>
-                <li><b>Mayor:</b> estructura <code>E</code> = vector de colas de listas de enteros. Sumar el mayor número de cada lista del <b>frente</b> de cada cola e imprimir el resultado.</li>
-                <li><b>Tracing:</b> función <code>queHace(j)</code> que invierte un string. Traza con <code>j = "0000011"</code>.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      </article>
-
       <article class="thread" id="parcial-google">
         <div class="thread-header">
           <h2>Visitantes Google (A2 · CC · RF1) — pendiente</h2>
@@ -8819,36 +9148,6 @@ end Negativos_Recu_2022;
                 <li><b>Intersección:</b> recibe lista <code>L1</code> y pila <code>P1</code>, retorna lista <code>L2</code> con la intersección (elementos en ambas), ordenada ascendentemente y sin repeticiones.</li>
                 <li><b>Tracing:</b> función recursiva <code>queHace(Lista)</code> que suma los pares de una lista de enteros. Traza con <code>7 → 8 → 10 → 5 → 9 → 14</code>.</li>
               </ol>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="thread" id="parcial-aulas">
-        <div class="thread-header">
-          <h2>Reserva de aulas (recuperatorio) — pendiente</h2>
-          <span class="tag warn">pendiente</span>
-          <span class="tag">3 ejercicios</span>
-        </div>
-        <div class="post post-prof">
-          <div class="post-avatar">CÁ</div>
-          <div class="post-body">
-            <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
-            <div class="post-text">
-              <ol>
-                <li><b>Aulas (lunes a viernes, 8-20hs):</b> retornar lista ordenada por cantidad de asientos de aulas vacías en un horario particular con cantidad de asientos mayor al promedio.</li>
-                <li><b>Matriz M con pila de listas de records:</b> retornar lista de números pares encontrados en la <b>base</b> de cada pila.</li>
-                <li><b>Tracing:</b> función recursiva <code>quehace(t)</code> sobre vector que suma todos los elementos. Traza con <code>t=(3,5,1,1,3,5)</code>. ¿Modifica el vector?</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-        <div class="post post-tip">
-          <div class="post-avatar">💡</div>
-          <div class="post-body">
-            <div class="post-meta"><strong>Tip</strong><span class="role">trampa de la base</span></div>
-            <div class="post-text">
-              <p>"Base de cada pila" = el <b>último</b> elemento que se metió, queda al fondo. Para acceder: Sacar TODO a una pila auxiliar; el último que sacás es la base; luego restaurás vaciando la auxiliar de vuelta. Patrón a memorizar.</p>
             </div>
           </div>
         </div>
