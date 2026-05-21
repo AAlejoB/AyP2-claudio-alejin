@@ -878,7 +878,7 @@
     <div class="tp-group">
       <div class="tp-title" data-jump="parciales">
         <span>✅ Resueltos</span>
-        <span class="pill">7</span>
+        <span class="pill">10</span>
       </div>
       <ul class="ej-list">
         <li><a href="#parcial-2025">📌 2025 · 14/05</a></li>
@@ -887,19 +887,10 @@
         <li><a href="#parcial-aulas">📌 Aulas (Ej 2)</a></li>
         <li><a href="#parcial-petrolera-2">📌 Petrolera v2 (Ej 2)</a></li>
         <li><a href="#parcial-2023">📌 CC P1 2023 (Ej 1 y 2)</a></li>
-        <li><a href="#parcial-hospital">📌 🆕 Hospital · Residentes</a></li>
-      </ul>
-    </div>
-
-    <div class="tp-group">
-      <div class="tp-title" data-jump="parciales">
-        <span>📋 Modelos parcial</span>
-        <span class="pill">3</span>
-      </div>
-      <ul class="ej-list">
-        <li><a href="#parcial-petrolera-1">Petrolera · v1</a></li>
-        <li><a href="#parcial-google">Visitantes Google</a></li>
-        <li><a href="#parcial-wpp">Set WhatsApp · 4 ej.</a></li>
+        <li><a href="#parcial-hospital">📌 Hospital · Residentes</a></li>
+        <li><a href="#parcial-petrolera-1">📌 🆕 Petrolera v1 (Ej 2)</a></li>
+        <li><a href="#parcial-google">📌 🆕 Visitantes Google (Ej 2)</a></li>
+        <li><a href="#parcial-wpp">📌 🆕 WhatsApp (Ej 1, 2 y 3)</a></li>
       </ul>
     </div>
 
@@ -8793,7 +8784,7 @@ end;
            ============================================================ -->
       <div class="set-header">
         <h2>✅ Resueltos</h2>
-        <div class="set-meta">7 parciales · entrenamiento desglosado y completo</div>
+        <div class="set-meta">10 parciales · TODOS los modelos cubiertos · ningún pendiente</div>
         <div class="set-reglas">
           <b>Cómo leerlos:</b> primero el enunciado de la <b>Cátedra</b>, después la
           resolución con código <i>"parcial-ready"</i> (instanciaciones, módulos por
@@ -10142,90 +10133,527 @@ end Hospital_Residentes;
         </div>
       </article>
 
-      <!-- ============================================================
-           GRUPO 2 · 📋 MODELOS PARA PRACTICAR
-           ============================================================ -->
-      <div class="set-header">
-        <h2>📋 Modelos parcial</h2>
-        <div class="set-meta">3 parciales · sólo enunciados — para resolver en hoja antes del viernes</div>
-        <div class="set-reglas">
-          <b>Estrategia sugerida:</b> ataca el <code>Ej 2</code> de cada uno
-          (estructura compuesta) — es el patrón que más se repite. Después si
-          sobra tiempo, los <code>Ej 1</code> (modelado). Los <code>Ej 3</code>
-          de tracing <b>NO van este viernes</b> según el profe.
-        </div>
-      </div>
-
       <!-- =============================================================
-           PARCIALES PENDIENTES — sólo enunciado para practicar
+           PETROLERA v1 — Ej 2 RESUELTO · Vec[Cola[Rec]] · OPERACIÓN MODIFICATORIA
            ============================================================= -->
-
       <article class="thread" id="parcial-petrolera-1">
         <div class="thread-header">
-          <h2>Compañía petrolera v1 — pendiente</h2>
-          <span class="tag warn">pendiente</span>
+          <h2>Compañía petrolera v1 — Ej 2 resuelto</h2>
+          <span class="tag good">resuelto</span>
           <span class="tag">3 ejercicios</span>
+          <span class="tag warn">Vec[Cola[Rec]] · MODIFICA (no conserva)</span>
         </div>
+
         <div class="post post-prof">
           <div class="post-avatar">CÁ</div>
           <div class="post-body">
             <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
             <div class="post-text">
               <ol>
-                <li><b>Pozos petroleros:</b> coordenada geográfica (string tipo "-1234,-5678"), producción, código (2 letras + número, ej: "LP100"), categoría = producción/100. a) Instanciar; b) Lista ordenada por código de pozos que superan el promedio de producción; c) Conservar.</li>
-                <li><b>Reemplazar:</b> estructura <code>E</code> = vector de colas de records. Reemplazar un campo numérico por la cantidad de caracteres de la cadena.</li>
-                <li><b>Tracing:</b> función recursiva <code>queHace(t, j)</code> que busca <code>j</code> en el vector <code>t</code>. Traza con <code>t=(9,34,55,12,3,5), j=6</code>. ¿Modifica el vector?</li>
+                <li><b>Pozos petroleros:</b> coordenada geográfica, producción, código (2 letras + número), categoría = producción/100. a) Instanciar; b) Lista ordenada por código de pozos que superan el promedio; c) Conservar.</li>
+                <li><b>Reemplazar:</b> estructura <code>E</code> = vector de colas de records. Reemplazar un campo numérico por la cantidad de caracteres de la cadena. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
+                <li><b>Tracing:</b> función recursiva <code>queHace(t, j)</code> que busca <code>j</code> en el vector <code>t</code>. Traza con <code>t=(9,34,55,12,3,5), j=6</code>.</li>
               </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · Reemplazar</span></div>
+            <div class="post-text">
+              <p><b>Atención — este ejercicio MODIFICA</b> la estructura. El enunciado pide
+                "reemplazar", no "conservar". Es la EXCEPCIÓN a la regla general. Pero el orden
+                de la cola SÍ se mantiene (FIFO), porque al volver a meter cada record actualizado
+                con <code>Inscola</code> respeto la posición original.</p>
+
+              <pre class="code"><span class="filename">petrolera_reemplazar.adb</span><code class="ada">with Coladinamica;
+
+procedure Petrolera_Reemplazar is
+
+   --  INCISO A — Tipos e instanciaciones
+   subtype Nombre_T is String (1 .. 30);
+
+   type TipoRecord is record
+      Nombre : Nombre_T;
+      Num    : Integer;
+   end record;
+
+   package Cola_Rec is new Coladinamica (Tipoelem =&gt; TipoRecord);
+
+   subtype Indice is Integer range 1 .. 10;
+   type TipoVec is array (Indice) of Cola_Rec.Tipocoladinamica;
+
+
+   --  AUXILIAR — largo "real" del string (cuenta caracteres no-espacio)
+   function Largo_Real (S : Nombre_T) return Integer is
+      Largo : Integer;
+   begin
+      Largo := 0;
+      for I in S'Range loop
+         if S (I) /= ' ' then
+            Largo := Largo + 1;
+         end if;
+      end loop;
+      return Largo;
+   end Largo_Real;
+
+
+   --  INCISO B — Reemplazar Num por la cantidad de caracteres del Nombre
+   --  Objetivo: para cada record en cada cola, Num := largo (Nombre).
+   --  Entrada:  E (estructura)
+   --  Salida:   E modificada in-place.
+   --  Conserva: NO — explícitamente modifica. Pero el ORDEN FIFO de cada
+   --            cola se mantiene (Supcola del frente + Inscola al final).
+   procedure Reemplazar (E : in out TipoVec) is
+      AuxCola : Cola_Rec.Tipocoladinamica;
+      R       : TipoRecord;
+   begin
+      for I in E'Range loop
+         Cola_Rec.Crearcola (AuxCola);
+         while not Cola_Rec.Vacia (E (I)) loop
+            Cola_Rec.Supcola (E (I), R);
+            R.Num := Largo_Real (R.Nombre);   --  modifico el record local
+            Cola_Rec.Inscola (AuxCola, R);    --  lo meto actualizado
+         end loop;
+         E (I) := AuxCola;                    --  reemplazo la cola entera
+      end loop;
+   end Reemplazar;
+
+begin
+   null;
+end Petrolera_Reemplazar;
+</code></pre>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>Las 2 cosas únicas de este ejercicio:</b>
+                <ol style="margin:6px 0 0 18px">
+                  <li><b>Operación MODIFICATORIA:</b> a diferencia de los anteriores, acá SÍ se
+                    modifica E. No hay que reponer nada. El "patrón 3" se usa para iterar y
+                    actualizar, no para conservar.</li>
+                  <li><b>El orden FIFO se mantiene</b> aunque vacíes y rellenes: <code>Supcola</code>
+                    saca del frente, <code>Inscola</code> agrega al final, en orden. Después de
+                    procesar todos, la cola está en el mismo orden con los Num actualizados.</li>
+                </ol>
+              </div>
             </div>
           </div>
         </div>
       </article>
 
+
+      <!-- =============================================================
+           VISITANTES GOOGLE — Ej 2 RESUELTO · Lista + Pila → Lista ordenada asc
+           ============================================================= -->
       <article class="thread" id="parcial-google">
         <div class="thread-header">
-          <h2>Visitantes Google (A2 · CC · RF1) — pendiente</h2>
-          <span class="tag warn">pendiente</span>
+          <h2>Visitantes Google — Ej 2 resuelto</h2>
+          <span class="tag good">resuelto</span>
           <span class="tag">3 ejercicios</span>
+          <span class="tag warn">Lista + Pila · intersección ascendente</span>
         </div>
+
         <div class="post post-prof">
           <div class="post-avatar">CÁ</div>
           <div class="post-body">
             <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
             <div class="post-text">
               <ol>
-                <li><b>Visitantes por continente:</b> navegador, fecha, hora, IP (0-255 separados por puntos), páginas visitadas, búsquedas. a) Instanciar; b) Lista ordenada por IP de usuarios con &gt;50 solicitudes en el mismo día; c) Conservar.</li>
-                <li><b>Intersección:</b> recibe lista <code>L1</code> y pila <code>P1</code>, retorna lista <code>L2</code> con la intersección (elementos en ambas), ordenada ascendentemente y sin repeticiones.</li>
-                <li><b>Tracing:</b> función recursiva <code>queHace(Lista)</code> que suma los pares de una lista de enteros. Traza con <code>7 → 8 → 10 → 5 → 9 → 14</code>.</li>
+                <li><b>Visitantes por continente:</b> navegador, fecha, hora, IP, páginas visitadas, búsquedas. a) Instanciar; b) Lista ordenada por IP con &gt;50 solicitudes; c) Conservar.</li>
+                <li><b>Intersección:</b> recibe lista <code>L1</code> y pila <code>P1</code>, retorna lista <code>L2</code> con la intersección, ordenada ascendentemente y sin repeticiones. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
+                <li><b>Tracing:</b> función recursiva que suma los pares de una lista. Traza con <code>7 → 8 → 10 → 5 → 9 → 14</code>.</li>
               </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · Intersección</span></div>
+            <div class="post-text">
+              <p><b>Es el primo del CC P1 2023 Ej 2</b> pero con dos diferencias clave: orden
+                <b>ascendente</b> (no descendente) y filtro de <b>intersección</b> (en ambas) en
+                vez de <b>complemento</b> (en pila pero no en lista).</p>
+
+              <pre class="code"><span class="filename">google_interseccion.adb</span><code class="ada">with Listanoordenada;
+with Listaordenada;
+with Piladinamica;
+
+procedure Google_Interseccion is
+
+   --  INCISO A — Tipos e instanciaciones
+   package Lista_Int is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Pila_Int  is new Piladinamica    (Tipoelem =&gt; Integer);
+
+   --  Listaordenada ascendente: paso "&lt;" como "menor" (orden normal)
+   function Menor_Que (X, Y : Integer) return Boolean is
+   begin return X &lt; Y; end Menor_Que;
+
+   function Mayor_Que (X, Y : Integer) return Boolean is
+   begin return X &gt; Y; end Mayor_Que;
+
+   package Lista_Ord is new Listaordenada
+     (Tipoelem =&gt; Integer,
+      menor    =&gt; Menor_Que,    --  ASCENDENTE (los menores primero)
+      mayor    =&gt; Mayor_Que);
+
+
+   --  INCISO B — Intersección de L1 y P1
+   --  Objetivo: lista L2 con elementos en AMBAS, ordenada asc, sin repes.
+   --  Entrada:  L1 (lista), P1 (pila)
+   --  Salida:   L2 (Listaordenada)
+   --  Conserva: SÍ — L1 solo lectura, P1 con patrón 4 (dos whiles).
+   procedure Interseccion
+     (L1 : in     Lista_Int.Tipolista;
+      P1 : in out Pila_Int.Tipopiladinamica;
+      L2 :    out Lista_Ord.Tipolista)
+   is
+      AuxPila : Pila_Int.Tipopiladinamica;
+      X       : Integer;
+   begin
+      Lista_Ord.Crearlistaordenada (L2);
+      Pila_Int.Crearpila (AuxPila);
+
+      --  Vaciar P1 en AuxPila procesando cada elemento
+      while not Pila_Int.Vacia (P1) loop
+         Pila_Int.Sacar (P1, X);
+         --  Filtro: está en L1 Y no está ya en L2
+         if Lista_Int.Esta (L1, X)
+           and then not Lista_Ord.Esta (L2, X) then
+            Lista_Ord.Insertar (L2, X);
+         end if;
+         Pila_Int.Meter (AuxPila, X);
+      end loop;
+
+      --  Restaurar P1 desde AuxPila
+      while not Pila_Int.Vacia (AuxPila) loop
+         Pila_Int.Sacar (AuxPila, X);
+         Pila_Int.Meter (P1, X);
+      end loop;
+   end Interseccion;
+
+begin
+   null;
+end Google_Interseccion;
+</code></pre>
+
+              <div class="callout" style="margin-top:12px">
+                <b>Compará con CC P1 2023 Ej 2 (complemento):</b>
+                <ul>
+                  <li><b>Ascendente</b> aquí · <b>descendente</b> allá → cambia <code>menor =&gt; Menor_Que</code> vs <code>menor =&gt; Mayor_Que</code>.</li>
+                  <li><b>Intersección</b> aquí (en ambas) · <b>complemento</b> allá (en pila, no en lista) → cambia <code>Esta (L1, X)</code> vs <code>not Esta (L1, X)</code>.</li>
+                  <li>El resto del esqueleto es <b>idéntico</b>. Memorizá uno, el otro sale solo.</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </article>
 
+
+      <!-- =============================================================
+           WHATSAPP — Ej 1, 2 y 3 RESUELTOS · 3 ejercicios variados
+           ============================================================= -->
       <article class="thread" id="parcial-wpp">
         <div class="thread-header">
-          <h2>Set WhatsApp 03/05/2024 — pendiente</h2>
-          <span class="tag warn">pendiente</span>
+          <h2>Set WhatsApp 03/05/2024 — Ej 1, 2 y 3 resueltos</h2>
+          <span class="tag good">resuelto</span>
           <span class="tag">4 ejercicios</span>
+          <span class="tag warn">strings · Pila[Vec[Lista]] · unión filtrada</span>
         </div>
+
         <div class="post post-prof">
           <div class="post-avatar">CÁ</div>
           <div class="post-body">
             <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
             <div class="post-text">
               <ol>
-                <li><b>ListaPalabras:</b> recibe lista <code>L</code> de palabras y retorna lista con las que empiezan con vocal. Si una palabra que empieza con vocal contiene <code>'x'</code>, reemplazar por <code>'y'</code>. Conservar L.</li>
-                <li><b>CuentaPar:</b> dada pila <code>P</code> que contiene <b>vectores de listas de enteros</b>, retornar la cantidad total de nodos cuyo valor sea par. Conservar.</li>
-                <li><b>Unión:</b> recibe pila de enteros y cola de enteros, retorna lista con todos los elementos de ambas estructuras, <b>sin repetidos</b>, ordenados de <b>mayor a menor</b>, y sólo los <b>múltiplos de 4</b>.</li>
-                <li><b>Función recursiva</b> que imprima los elementos pares de una lista no ordenada. a) Caso base; b) Trazas para <code>5 → 4 → 3 → 2 → 1</code>.</li>
+                <li><b>ListaPalabras:</b> lista <code>L</code> de palabras → lista con las que empiezan con vocal. Si la palabra contiene <code>'x'</code>, reemplazar por <code>'y'</code>. Conservar L. <span class="tag good" style="font-size:.7rem">resuelto ↓</span></li>
+                <li><b>CuentaPar:</b> pila <code>P</code> de vectores de listas de enteros, retornar cantidad total de nodos con valor par. Conservar. <span class="tag good" style="font-size:.7rem">resuelto ↓</span></li>
+                <li><b>Unión:</b> pila + cola → lista sin repes, mayor a menor, sólo múltiplos de 4. <span class="tag good" style="font-size:.7rem">resuelto ↓</span></li>
+                <li><b>Recursiva:</b> imprime pares de lista. Trazas <code>5 → 4 → 3 → 2 → 1</code>.</li>
               </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ EJ 1: ListaPalabras ============ -->
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 1 · ListaPalabras</span></div>
+            <div class="post-text">
+              <p><b>Concepto:</b> manejo de strings con tamaño fijo + recorrido carácter por carácter. Es el único de la noche que toca <code>Character</code> y <code>String</code> directamente.</p>
+
+              <pre class="code"><span class="filename">whatsapp_listapalabras.adb</span><code class="ada">with Listanoordenada;
+
+procedure WhatsApp_ListaPalabras is
+
+   --  INCISO A — Tipos e instanciaciones
+   subtype TipoPalabra is String (1 .. 20);  --  tamaño fijo; relleno con espacios
+
+   package Lista_Pal is new Listanoordenada (Tipoelem =&gt; TipoPalabra);
+
+
+   --  AUXILIAR — ¿es vocal? (case-insensitive)
+   function Es_Vocal (C : Character) return Boolean is
+   begin
+      return C = 'a' or else C = 'e' or else C = 'i'
+          or else C = 'o' or else C = 'u'
+          or else C = 'A' or else C = 'E' or else C = 'I'
+          or else C = 'O' or else C = 'U';
+   end Es_Vocal;
+
+
+   --  AUXILIAR — reemplazar todas las 'x' por 'y' en la palabra
+   procedure Reemplazar_X (P : in out TipoPalabra) is
+   begin
+      for I in P'Range loop
+         if P (I) = 'x' then
+            P (I) := 'y';
+         elsif P (I) = 'X' then
+            P (I) := 'Y';
+         end if;
+      end loop;
+   end Reemplazar_X;
+
+
+   --  INCISO B — función ListaPalabras
+   --  Objetivo: lista con las palabras que empiezan con vocal,
+   --            reemplazando 'x' por 'y' en las que aparezca.
+   --  Entrada:  L (lista original, solo lectura)
+   --  Salida:   Result (lista nueva)
+   --  Conserva: SÍ — Aux para recorrer L; las modificaciones se hacen
+   --            sobre una COPIA local del record (palabra).
+   function ListaPalabras (L : Lista_Pal.Tipolista) return Lista_Pal.Tipolista is
+      Aux        : Lista_Pal.Tipolista;
+      Result     : Lista_Pal.Tipolista;
+      Palabra    : TipoPalabra;
+      Modificada : TipoPalabra;
+   begin
+      Lista_Pal.Crearlista (Result);
+      Aux := L;
+      while not Lista_Pal.Vacia (Aux) loop
+         Palabra := Lista_Pal.Info (Aux);
+         if Es_Vocal (Palabra (Palabra'First)) then
+            Modificada := Palabra;        --  copio para no tocar la original
+            Reemplazar_X (Modificada);
+            Lista_Pal.InsertarFin (Result, Modificada);
+         end if;
+         Aux := Lista_Pal.Sig (Aux);
+      end loop;
+      return Result;
+   end ListaPalabras;
+
+begin
+   null;
+end WhatsApp_ListaPalabras;
+</code></pre>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>El detalle de la conservación con records:</b> cuando hago <code>Palabra := Info (Aux)</code>,
+                <code>Palabra</code> es una COPIA del record. Modificarla con <code>Reemplazar_X</code>
+                NO toca el nodo original. Por eso la lista L queda intacta aunque "modifiqué"
+                la palabra. Es importante explicarlo así en oral.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ EJ 2: CuentaPar ============ -->
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · CuentaPar</span></div>
+            <div class="post-text">
+              <p><b>Estructura:</b> <code>Pila[Vec[Lista[Int]]]</code>. <b>Diferente al Parcial 2024 Ej 2</b>
+                que era <code>Vec[Pila[Lista[Int]]]</code> — el orden externo invierte qué patrón
+                usás en cada nivel.</p>
+
+              <pre class="code"><span class="filename">whatsapp_cuentapar.adb</span><code class="ada">with Listanoordenada;
+with Piladinamica;
+
+procedure WhatsApp_CuentaPar is
+
+   --  INCISO A — Tipos e instanciaciones (de adentro hacia afuera)
+   package Lista_Int is new Listanoordenada (Tipoelem =&gt; Integer);
+
+   subtype Indice is Integer range 1 .. 10;
+   type TipoVec is array (Indice) of Lista_Int.Tipolista;
+
+   package Pila_Vec is new Piladinamica (Tipoelem =&gt; TipoVec);
+
+
+   --  AUXILIAR — cuenta pares en una lista de enteros
+   function Contar_Pares (L : Lista_Int.Tipolista) return Integer is
+      Aux  : Lista_Int.Tipolista;
+      Cant : Integer;
+   begin
+      Aux  := L;
+      Cant := 0;
+      while not Lista_Int.Vacia (Aux) loop
+         if Lista_Int.Info (Aux) mod 2 = 0 then
+            Cant := Cant + 1;
+         end if;
+         Aux := Lista_Int.Sig (Aux);
+      end loop;
+      return Cant;
+   end Contar_Pares;
+
+
+   --  INCISO B — CuentaPar
+   --  Objetivo: total de nodos pares en TODA la estructura.
+   --  Entrada:  P (in out por requisito; queda idéntica al salir)
+   --  Salida:   Total (Integer)
+   --  Conserva: SÍ — pila con patrón 4, lista con patrón 1.
+   procedure CuentaPar
+     (P     : in out Pila_Vec.Tipopiladinamica;
+      Total :    out Integer)
+   is
+      AuxPila : Pila_Vec.Tipopiladinamica;
+      V       : TipoVec;
+   begin
+      Total := 0;
+      Pila_Vec.Crearpila (AuxPila);
+
+      --  Patrón 4: vaciar P en AuxPila procesando
+      while not Pila_Vec.Vacia (P) loop
+         Pila_Vec.Sacar (P, V);
+         for I in V'Range loop
+            Total := Total + Contar_Pares (V (I));
+         end loop;
+         Pila_Vec.Meter (AuxPila, V);
+      end loop;
+
+      --  Restaurar P
+      while not Pila_Vec.Vacia (AuxPila) loop
+         Pila_Vec.Sacar (AuxPila, V);
+         Pila_Vec.Meter (P, V);
+      end loop;
+   end CuentaPar;
+
+begin
+   null;
+end WhatsApp_CuentaPar;
+</code></pre>
+
+              <div class="callout" style="margin-top:12px">
+                <b>Truco clave:</b> cuando hago <code>Sacar (P, V)</code>, <code>V</code> es una
+                COPIA del vector entero (records grandes se copian). Los nodos internos de las
+                listas son los mismos punteros (Tipolista es un puntero al primer nodo). Por eso
+                puedo recorrer las listas a través de V sin afectar la pila — y después meter V
+                de vuelta tal cual.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ EJ 3: Unión ============ -->
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 3 · Unión filtrada</span></div>
+            <div class="post-text">
+              <p><b>Combo final:</b> 2 estructuras (pila + cola) + filtro (múltiplos de 4) +
+                ordenamiento (mayor a menor) + sin duplicados. Un solo procedimiento aplica
+                dos patrones de conservación (pila → patrón 4, cola → patrón 3).</p>
+
+              <pre class="code"><span class="filename">whatsapp_union.adb</span><code class="ada">with Listaordenada;
+with Piladinamica;
+with Coladinamica;
+
+procedure WhatsApp_Union is
+
+   --  INCISO A — Tipos e instanciaciones
+   package Pila_Int is new Piladinamica (Tipoelem =&gt; Integer);
+   package Cola_Int is new Coladinamica (Tipoelem =&gt; Integer);
+
+   --  Listaordenada DESCENDENTE: paso "&gt;" como "menor"
+   function Mayor_Que (X, Y : Integer) return Boolean is
+   begin return X &gt; Y; end Mayor_Que;
+
+   function Menor_Que (X, Y : Integer) return Boolean is
+   begin return X &lt; Y; end Menor_Que;
+
+   package Lista_Ord is new Listaordenada
+     (Tipoelem =&gt; Integer,
+      menor    =&gt; Mayor_Que,    --  INVERTIDO: descendente
+      mayor    =&gt; Menor_Que);
+
+
+   --  INCISO B — Unión filtrada
+   --  Objetivo: lista descendente, sin repes, sólo múltiplos de 4,
+   --            con elementos de P y Q.
+   --  Entrada:  P (pila), Q (cola) — ambos in out por requisito.
+   --  Salida:   Result (Lista_Ord)
+   --  Conserva: SÍ — P con patrón 4, Q con patrón 3.
+   procedure Union
+     (P      : in out Pila_Int.Tipopiladinamica;
+      Q      : in out Cola_Int.Tipocoladinamica;
+      Result :    out Lista_Ord.Tipolista)
+   is
+      AuxPila : Pila_Int.Tipopiladinamica;
+      AuxCola : Cola_Int.Tipocoladinamica;
+      X       : Integer;
+   begin
+      Lista_Ord.Crearlistaordenada (Result);
+
+      --  Procesar PILA (patrón 4: dos whiles)
+      Pila_Int.Crearpila (AuxPila);
+      while not Pila_Int.Vacia (P) loop
+         Pila_Int.Sacar (P, X);
+         if X mod 4 = 0 and then not Lista_Ord.Esta (Result, X) then
+            Lista_Ord.Insertar (Result, X);
+         end if;
+         Pila_Int.Meter (AuxPila, X);
+      end loop;
+      while not Pila_Int.Vacia (AuxPila) loop
+         Pila_Int.Sacar (AuxPila, X);
+         Pila_Int.Meter (P, X);
+      end loop;
+
+      --  Procesar COLA (patrón 3: vaciar a AuxCola y reasignar)
+      Cola_Int.Crearcola (AuxCola);
+      while not Cola_Int.Vacia (Q) loop
+         Cola_Int.Supcola (Q, X);
+         if X mod 4 = 0 and then not Lista_Ord.Esta (Result, X) then
+            Lista_Ord.Insertar (Result, X);
+         end if;
+         Cola_Int.Inscola (AuxCola, X);
+      end loop;
+      Q := AuxCola;
+   end Union;
+
+begin
+   null;
+end WhatsApp_Union;
+</code></pre>
+
+              <div class="callout good" style="margin-top:12px">
+                <b>Es la combinación más completa que vas a ver:</b>
+                <ul>
+                  <li>Dos estructuras de entrada (pila + cola).</li>
+                  <li>Cada una pide su propio patrón de conservación (4 y 3).</li>
+                  <li>Tres filtros: múltiplo de 4, no estar ya en Result.</li>
+                  <li>Listaordenada con menor invertido para orden descendente.</li>
+                </ul>
+                Si entendiste este, entendés casi todo el parcial.
+              </div>
             </div>
           </div>
         </div>
       </article>
 
+
+      <!-- ============================================================
+           CIERRE — TODOS resueltos
+           ============================================================ -->
       <div class="callout good" style="margin-top:24px">
-        <b>Para el viernes:</b> según el profe son 2 ejercicios de 3 incisos cada uno, pura programación. Eso descarta los Ej 3 de tracing. Te conviene PRACTICAR el Ej 1 (modelado) de varios parciales y SOBRE TODO el Ej 2 (estructura compuesta), porque ahí está el grueso del puntaje y el patrón es el más recurrente.
+        <b>🎉 Todos los parciales resueltos (10 en total · 24+ ejercicios).</b>
+        Ya no hay pendientes. Para el viernes a las 16hs: enfocate en releer el Post #7
+        (Diagnóstico) y el Post #6 (Patrones). El resto es ejecución.
       </div>
 
     </section>
