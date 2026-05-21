@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog del TP Integrador — Gesti&oacute;n de Cl&iacute;nica en Ada</title>
+<style>
+  :root {
+    --bg: #1e1e2e;
+    --surface: #282840;
+    --text: #cdd6f4;
+    --heading: #89b4fa;
+    --accent: #f5c2e7;
+    --code-bg: #1a1a2e;
+    --border: #45475a;
+    --link: #89dceb;
+    --table-head: #313244;
+    --success: #a6e3a1;
+    --warn: #fab387;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  h1 {
+    color: var(--accent);
+    font-size: 2rem;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    color: #a6adc8;
+    font-style: italic;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+  h2 {
+    color: var(--heading);
+    font-size: 1.5rem;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--heading);
+    padding-left: 0.75rem;
+  }
+  h3 {
+    color: var(--success);
+    font-size: 1.15rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p { margin-bottom: 1rem; }
+
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav#toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  nav#toc h2 { margin-top: 0; border: none; padding: 0; font-size: 1.2rem; }
+  nav#toc ol { padding-left: 1.5rem; }
+  nav#toc li { margin: 0.3rem 0; }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    color: #f9e2af;
+  }
+  pre code { color: var(--text); }
+  .kw { color: #cba6f7; font-weight: bold; }
+  .cm { color: #6c7086; font-style: italic; }
+  .str { color: #a6e3a1; }
+  .fn { color: #89dceb; }
+
+  blockquote {
+    border-left: 4px solid var(--warn);
+    background: rgba(250, 179, 135, 0.08);
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  th {
+    background: var(--table-head);
+    color: var(--heading);
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+  }
+  td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+  }
+  tr:nth-child(even) td { background: rgba(49, 50, 68, 0.4); }
+
+  .diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    white-space: pre;
+  }
+
+  strong { color: var(--accent); }
+  em { color: #b4befe; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  .back-top {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #6c7086;
+  }
+
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { margin: 0.25rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Blog del TP Integrador &mdash; Gesti&oacute;n de Cl&iacute;nica en Ada</h1>
+<p class="subtitle">
+  Bit&aacute;cora paso-a-paso de la l&oacute;gica usada para resolver el integrador.<br>
+  Pensado como material de estudio: explica POR QU&Eacute; est&aacute; cada cosa donde est&aacute;, no solo QU&Eacute; hace.
+</p>
+
+<!-- ═══════════ INDICE ═══════════ -->
+<nav id="toc">
+<h2>&Iacute;ndice</h2>
+<ol>
+  <li><a href="#sec1">Mapa del proyecto</a></li>
+  <li><a href="#sec2">C&oacute;mo compilar y correr</a></li>
+  <li><a href="#sec3">El package gen&eacute;rico <code>Lista_Ordenada</code></a></li>
+  <li><a href="#sec4">TAD Paciente</a></li>
+  <li><a href="#sec5">TAD Turno</a></li>
+  <li><a href="#sec6">TAD M&eacute;dico (con agenda)</a></li>
+  <li><a href="#sec7">TAD Cl&iacute;nica (orquestador)</a></li>
+  <li><a href="#sec8">Interfaz por consola y <code>main</code></a></li>
+  <li><a href="#sec9">Persistencia en archivo de texto</a></li>
+  <li><a href="#sec10">Errores t&iacute;picos y c&oacute;mo se manejan</a></li>
+  <li><a href="#sec11">Decisiones de dise&ntilde;o que valen la pena</a></li>
+  <li><a href="#sec12">Pr&oacute;ximos pasos / Cl&iacute;nica 2</a></li>
+  <li><a href="#glosario">Ap&eacute;ndice: glosario de Ada</a></li>
+</ol>
+</nav>
+
+<!-- ═══════════ 1 ═══════════ -->
+<h2 id="sec1">1. Mapa del proyecto</h2>
+
+<div class="diagram">TP INTEGRADOR PARA GU&Iacute;A/
+&#9500;&#9472;&#9472; BLOG.html               &larr; este archivo
+&#9500;&#9472;&#9472; COMO_COMPILAR.txt       &larr; instrucciones cortas
+&#9500;&#9472;&#9472; data/
+&#9474;   &#9492;&#9472;&#9472; clinica.txt         &larr; persistencia (se crea al &quot;Guardar y salir&quot;)
+&#9500;&#9472;&#9472; ejemplo_tf_extraido/    &larr; ejemplo dado por la c&aacute;tedra (no se modifica)
+&#9492;&#9472;&#9472; src/
+    &#9500;&#9472;&#9472; lista_ordenada.ads / .adb
+    &#9500;&#9472;&#9472; paciente.ads        / .adb
+    &#9500;&#9472;&#9472; turno.ads           / .adb
+    &#9500;&#9472;&#9472; medico.ads          / .adb
+    &#9500;&#9472;&#9472; clinica.ads         / .adb
+    &#9500;&#9472;&#9472; interfaz.ads        / .adb
+    &#9492;&#9472;&#9472; gestion_clinica.adb  &larr; procedimiento principal</div>
+
+<p>Capas:</p>
+
+<div class="diagram">                       &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+gestion_clinica.adb &rarr;  &#9474;  procedimiento main     &#9474;
+                       &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                                    &#9474; usa
+                       &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+   interfaz.ads/adb &larr;  &#9474;   capa de I/O por men&uacute;  &#9474;
+                       &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                                    &#9474; delega
+                       &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+   clinica.ads/adb  &larr;  &#9474;   TAD orquestador       &#9474;
+                       &#9492;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9496;
+                           &#9474;       &#9474;         &#9474;
+                           &#9660;       &#9660;         &#9660;
+                     paciente   medico    turno
+                                    &#9474;         &#9650;
+                                    &#9492;&#9472; usa &#9472;&#9472;&#9472;&#9496;
+                                    &#9474;
+                                    &#9660;
+                       &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+                       &#9474; lista_ordenada (gen&eacute;rico)&#9474;
+                       &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</div>
+
+<p>Regla de oro: <strong>una dependencia siempre apunta hacia abajo en este diagrama</strong>.
+Eso evita imports circulares y mantiene las responsabilidades separadas.</p>
+
+<hr>
+
+<!-- ═══════════ 2 ═══════════ -->
+<h2 id="sec2">2. C&oacute;mo compilar y correr</h2>
+
+<p>Necesit&aacute;s tener instalado GNAT (cualquier versi&oacute;n &ge; 3.15). En el shell:</p>
+
+<pre><code>cd "TP INTEGRADOR PARA GU&Iacute;A/src"
+gnatmake gestion_clinica.adb
+./gestion_clinica.exe</code></pre>
+
+<p><code>gnatmake</code> se encarga de:</p>
+<ol>
+  <li>Determinar qu&eacute; <code>.adb</code>/<code>.ads</code> est&aacute;n relacionados.</li>
+  <li>Compilarlos en el orden correcto.</li>
+  <li>Linkear todo en un ejecutable <code>gestion_clinica.exe</code>.</li>
+</ol>
+
+<p>Para limpiar:</p>
+<pre><code>rm -f *.ali *.o gestion_clinica.exe</code></pre>
+
+<blockquote>
+Si tu GNAT es Ada 2012+ (todo desde GNAT 4.x), tambi&eacute;n funciona sin
+cambiar nada &mdash; solo no usamos features de Ada 2005/2012 para mantener
+compatibilidad amplia.
+</blockquote>
+
+<hr>
+
+<!-- ═══════════ 3 ═══════════ -->
+<h2 id="sec3">3. El package gen&eacute;rico <code>Lista_Ordenada</code></h2>
+
+<h3>3.1 &iquest;Por qu&eacute; gen&eacute;rico?</h3>
+
+<p>En todo el integrador necesitamos guardar listas ordenadas: m&eacute;dicos
+(ordenados por apellido), pacientes (ordenados por apellido), turnos de un
+m&eacute;dico (ordenados cronol&oacute;gicamente). En vez de copiar y pegar la
+implementaci&oacute;n tres veces, escribimos UNA y la <strong>instanciamos</strong> para cada tipo.</p>
+
+<p>Eso es lo que hace <code>generic</code>:</p>
+
+<pre><code><span class="kw">generic</span>
+   <span class="kw">type</span> Tipoelem <span class="kw">is private</span>;
+   <span class="kw">with function</span> <span class="fn">Menor</span> (X, Y: Tipoelem) <span class="kw">return</span> Boolean;
+   <span class="kw">with function</span> <span class="fn">Mayor</span> (X, Y: Tipoelem) <span class="kw">return</span> Boolean;
+   <span class="kw">with function</span> <span class="fn">Igual</span> (X, Y: Tipoelem) <span class="kw">return</span> Boolean;
+<span class="kw">package</span> Lista_Ordenada <span class="kw">is</span>
+   <span class="kw">type</span> Tipolista <span class="kw">is private</span>;
+   ...
+<span class="kw">end</span> Lista_Ordenada;</code></pre>
+
+<p><code>Tipoelem</code> es un par&aacute;metro de tipo: cuando instanciamos, decimos &ldquo;este
+par&aacute;metro va a ser <code>Tipopaciente</code>&rdquo; (o <code>Tipomedico</code>, o <code>Tipoturno</code>). Las tres
+funciones <code>Menor / Mayor / Igual</code> tambi&eacute;n son par&aacute;metros: el cliente nos
+provee la l&oacute;gica concreta de comparaci&oacute;n porque la lista no sabe nada
+sobre el dominio.</p>
+
+<h3>3.2 &iquest;Por qu&eacute; TRES comparadores?</h3>
+
+<p>Lo m&aacute;s com&uacute;n son dos: <code>Menor</code> y <code>Mayor</code> (con eso orden&aacute;s). Ac&aacute; usamos un
+tercero, <code>Igual</code>, por una raz&oacute;n sutil: queremos que dos elementos sean &ldquo;el
+mismo&rdquo; cuando coincide su <strong>clave primaria</strong>, aunque el resto difiera.</p>
+
+<p>Ejemplo: dos pacientes con el mismo DNI son la misma persona, aunque uno
+tenga &ldquo;OSDE&rdquo; y otro &ldquo;Swiss Medical&rdquo; (porque cambi&oacute; de obra social). Si
+confi&aacute;ramos en la igualdad estructural autom&aacute;tica de records, NO los
+ver&iacute;amos como iguales y tendr&iacute;amos duplicados en la lista.</p>
+
+<pre><code><span class="kw">function</span> <span class="fn">Igual</span> (X, Y : Tipopaciente) <span class="kw">return</span> Boolean <span class="kw">is</span>
+<span class="kw">begin</span>
+   <span class="kw">return</span> X.Dni = Y.Dni;   <span class="cm">-- solo el DNI define identidad</span>
+<span class="kw">end</span> Igual;</code></pre>
+
+<h3>3.3 Tipo <code>private</code> y access types</h3>
+
+<pre><code><span class="kw">type</span> Tipolista <span class="kw">is private</span>;
+<span class="kw">private</span>
+   <span class="kw">type</span> Tiponodo;
+   <span class="kw">type</span> Tipolista <span class="kw">is access</span> Tiponodo;
+   <span class="kw">type</span> Tiponodo <span class="kw">is record</span>
+      Info : Tipoelem;
+      Sig  : Tipolista;
+   <span class="kw">end record</span>;</code></pre>
+
+<ul>
+  <li><strong><code>type Tipolista is private</code></strong>: el cliente no ve la estructura interna.
+  Solo puede usar las operaciones p&uacute;blicas (Insertar, Suprimir, Esta, ...).</li>
+  <li><strong><code>type Tiponodo;</code></strong> (sin definici&oacute;n): es una declaraci&oacute;n INCOMPLETA.
+  Necesaria porque <code>Tipolista</code> es puntero a <code>Tiponodo</code> y <code>Tiponodo</code> se
+  autorreferencia por <code>Sig</code>.</li>
+  <li><strong><code>type Tipolista is access Tiponodo</code></strong>: en Ada los punteros se llaman
+  <em>access types</em> y son fuertemente tipados (no pod&eacute;s mezclar punteros a
+  cosas distintas).</li>
+</ul>
+
+<h3>3.4 Instanciaci&oacute;n: <code>Ada.Unchecked_Deallocation</code></h3>
+
+<p>Para liberar memoria reservada con <code>new</code>, instanciamos un gen&eacute;rico de la
+biblioteca est&aacute;ndar:</p>
+
+<pre><code><span class="kw">procedure</span> <span class="fn">Free</span> <span class="kw">is new</span> Ada.Unchecked_Deallocation
+   (Object =&gt; Tiponodo, Name =&gt; Tipolista);</code></pre>
+
+<p>Esto crea un procedimiento <code>Free</code> que toma un <code>Tipolista</code> (puntero) y
+libera el nodo apuntado. Lo usamos en <code>Limpiar</code> y <code>Suprimir</code>.</p>
+
+<h3>3.5 <code>Insertar</code>: paso a paso</h3>
+
+<p>La lista mantiene siempre el invariante &ldquo;ordenada de menor a mayor seg&uacute;n
+<code>Menor</code>&rdquo;. Al insertar:</p>
+
+<ol>
+  <li><strong>Lista vac&iacute;a</strong> &rarr; el nuevo nodo es la cabeza, listo.</li>
+  <li><strong>Elemento menor que la cabeza</strong> &rarr; enlazar al frente.</li>
+  <li><strong>En otro caso</strong>, recorrer con dos punteros (<code>Ant</code>, <code>Ptr</code>) hasta encontrar
+  la posici&oacute;n:
+    <ul>
+      <li>mientras <code>Mayor(Elemento, Ptr.Info)</code>, avanzar.</li>
+      <li>si encontramos un <code>Igual</code> antes, NO insertamos (descartamos el nodo
+      reservado con <code>Free</code>) &rarr; as&iacute; evitamos duplicados.</li>
+    </ul>
+  </li>
+  <li>Enlazar el nuevo nodo entre <code>Ant</code> y <code>Ptr</code>.</li>
+</ol>
+
+<h3>3.6 Iteraci&oacute;n interna: <code>Recorrer</code></h3>
+
+<p>Definimos un gen&eacute;rico ANIDADO:</p>
+
+<pre><code><span class="kw">generic</span>
+   <span class="kw">with procedure</span> <span class="fn">Accion</span> (E: <span class="kw">in</span> Tipoelem);
+<span class="kw">procedure</span> <span class="fn">Recorrer</span> (Lista: <span class="kw">in</span> Tipolista);</code></pre>
+
+<p>Para usarlo, el cliente instancia <code>Recorrer</code> con su procedimiento. Es el
+patr&oacute;n &ldquo;Visitor&rdquo; sin exponer la estructura. (En el integrador igual usamos
+mucho <code>Info</code>/<code>Sig</code> directamente porque a veces necesitamos contar/filtrar y
+es m&aacute;s c&oacute;modo el bucle manual.)</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 4 ═══════════ -->
+<h2 id="sec4">4. TAD Paciente</h2>
+
+<h3>4.1 Datos y representaci&oacute;n</h3>
+
+<pre><code><span class="kw">type</span> Tipopaciente <span class="kw">is record</span>
+   Dni            : Integer;
+   Nombre         : Cadena;     <span class="cm">-- string(1..50)</span>
+   Long_Nombre    : Natural;
+   Apellido       : Cadena;
+   Long_Apellido  : Natural;
+   Obra_Social    : Cadena;
+   Long_OS        : Natural;
+<span class="kw">end record</span>;</code></pre>
+
+<p>Patr&oacute;n <strong>string-de-longitud-fija + contador</strong>:</p>
+<ul>
+  <li><code>Cadena</code> es <code>String (1 .. 50)</code>.</li>
+  <li>Junto guardamos cu&aacute;ntos caracteres del string est&aacute;n &ldquo;vivos&rdquo;.</li>
+  <li>Los getters devuelven el slice <code>(1 .. Long_X)</code>, as&iacute; afuera ven solo lo
+  que escribieron.</li>
+</ul>
+
+<p>&iquest;Por qu&eacute; no usar <code>Unbounded_String</code>? Porque obligar&iacute;a a hacer <code>with
+Ada.Strings.Unbounded</code> en TODO el proyecto, complica la persistencia y es
+ligeramente m&aacute;s lento. Para 50 caracteres de nombre, fijo y simple alcanza.</p>
+
+<h3>4.2 Comparadores</h3>
+
+<table>
+  <tr><th>Funci&oacute;n</th><th>Compara por</th></tr>
+  <tr><td><code>Igual</code></td><td>DNI (clave primaria)</td></tr>
+  <tr><td><code>Menor</code></td><td>Apellido, desempate por nombre</td></tr>
+  <tr><td><code>Mayor</code></td><td>inverso de <code>Menor</code></td></tr>
+</table>
+
+<p>Importante: la propiedad <strong><code>Igual(x,y) &rArr; no Menor(x,y) y no Mayor(x,y)</code></strong>
+se cumple porque dos pacientes con mismo DNI representan la misma persona
+(con mismo apellido y nombre).</p>
+
+<h3>4.3 Constructor de b&uacute;squeda: <code>Por_Dni</code></h3>
+
+<pre><code><span class="kw">function</span> <span class="fn">Por_Dni</span> (Dni : Integer) <span class="kw">return</span> Tipopaciente;</code></pre>
+
+<p>Devuelve un Paciente con SOLO el DNI cargado. &iquest;Para qu&eacute;? Para usarlo como
+&ldquo;clave de b&uacute;squeda&rdquo; en <code>Esta</code>, <code>Buscar</code>, <code>Suprimir</code>. La lista ordenada usa
+<code>Igual</code> para comparar, e <code>Igual</code> solo mira el DNI, as&iacute; que no importa que
+el resto del record est&eacute; vac&iacute;o.</p>
+
+<h3>4.4 Persistencia (<code>Guardar</code> / <code>Cargar</code>)</h3>
+
+<p>Cada paciente se serializa como 4 l&iacute;neas: DNI, nombre, apellido, OS. Es
+texto plano legible (lo pod&eacute;s abrir con un editor y verificar). Para
+volver a leer usamos <code>Get_Line</code> (procedimiento, Ada 95) con un buffer
+y un <code>Last : Natural</code> que dice cu&aacute;ntos caracteres se leyeron.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 5 ═══════════ -->
+<h2 id="sec5">5. TAD Turno</h2>
+
+<h3>5.1 Representaci&oacute;n inteligente de fecha y hora</h3>
+
+<pre><code><span class="kw">subtype</span> Tipoanio <span class="kw">is</span> Integer <span class="kw">range</span> 2024 .. 2100;
+<span class="kw">subtype</span> Tipomes  <span class="kw">is</span> Integer <span class="kw">range</span> 1 .. 12;
+<span class="kw">subtype</span> Tipodia  <span class="kw">is</span> Integer <span class="kw">range</span> 1 .. 31;
+<span class="kw">subtype</span> Tipohora <span class="kw">is</span> Integer <span class="kw">range</span> 0 .. 24*60 - 1;</code></pre>
+
+<p>Tres trucos importantes:</p>
+
+<ol>
+  <li><strong><code>subtype</code> con rango</strong>: el compilador chequea que cualquier asignaci&oacute;n
+  a una variable de ese subtipo est&eacute; en rango. Si hac&eacute;s <code>M : Tipomes := 13</code>,
+  se levanta <code>Constraint_Error</code> autom&aacute;ticamente &mdash; no ten&eacute;s que validarlo a
+  mano.</li>
+  <li><strong>Hora en minutos del d&iacute;a (0..1439)</strong>: en vez de guardar &ldquo;hora&rdquo; y
+  &ldquo;minuto&rdquo; por separado, guardamos un &uacute;nico entero. Comparar dos turnos por
+  hora es comparar dos enteros &mdash; chau l&oacute;gica de campos.</li>
+  <li><strong>Validaci&oacute;n cruzada mes/d&iacute;a</strong>: el subtipo <code>Tipodia</code> permite 1..31 pero
+  febrero no llega a 31. Eso lo chequea <code>Crear</code> con un helper
+  <code>Dias_Del_Mes</code> (que considera a&ntilde;os bisiestos: divisible por 4 pero NO
+  por 100, salvo que sea por 400).</li>
+</ol>
+
+<h3>5.2 Comparaci&oacute;n cronol&oacute;gica</h3>
+
+<p>Definimos <code>Codigo_Cronologico (T) = Anio*10000 + Mes*100 + Dia</code>. Es un
+entero monot&oacute;nico: el d&iacute;a 5/3/2026 da 20260305, el 4/4/2026 da 20260404.
+As&iacute;, comparar fechas es comparar enteros, sin escribir &ldquo;if a&ntilde;o mayor; si
+no, si mes mayor; si no...&rdquo;.</p>
+
+<h3>5.3 <code>Igual</code> por slot temporal</h3>
+
+<pre><code><span class="kw">function</span> <span class="fn">Igual</span> (X, Y : Tipoturno) <span class="kw">return</span> Boolean <span class="kw">is</span>
+<span class="kw">begin</span>
+   <span class="kw">return</span> Codigo_Cronologico (X) = Codigo_Cronologico (Y)
+      <span class="kw">and</span> X.Hora_Minutos = Y.Hora_Minutos;
+<span class="kw">end</span> Igual;</code></pre>
+
+<p>Dos turnos son &ldquo;iguales&rdquo; si caen en la misma fecha+hora, <strong>sin mirar el
+DNI del paciente</strong>. Esto es porque cada slot temporal del m&eacute;dico es &Uacute;NICO:
+no pod&eacute;s tener dos pacientes a las 14:30 del mismo d&iacute;a. As&iacute; <code>Esta</code>/<code>Buscar</code>
+prev&eacute;n autom&aacute;ticamente el doble booking.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 6 ═══════════ -->
+<h2 id="sec6">6. TAD M&eacute;dico (con agenda)</h2>
+
+<h3>6.1 Composici&oacute;n</h3>
+
+<p>Un m&eacute;dico es:</p>
+<ul>
+  <li>Datos personales (nombre, apellido, DNI, especialidad)</li>
+  <li>Capacidad: <code>Max_Turnos_Dia : Positive</code></li>
+  <li>Lista de obras sociales aceptadas (arreglo de tama&ntilde;o fijo)</li>
+  <li><strong>Agenda: una <code>Lista_Ordenada</code> de <code>Tipoturno</code> instanciada DENTRO del
+  m&eacute;dico</strong>.</li>
+</ul>
+
+<p>La instanciaci&oacute;n interna se hace en la zona privada del spec:</p>
+
+<pre><code><span class="kw">private</span>
+   <span class="kw">package</span> Agenda <span class="kw">is new</span> Lista_Ordenada
+      (Tipoelem =&gt; Turno.Tipoturno,
+       Menor    =&gt; Turno.Menor,
+       Mayor    =&gt; Turno.Mayor,
+       Igual    =&gt; Turno.Igual);
+
+   <span class="kw">type</span> Tipomedico <span class="kw">is record</span>
+      ...
+      Turnos_Reservados : Agenda.Tipolista;
+      ...
+   <span class="kw">end record</span>;</code></pre>
+
+<h3>6.2 Por qu&eacute; obras sociales en arreglo y no en lista</h3>
+
+<p>Tres razones:</p>
+<ol>
+  <li>Un m&eacute;dico no acepta m&aacute;s de ~5-10 obras sociales en la pr&aacute;ctica (l&iacute;mite
+  <code>Max_Obras_Sociales = 20</code> por las dudas).</li>
+  <li>Un arreglo no necesita liberar memoria, no tiene problema de aliasing.</li>
+  <li>Una lista enlazada de strings ser&iacute;a otra instanciaci&oacute;n gen&eacute;rica m&aacute;s, sin
+  beneficio.</li>
+</ol>
+
+<h3>6.3 El &ldquo;gotcha&rdquo; del shallow copy</h3>
+
+<blockquote>
+Cuando copi&aacute;s un <code>Tipomedico</code> por valor (asign&aacute;ndolo a una variable o
+devolvi&eacute;ndolo de una funci&oacute;n), el campo <code>Turnos_Reservados</code> se copia
+COMO PUNTERO &mdash; apunta a los mismos nodos. Si modific&aacute;s la agenda en la
+copia y la copia se descarta, los cambios pueden perderse.
+</blockquote>
+
+<p>Por eso, <strong>modificar la agenda del m&eacute;dico requiere un patr&oacute;n espec&iacute;fico</strong>:</p>
+
+<pre><code>M := Buscar_Medico_Por_Dni (Clinica, 12345678);   <span class="cm">-- copia</span>
+Reservar_Turno (M, T);                             <span class="cm">-- modifica copia</span>
+Modificar_Medico (Clinica, M);                     <span class="cm">-- reemplaza original</span></code></pre>
+
+<p><code>Modificar_Medico</code> hace <code>Suprimir</code> + <code>Insertar</code> en la lista de m&eacute;dicos: el
+nodo viejo se libera (el campo de agenda viaja en M, as&iacute; que no se libera
+la lista de turnos), y un nodo nuevo se crea con M actualizado.</p>
+
+<h3>6.4 Disponibilidad por d&iacute;a</h3>
+
+<pre><code>Disponibles_Dia(M, a&ntilde;o, mes, d&iacute;a) = Max_Turnos_Dia - Cantidad_Turnos_Dia(M,...)</code></pre>
+
+<p><code>Cantidad_Turnos_Dia</code> recorre la agenda y cuenta los que matchean fecha.
+Es O(n) en cantidad de turnos del m&eacute;dico &mdash; est&aacute; bien, no esperamos miles.</p>
+
+<h3>6.5 <code>Listar_Turnos_Semana</code>: subprograma anidado</h3>
+
+<p>Para imprimir 7 d&iacute;as seguidos, necesitamos avanzar la fecha respetando
+fines de mes y bisiestos. En vez de exportar un <code>Avanzar_Dia</code> p&uacute;blico,
+metemos sub-funciones anidadas dentro de <code>Listar_Turnos_Semana</code>:</p>
+
+<pre><code><span class="kw">procedure</span> <span class="fn">Listar_Turnos_Semana</span> (...) <span class="kw">is</span>
+   <span class="kw">function</span> <span class="fn">Bisiesto</span> (X) <span class="kw">return</span> Boolean <span class="kw">is</span> ... <span class="kw">end</span>;
+   <span class="kw">function</span> <span class="fn">Dias_Mes</span> (M, A) <span class="kw">return</span> ... <span class="kw">is</span> ... <span class="kw">end</span>;
+   <span class="kw">procedure</span> <span class="fn">Avanzar_Dia</span> <span class="kw">is</span> ... <span class="kw">end</span>;
+<span class="kw">begin</span>
+   <span class="kw">for</span> I <span class="kw">in</span> 1..7 <span class="kw">loop</span>
+      Listar_Turnos_Dia (M, A, Me, D);
+      Avanzar_Dia;
+   <span class="kw">end loop</span>;
+<span class="kw">end</span> Listar_Turnos_Semana;</code></pre>
+
+<p>Subprogramas anidados son una caracter&iacute;stica cl&aacute;sica de Ada/Pascal: ven
+las variables del enclosing scope (<code>A</code>, <code>Me</code>, <code>D</code>) sin necesidad de
+par&aacute;metros. Mantienen el c&oacute;digo local sin polucionar el package con
+helpers que solo usa una operaci&oacute;n.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 7 ═══════════ -->
+<h2 id="sec7">7. TAD Cl&iacute;nica (orquestador)</h2>
+
+<h3>7.1 Composici&oacute;n</h3>
+
+<pre><code><span class="kw">type</span> Tipoclinica <span class="kw">is record</span>
+   Nombre      : String (1 .. 80);
+   Long_Nombre : Natural;
+   Medicos     : Lista_Medicos.Tipolista;     <span class="cm">-- instancia gen&eacute;rico</span>
+   Pacientes   : Lista_Pacientes.Tipolista;   <span class="cm">-- instancia gen&eacute;rico</span>
+<span class="kw">end record</span>;</code></pre>
+
+<p>Dos instanciaciones distintas del mismo <code>Lista_Ordenada</code>, una por tipo.
+Cada lista usa los <code>Menor / Mayor / Igual</code> propios de su tipo.</p>
+
+<h3>7.2 &iquest;Por qu&eacute; la mayor&iacute;a de operaciones de turno est&aacute;n aqu&iacute;?</h3>
+
+<p>El enunciado dice &ldquo;TAD Paciente: solicitar turno con un m&eacute;dico&rdquo;. Eso
+necesita acceso a AMBAS listas (paciente y m&eacute;dico), as&iacute; que vive en
+<code>Cl&iacute;nica</code>. Esa es la decisi&oacute;n arquitect&oacute;nica m&aacute;s t&iacute;pica: las operaciones
+que cruzan TADs viven en el TAD que los contiene.</p>
+
+<h3>7.3 <code>Sacar_Turno</code></h3>
+
+<pre><code><span class="kw">procedure</span> <span class="fn">Sacar_Turno</span> (C, Dni_Medico, Dni_Paciente, T) <span class="kw">is</span>
+<span class="kw">begin</span>
+   1. validar que el paciente existe   &rarr; Paciente_Inexistente
+   2. obtener copia del m&eacute;dico         &rarr; Medico_Inexistente
+   3. Reservar_Turno (M, T) en la copia &rarr; Sin_Disponibilidad
+   4. Modificar_Medico (C, M)           <span class="cm">-- reemplaza</span>
+<span class="kw">end</span>;</code></pre>
+
+<p>Cada paso traduce excepciones del nivel inferior a las del nivel Cl&iacute;nica
+(ver bloque <code>exception</code> interno).</p>
+
+<h3>7.4 Filtros y b&uacute;squedas</h3>
+
+<p>Las operaciones tipo &ldquo;Listar m&eacute;dicos por especialidad&rdquo; recorren la lista
+completa con <code>Esta</code> + <code>Sig</code> + <code>Info</code>. Es O(n), pero la lista est&aacute; ordenada
+por apellido, no por especialidad. Una alternativa ser&iacute;a un <strong>&iacute;ndice
+secundario por especialidad</strong>, pero eso complica el modelo y el integrador
+no lo pide.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 8 ═══════════ -->
+<h2 id="sec8">8. Interfaz por consola y <code>main</code></h2>
+
+<h3>8.1 Capas</h3>
+
+<p><code>gestion_clinica.adb</code> (main) &rarr; <code>interfaz</code> (UI) &rarr; <code>clinica</code> (l&oacute;gica) &rarr; <code>medico/paciente/turno</code> &rarr; <code>lista_ordenada</code>.</p>
+
+<p><code>interfaz.adb</code> solo:</p>
+<ul>
+  <li>pide datos al usuario,</li>
+  <li>llama al TAD que hace falta,</li>
+  <li>atrapa las excepciones del TAD y muestra un mensaje legible.</li>
+</ul>
+
+<h3>8.2 Por qu&eacute; letras en lugar de n&uacute;meros</h3>
+
+<p>Al principio el men&uacute; era &ldquo;1..16&rdquo;. Pero <code>Get_Line</code> devuelve un string y
+nuestra funci&oacute;n <code>Leer_Opcion</code> toma solo el primer car&aacute;cter, as&iacute; que &lsquo;1&rsquo; y
+&lsquo;10&rsquo; se confunden. Soluci&oacute;n: opciones con letras (a..q), una por
+operaci&oacute;n. Es un cambio de UX chico que evita un parser entero.</p>
+
+<h3>8.3 Manejo de excepciones en la UI</h3>
+
+<p>Cada <code>Menu_X</code> hace <code>begin ... call ... exception when ... =&gt; Put_Line; end</code>.
+Esto es <strong>exception translation pragm&aacute;tica</strong>: la l&oacute;gica de negocio
+levanta excepciones tipadas (<code>Medico_Inexistente</code>, <code>Sin_Disponibilidad</code>,
+...), y la UI las traduce a mensajes en espa&ntilde;ol que el usuario entiende.</p>
+
+<p>Si no atrap&aacute;ramos las excepciones ac&aacute;, el programa morir&iacute;a con un trace
+de Ada en mitad del men&uacute;.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 9 ═══════════ -->
+<h2 id="sec9">9. Persistencia en archivo de texto</h2>
+
+<h3>9.1 Formato</h3>
+
+<p><code>data/clinica.txt</code>:</p>
+
+<pre><code>&lt;NOMBRE_CLINICA&gt;
+&lt;CANT_MEDICOS&gt;
+   ... bloques de m&eacute;dico ...
+&lt;CANT_PACIENTES&gt;
+   ... bloques de paciente ...</code></pre>
+
+<p>Un bloque de m&eacute;dico:</p>
+
+<pre><code>&lt;DNI&gt;
+&lt;NOMBRE&gt;
+&lt;APELLIDO&gt;
+&lt;ESPECIALIDAD&gt;
+&lt;MAX_TURNOS&gt;
+&lt;CANT_OS&gt;
+&lt;OS_1&gt;
+&lt;OS_2&gt;
+...
+&lt;CANT_TURNOS&gt;
+&lt;turno_1&gt;   &larr; una l&iacute;nea: a&ntilde;o tab mes tab d&iacute;a tab hora tab dni
+&lt;turno_2&gt;
+...</code></pre>
+
+<h3>9.2 Por qu&eacute; texto y no binario</h3>
+
+<ul>
+  <li><strong>Reproducibilidad / debugging</strong>: lo abr&iacute;s con un editor y verific&aacute;s
+  qu&eacute; pas&oacute;.</li>
+  <li><strong>Independiente de la plataforma</strong>: no hay que preocuparse por
+  endianness, padding de records, etc.</li>
+  <li><strong>Simple</strong>: con <code>Put_Line</code> y <code>Get_Line</code> alcanza.</li>
+</ul>
+
+<p>Costo: archivo m&aacute;s grande y un poco m&aacute;s lento, pero para un integrador
+con decenas de m&eacute;dicos/pacientes, irrelevante.</p>
+
+<h3>9.3 Cargar inteligente</h3>
+
+<p>Si el archivo no existe, <code>Cargar_De_Archivo</code> atrapa <code>Name_Error</code> y deja la
+cl&iacute;nica como estaba (vac&iacute;a). As&iacute; el primer arranque del programa funciona
+sin tener que crear el archivo a mano.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 10 ═══════════ -->
+<h2 id="sec10">10. Errores t&iacute;picos y c&oacute;mo se manejan</h2>
+
+<table>
+  <tr>
+    <th>Excepci&oacute;n</th>
+    <th>&iquest;D&oacute;nde se levanta?</th>
+    <th>&iquest;C&oacute;mo la ve el usuario?</th>
+  </tr>
+  <tr>
+    <td><code>DNI_Invalido</code></td>
+    <td>Crear paciente/m&eacute;dico con DNI&le;0</td>
+    <td>&ldquo;[ERROR] DNI fuera de rango.&rdquo;</td>
+  </tr>
+  <tr>
+    <td><code>Cadena_Demasiado_Larga</code></td>
+    <td>Nombre &gt;50 chars</td>
+    <td>&ldquo;[ERROR] Alguna cadena supera los 50.&rdquo;</td>
+  </tr>
+  <tr>
+    <td><code>Medico_Repetido</code></td>
+    <td>Alta con DNI ya existente</td>
+    <td>&ldquo;[ERROR] Ya existe un m&eacute;dico...&rdquo;</td>
+  </tr>
+  <tr>
+    <td><code>Medico_Inexistente</code></td>
+    <td>Baja/b&uacute;squeda con DNI inexistente</td>
+    <td>&ldquo;[ERROR] No existe m&eacute;dico...&rdquo;</td>
+  </tr>
+  <tr>
+    <td><code>Sin_Disponibilidad</code></td>
+    <td>Sacar turno cuando no hay</td>
+    <td>&ldquo;[ERROR] No hay disponibilidad...&rdquo;</td>
+  </tr>
+  <tr>
+    <td><code>Turno_Inexistente</code></td>
+    <td>Cancelar turno que no existe</td>
+    <td>&ldquo;[ERROR] No existe ese turno...&rdquo;</td>
+  </tr>
+  <tr>
+    <td><code>Constraint_Error</code></td>
+    <td>Subtypes fuera de rango (mes 13)</td>
+    <td>&ldquo;[ERROR] Fecha u hora inv&aacute;lida.&rdquo;</td>
+  </tr>
+  <tr>
+    <td><code>Maximo_Obras_Sociales</code></td>
+    <td>Agregar OS &gt;20</td>
+    <td>&ldquo;[ERROR] El m&eacute;dico ya alcanz&oacute; el m&aacute;x.&rdquo;</td>
+  </tr>
+</table>
+
+<p>La regla did&aacute;ctica: <strong>levantar excepciones donde se descubre el error</strong>,
+<strong>atraparlas y traducirlas en la UI</strong>.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 11 ═══════════ -->
+<h2 id="sec11">11. Decisiones de dise&ntilde;o que valen la pena</h2>
+
+<h3>11.1 Tipos privados en TODO TAD</h3>
+
+<p>Cada <code>Tipopaciente</code>, <code>Tipomedico</code>, etc. es <code>private</code>. El cliente solo ve
+las operaciones, no la estructura. Si ma&ntilde;ana cambiamos de &ldquo;string fijo
+con longitud&rdquo; a &ldquo;Unbounded_String&rdquo;, <strong>nada afuera del .adb se entera</strong>.</p>
+
+<h3>11.2 <code>Por_Dni</code> como constructor de b&uacute;squeda</h3>
+
+<p>Patr&oacute;n muy &uacute;til: una funci&oacute;n que devuelve un valor del tipo con SOLO la
+clave cargada. Permite usar las APIs <code>Esta(lista, clave)</code> /
+<code>Suprimir(lista, clave)</code> sin necesitar el record completo.</p>
+
+<h3>11.3 Una sola lista ordenada gen&eacute;rica para todo</h3>
+
+<p>En vez de tres implementaciones de &ldquo;lista de X&rdquo;, una sola gen&eacute;rica
+instanciada tres veces. Menos c&oacute;digo, una &uacute;nica fuente de verdad para
+bugs como &ldquo;Suprimir ajusta los punteros bien&rdquo;.</p>
+
+<h3>11.4 Excepciones por capa</h3>
+
+<p>Cada package define SUS propias excepciones (<code>Medico.Sin_Disponibilidad</code>,
+<code>Clinica.Sin_Disponibilidad</code>, etc.). El TAD superior atrapa las del
+inferior y las re-lanza con su propia tipificaci&oacute;n. Es m&aacute;s prolijo que
+exponer &ldquo;primitivas&rdquo; como <code>Listavacia</code> desde toda la pila.</p>
+
+<h3>11.5 Comentarios densos en espa&ntilde;ol</h3>
+
+<p>Toda la base est&aacute; comentada al estilo &ldquo;explicaci&oacute;n did&aacute;ctica&rdquo;. El usuario
+est&aacute; atrasado en la cursada, y el TP tiene que servir como material de
+estudio, no solo entrega.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ 12 ═══════════ -->
+<h2 id="sec12">12. Pr&oacute;ximos pasos / Cl&iacute;nica 2</h2>
+
+<p>El enunciado de <strong>Cl&iacute;nica 2</strong> pide algunas cosas extra:</p>
+
+<ol>
+  <li><strong>&ldquo;Obtener informe de asistencia m&eacute;dica&rdquo;</strong> (turnos atendidos por
+  especialidad, ordenado por m&eacute;dico). Implica distinguir entre &ldquo;turno
+  reservado&rdquo; y &ldquo;turno atendido&rdquo;. Una opci&oacute;n: agregar un campo <code>Estado</code>
+  al <code>Tipoturno</code> (Reservado/Atendido/Cancelado).</li>
+  <li><strong>&ldquo;Reasignar turnos&rdquo;</strong> cuando un m&eacute;dico no puede atender. Operaci&oacute;n en
+  Cl&iacute;nica que mueve la agenda de un m&eacute;dico a otro de la misma especialidad.</li>
+  <li><strong>&ldquo;Consultar historial de turnos del paciente&rdquo;</strong>. Hoy buscamos turnos
+  por m&eacute;dico; necesitar&iacute;amos un &iacute;ndice secundario por DNI de paciente,
+  o recorrer todos los m&eacute;dicos buscando turnos de ese paciente (m&aacute;s
+  simple, suficiente).</li>
+</ol>
+
+<p>Cuando llegue Cl&iacute;nica 2 se puede:</p>
+<ul>
+  <li>Agregar <code>Estado : (Reservado, Atendido, Cancelado)</code> en <code>Tipoturno</code>.</li>
+  <li>Agregar <code>Marcar_Atendido (M, T)</code> en <code>Medico</code>.</li>
+  <li>Agregar <code>Informe_Asistencia (C)</code> en <code>Clinica</code>, ordenado por m&eacute;dico.</li>
+  <li>Agregar <code>Reasignar (C, dni_origen, dni_destino, T)</code> en <code>Clinica</code>.</li>
+  <li>Agregar <code>Historial_Paciente (C, dni)</code> que recorre m&eacute;dicos.</li>
+</ul>
+
+<p>La arquitectura actual aguanta estos cambios sin reescribir nada.</p>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+<hr>
+
+<!-- ═══════════ GLOSARIO ═══════════ -->
+<h2 id="glosario">Ap&eacute;ndice: glosario de Ada</h2>
+
+<table>
+  <tr><th>Concepto</th><th>Qu&eacute; es / cu&aacute;ndo aparece</th></tr>
+  <tr><td><code>package X is</code></td><td>Declara la INTERFACE p&uacute;blica de un m&oacute;dulo (.ads).</td></tr>
+  <tr><td><code>package body X is</code></td><td>Implementaci&oacute;n (.adb).</td></tr>
+  <tr><td><code>is private</code></td><td>El tipo se declara opaco; su detalle vive abajo de <code>private</code>.</td></tr>
+  <tr><td><code>generic</code></td><td>Plantilla de package o subprograma. Hay que instanciar para usar.</td></tr>
+  <tr><td><code>package Y is new X(...)</code></td><td>Instanciaci&oacute;n de un gen&eacute;rico.</td></tr>
+  <tr><td><code>with X;</code></td><td>Importa el package X en este archivo.</td></tr>
+  <tr><td><code>use X;</code></td><td>Permite escribir <code>Foo</code> en vez de <code>X.Foo</code>. Cuidado con colisiones.</td></tr>
+  <tr><td><code>access T</code></td><td>Puntero a T.</td></tr>
+  <tr><td><code>new T'(...)</code></td><td>Reserva memoria en heap y devuelve puntero.</td></tr>
+  <tr><td><code>Ada.Unchecked_Deallocation</code></td><td>Gen&eacute;rico stdlib para liberar memoria reservada con <code>new</code>.</td></tr>
+  <tr><td><code>subtype</code></td><td>Alias con restricci&oacute;n (rango, accuracy, ...).</td></tr>
+  <tr><td><code>'First</code>, <code>'Last</code>, <code>'Range</code></td><td>Atributos autom&aacute;ticos de tipos discretos/arreglos.</td></tr>
+  <tr><td><code>raise X;</code></td><td>Lanza la excepci&oacute;n X.</td></tr>
+  <tr><td><code>exception when X =&gt; ...</code></td><td>Atrapa la excepci&oacute;n X.</td></tr>
+  <tr><td><code>in / out / in out</code></td><td>Modos de paso de par&aacute;metros.</td></tr>
+  <tr><td><code>Constraint_Error</code></td><td>Excepci&oacute;n predefinida: subtype/index fuera de rango.</td></tr>
+</table>
+
+<a class="back-top" href="#toc">&uarr; Volver al &iacute;ndice</a>
+
+</div>
+</body>
+</html>

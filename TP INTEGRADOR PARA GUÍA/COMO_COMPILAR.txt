@@ -1,0 +1,75 @@
+═══════════════════════════════════════════════════════════════════════
+  TP INTEGRADOR — Gestión de Clínica
+  Cómo compilar y correr
+═══════════════════════════════════════════════════════════════════════
+
+REQUISITO: tener GNAT instalado (cualquier versión ≥ 3.15p).
+           En esta máquina ya está en C:\GNAT\bin.
+
+─── Compilar ──────────────────────────────────────────────────────────
+
+Desde Git Bash o cmd, parado en la carpeta del proyecto:
+
+    cd "src"
+    gnatmake gestion_clinica.adb
+
+Si todo va bien, no se imprime ningún error y queda el ejecutable
+"gestion_clinica.exe" dentro de src/.
+
+─── Correr ────────────────────────────────────────────────────────────
+
+    cd src
+    ./gestion_clinica.exe
+
+(En cmd: gestion_clinica.exe)
+
+El programa intenta cargar el estado de la clínica desde
+"data/clinica.txt". Si no existe (primer arranque), arranca vacío.
+Cuando salgas con "g", graba el estado ahí.
+
+─── Limpiar artefactos ────────────────────────────────────────────────
+
+    rm -f src/*.ali src/*.o src/gestion_clinica.exe
+
+(En cmd: del /Q src\*.ali src\*.o src\gestion_clinica.exe)
+
+─── Estructura ────────────────────────────────────────────────────────
+
+  src/
+   ├ lista_ordenada.ads/.adb   ← package genérico de lista enlazada
+   ├ paciente.ads/.adb         ← TAD Paciente
+   ├ turno.ads/.adb            ← TAD Turno
+   ├ medico.ads/.adb           ← TAD Médico
+   ├ clinica.ads/.adb          ← TAD Clínica (orquesta todo)
+   ├ interfaz.ads/.adb         ← capa de menú por consola
+   └ gestion_clinica.adb       ← procedimiento principal
+
+  data/
+   └ clinica.txt               ← persistencia (texto plano)
+
+─── Atajos del menú principal ─────────────────────────────────────────
+
+  MÉDICOS
+    a.  Alta de médico                  c.  Buscar (nombre/esp.)
+    b.  Baja de médico                  d.  Listar (todos / esp.)
+    e.  Listar OS de un médico          f.  Agregar OS
+    h.  Modificar máx. turnos / día
+
+  PACIENTES
+    i.  Alta de paciente                k.  Buscar por DNI
+    j.  Baja de paciente                l.  Listar pacientes
+
+  TURNOS
+    m.  Buscar turno disponible (esp+fecha)
+    n.  Sacar turno
+    o.  Cancelar turno
+    p.  Disponibilidad por especialidad para un día
+    q.  Listar agenda de un médico (día / semana)
+
+  SALIR
+    g.  Guardar y salir
+    s.  Salir sin guardar
+
+═══════════════════════════════════════════════════════════════════════
+Ver BLOG.md para una explicación paso-a-paso de toda la lógica.
+═══════════════════════════════════════════════════════════════════════

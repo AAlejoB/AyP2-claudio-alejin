@@ -1,0 +1,48 @@
+# ====================================================
+# .gitignore — AyP2 Claudio & Alejín
+# ====================================================
+
+# --- PRIVADO: historial de Claude Code (NO subir nunca) ---
+.claude/
+
+# --- Carpetas temporales que arma Claude al descomprimir ---
+_session_export/
+_parciales_1/
+_parciales_extraidos/
+
+# --- Exports de sesiones de Claude (pueden tener charlas privadas) ---
+session-export-*.zip
+
+# --- Material de cátedra: demasiado pesado (365 MB) ---
+# Lo tenés local en D:\workspace\ADA\AUXILIAR_BASE_TEÓRICA\
+# Si tus amigos lo necesitan, pásalo aparte.
+AUXILIAR_BASE_TEÓRICA/
+
+# --- Binarios de compilación de Ada ---
+*.exe
+*.ali
+*.o
+b~*.adb
+b~*.ads
+
+# --- Versiones de backup automático del IDE ---
+*.adb.[0-9]
+*.ads.[0-9]
+*.adb.~*
+*.ads.~*
+
+# --- Sistema operativo ---
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# --- Editores ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Node / build (por si algún día) ---
+node_modules/
+dist/
+build/
