@@ -766,7 +766,7 @@
     <div class="tp-group">
       <div class="tp-title" data-jump="manual">
         <span>Manual de Supervivencia</span>
-        <span class="pill">5 posts</span>
+        <span class="pill">6 posts</span>
       </div>
       <ul class="ej-list">
         <li><a href="#manual-post1">#1 · TAD, Packages, Genéricos</a></li>
@@ -774,6 +774,7 @@
         <li><a href="#manual-post3">#3 · Estructuras compuestas</a></li>
         <li><a href="#manual-post4">#4 · Memoria dinámica</a></li>
         <li><a href="#manual-post5">#5 · Listas enlazadas</a></li>
+        <li><a href="#manual-post6">#6 · 🆕 Patrones de conservación</a></li>
       </ul>
     </div>
 
@@ -1857,9 +1858,220 @@ end if;
               </div>
 
               <p style="margin-top:14px;color:var(--text-mute)">
-                <b>Hasta acá los 5 cimientos del 1er parcial.</b> Si querés más posts sobre temas
-                puntuales (CUIL, Josephus, BFS, ABB ya para 2do parcial...), pedímelos y los
-                agrego.
+                <b>Hasta acá los cimientos teóricos.</b> El Post #6 baja todo esto a patrones
+                concretos de conservación — lo que más se evalúa en parcial.
+              </p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ POST #6 — PATRONES DE CONSERVACIÓN ============ -->
+      <article class="thread" id="manual-post6">
+        <div class="thread-header">
+          <h2>Post #6 — Patrones de conservación (la cocina del parcial)</h2>
+          <span class="tag">post #6</span>
+          <span class="tag good">aplicado</span>
+          <span class="tag warn">léelo el jueves</span>
+        </div>
+
+        <div class="post post-theory">
+          <div class="post-avatar">📚</div>
+          <div>
+            <div class="post-meta"><strong>Manual</strong><span class="role">teoría aplicada</span><span>Post #6</span></div>
+            <div class="post-content">
+
+              <h3>🧠 El porqué</h3>
+              <p>
+                "Conservar la estructura" aparece en <b>todos</b> los parciales viejos. No es un
+                inciso extra: es una <b>línea de aprobación</b>. Si tu procedimiento devuelve la
+                respuesta correcta pero destruye la pila/cola/lista del cliente, perdés casi
+                todo el puntaje del ejercicio.
+              </p>
+              <p>
+                Los packages de la cátedra tienen una característica que <b>complica</b> la
+                conservación: muchas operaciones son <b>destructivas por diseño</b>
+                (<code>Sacar</code>, <code>Supcola</code>, <code>Suprimir</code>). Para "ver" el
+                contenido sin destruirlo hay que aplicar <b>patrones</b>. Este post los junta a
+                todos en un solo lugar.
+              </p>
+
+              <div class="callout">
+                <b>Regla mental:</b> en cualquier procedimiento, antes de tocar una estructura
+                preguntate <i>"si esto fuera el procedimiento del parcial, ¿la estructura
+                quedaría igual al salir?"</i>. Si la respuesta no es un <b>sí rotundo</b>,
+                volvé y aplicá uno de los 5 patrones de abajo.
+              </div>
+
+              <h3>📐 Patrón 1 — Lista: <code>Aux</code> para recorrer sin modificar</h3>
+              <p>
+                El más simple y el más usado. <code>Tipolista</code> es internamente un puntero
+                al primer nodo. Si copiás ese puntero a una variable local y avanzás la local
+                con <code>Sig</code>, el puntero original del cliente queda intacto.
+              </p>
+              <pre class="code"><span class="filename">patron_1.adb</span><code class="ada">function Suma (L : Lista_Int.Tipolista) return Integer is
+   Aux : Lista_Int.Tipolista := L;   --  copia el puntero raíz
+   S   : Integer := 0;
+begin
+   while not Lista_Int.Vacia (Aux) loop
+      S := S + Lista_Int.Info (Aux);
+      Aux := Lista_Int.Sig (Aux);    --  avanza Aux, NO modifica L
+   end loop;
+   return S;
+end Suma;
+</code></pre>
+              <div class="callout warn" style="margin-top:8px">
+                <b>Trampa:</b> si en vez de <code>Aux := Sig (Aux)</code> escribís
+                <code>L := Sig (L)</code>, modificás el parámetro del cliente. <b>Nunca</b>
+                hagas eso, ni con parámetro <code>in out</code>: usá una variable local.
+              </div>
+
+              <h3>📐 Patrón 2 — Pila: "espiar" el tope con <code>Sacar + Meter</code></h3>
+              <p>
+                <code>Piladinamica</code> no tiene operación <code>Tope</code>. Si necesitás ver
+                el tope sin destruir, lo sacás y lo volvés a meter <b>inmediatamente</b>. La
+                pila queda idéntica.
+              </p>
+              <pre class="code"><span class="filename">patron_2.adb</span><code class="ada">--  Acceder al tope sin destruir la pila:
+Pila.Sacar (P, Tope);   --  saco el elemento de arriba
+...                     --  uso Tope (lee, no modifica P)
+Pila.Meter (P, Tope);   --  lo devuelvo al tope
+--  P queda EXACTAMENTE como estaba.
+</code></pre>
+              <div class="callout warn" style="margin-top:8px">
+                <b>Trampa:</b> entre <code>Sacar</code> y <code>Meter</code> la pila está
+                modificada. Si en el medio llamás a otra función que también la toca, perdés
+                la conservación. Tip: hacé el <code>Meter</code> en la <b>línea siguiente</b>
+                al uso, para que sea obvio.
+              </div>
+
+              <h3>📐 Patrón 3 — Cola: vaciar a auxiliar para encontrar el final</h3>
+              <p>
+                <code>Coladinamica</code> solo permite <code>Supcola</code> (saca del frente)
+                e <code>Inscola</code> (mete al final). Para llegar al <b>final</b> hay que
+                vaciar toda la cola a una auxiliar y capturar el último elemento sacado.
+              </p>
+              <pre class="code"><span class="filename">patron_3.adb</span><code class="ada">--  Encontrar el ÚLTIMO de la cola conservándola:
+Aux    : Cola.Tipocoladinamica;
+Ultimo : Tipoelem;
+begin
+   Cola.Crearcola (Aux);
+   while not Cola.Vacia (C) loop
+      Cola.Supcola (C, Ultimo);    --  Ultimo se sobrescribe; queda con el último
+      Cola.Inscola (Aux, Ultimo);  --  reconstruyo en orden original
+   end loop;
+   --  Ultimo tiene el FINAL.
+   C := Aux;   --  reasigno; C queda restaurada al orden original
+end;
+</code></pre>
+              <div class="callout" style="margin-top:8px">
+                <b>Por qué <code>C := Aux</code> funciona:</b> <code>Tipocoladinamica</code> es un
+                record con dos punteros (<code>Frente</code>, <code>Final</code>). Asignar el
+                record copia los punteros: C pasa a apuntar a los mismos nodos que Aux.
+              </div>
+
+              <h3>📐 Patrón 4 — Pila: llegar a la <b>base</b> (el fondo)</h3>
+              <p>
+                Más rebuscado que el patrón 2. Para encontrar lo que está al fondo de la pila,
+                hay que <b>vaciarla entera</b> a una pila auxiliar. El último que sale es la
+                base. Después se restaura.
+              </p>
+              <pre class="code"><span class="filename">patron_4.adb</span><code class="ada">--  Encontrar la BASE de la pila conservándola:
+Aux  : Pila.Tipopiladinamica;
+Base : Tipoelem;
+X    : Tipoelem;
+begin
+   Pila.Crearpila (Aux);
+
+   --  Vaciar P en Aux. Base queda con el ÚLTIMO sacado.
+   while not Pila.Vacia (P) loop
+      Pila.Sacar (P, Base);      --  el último Base que se asigna es la base
+      Pila.Meter (Aux, Base);    --  Aux queda con la pila INVERTIDA
+   end loop;
+
+   --  Restaurar P invirtiendo Aux otra vez:
+   while not Pila.Vacia (Aux) loop
+      Pila.Sacar (Aux, X);
+      Pila.Meter (P, X);
+   end loop;
+   --  P queda IGUAL al inicio. Base tiene el fondo.
+end;
+</code></pre>
+              <div class="callout warn" style="margin-top:8px">
+                <b>Trampa típica:</b> si te olvidás del segundo while (restaurar), P queda
+                vacía. Es el error más cometido en parcial cuando piden "base de pila".
+                <b>Memoriza:</b> dos whiles, siempre.
+              </div>
+
+              <h3>📐 Patrón 5 — Combinar a 2 o 3 niveles (estructuras compuestas)</h3>
+              <p>
+                Cuando el parcial te tira <i>"vector de pilas de listas"</i>, <i>"pila de colas
+                de listas"</i>, etc., aplicás los patrones 1-4 <b>anidados</b>. La regla: cada
+                nivel pide su propio patrón de conservación.
+              </p>
+              <table class="dt" style="margin-top:8px">
+                <thead>
+                  <tr><th>Estructura</th><th>Nivel externo</th><th>Nivel medio</th><th>Nivel interno</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Vec[Pila[Lista]] <br><i>(Parcial 2024 Ej 2)</i></td><td>Recorro vector con <code>for</code></td><td>Patrón 2 (Sacar+Meter tope)</td><td>Patrón 1 (Aux)</td></tr>
+                  <tr><td>Pila[Cola[Lista]] <br><i>(Recu 2022 Ej 2)</i></td><td>Patrón 2 (Sacar+Meter tope)</td><td>Patrón 3 (vaciar a Aux)</td><td>Patrón 1 (Aux)</td></tr>
+                  <tr><td>Matriz[Pila[Lista]] <br><i>(Aulas)</i></td><td><code>for I, J in Range</code></td><td>Patrón 2 o 4 (según si pide tope o base)</td><td>Patrón 1 (Aux)</td></tr>
+                  <tr><td>Vec[Cola[Lista]] <br><i>(Petrolera v2)</i></td><td><code>for I in Range</code></td><td>Patrón 3 si pide final, "espiar frente" si pide frente</td><td>Patrón 1 (Aux)</td></tr>
+                </tbody>
+              </table>
+
+              <p style="margin-top:8px">
+                "Espiar el frente de una cola" es la versión cola del patrón 2: <code>Supcola</code>
+                + <code>Inscola</code> del mismo elemento (queda al final). Si la cola tiene N
+                elementos, hay que repetir N-1 veces más para que vuelva al orden original.
+                <i>Es feo</i>; en general se opta directamente por el patrón 3 (vaciar a auxiliar).
+              </p>
+
+              <!-- ====== Caja de DEPENDENCIAS ====== -->
+              <div class="dep-box" style="margin-top:18px">
+                <div class="box-header">🟡 Check de dependencias</div>
+                <ul>
+                  <li>Tener claro que <code>Tipolista</code>, <code>Tipopiladinamica</code> y
+                    <code>Tipocoladinamica</code> son <b>punteros internos</b> (o records con
+                    punteros). De ahí que "copiar el tipo" copia el puntero, no los nodos.</li>
+                  <li>Tener fresco el Post #4 (memoria dinámica) y Post #5 (listas enlazadas).</li>
+                  <li>Tener clavadas las firmas de cada package: <code>Crearpila/Vacia/Meter/Sacar</code>,
+                    <code>Crearcola/Vacia/Inscola/Supcola</code>, <code>Crearlista/Vacia/Info/Sig/InsertarPpio</code>.</li>
+                </ul>
+              </div>
+
+              <!-- ====== Caja de ALERTAS ====== -->
+              <div class="alert-box" style="margin-top:14px">
+                <div class="box-header">🔴 Alertas de cátedra</div>
+                <ul>
+                  <li><b>"Conservar"</b> no es opcional: es criterio de corrección directo. La
+                    cátedra lo pone explícito en TODOS los parciales viejos.</li>
+                  <li><b>El parámetro <code>in out</code> no rompe la conservación</b> si el
+                    procedimiento restaura la estructura. Documentalo en el header del proc:
+                    <i>"in out por requisito técnico; queda idéntica al salir"</i>.</li>
+                  <li><b>NO inventes operaciones</b> que el package no tiene. No existe
+                    <code>Tope</code>, <code>UltimoCola</code>, <code>BasePila</code>. Si las
+                    necesitás, las construís con los patrones.</li>
+                </ul>
+              </div>
+
+              <!-- ====== Cómo verbalizarlo ====== -->
+              <div class="callout good" style="margin-top:14px">
+                <b>Cómo decirlo en oral si te preguntan "¿cómo conservás?":</b><br>
+                <i>"Uso una variable auxiliar para recorrer sin modificar el parámetro del
+                cliente. Si el package no me deja leer sin sacar, hago <b>sacar + meter</b>
+                inmediato para pila, o <b>vaciar a una cola auxiliar</b> en el caso de cola.
+                Para encontrar la base de una pila uso dos whiles: uno que invierte a una
+                auxiliar y otro que restaura. En estructuras compuestas aplico el patrón que
+                corresponde a cada nivel."</i>
+              </div>
+
+              <p style="margin-top:14px;color:var(--text-mute)">
+                <b>Cómo usar este post:</b> leelo entero el jueves a la noche. Antes del parcial,
+                revisá solo los <i>encabezados de cada patrón</i> y la tabla del Patrón 5. Si te
+                olvidás de uno en el momento, volvé a este post mentalmente: la imagen de los
+                "dos whiles" del patrón 4 es la más útil.
               </p>
             </div>
           </div>
