@@ -878,7 +878,7 @@
     <div class="tp-group">
       <div class="tp-title" data-jump="parciales">
         <span>✅ Resueltos</span>
-        <span class="pill">6</span>
+        <span class="pill">7</span>
       </div>
       <ul class="ej-list">
         <li><a href="#parcial-2025">📌 2025 · 14/05</a></li>
@@ -886,7 +886,8 @@
         <li><a href="#parcial-recu-2022">📌 2022 · Recu (Ej 2)</a></li>
         <li><a href="#parcial-aulas">📌 Aulas (Ej 2)</a></li>
         <li><a href="#parcial-petrolera-2">📌 Petrolera v2 (Ej 2)</a></li>
-        <li><a href="#parcial-2023">📌 CC P1 2023 (Ej 2)</a></li>
+        <li><a href="#parcial-2023">📌 CC P1 2023 (Ej 1 y 2)</a></li>
+        <li><a href="#parcial-hospital">📌 🆕 Hospital · Residentes</a></li>
       </ul>
     </div>
 
@@ -8792,7 +8793,7 @@ end;
            ============================================================ -->
       <div class="set-header">
         <h2>✅ Resueltos</h2>
-        <div class="set-meta">6 parciales · entrenamiento desglosado y completo</div>
+        <div class="set-meta">7 parciales · entrenamiento desglosado y completo</div>
         <div class="set-reglas">
           <b>Cómo leerlos:</b> primero el enunciado de la <b>Cátedra</b>, después la
           resolución con código <i>"parcial-ready"</i> (instanciaciones, módulos por
@@ -9570,14 +9571,14 @@ end Petrolera_Suma_Mayores;
       </article>
 
       <!-- =============================================================
-           CC P1 2023 — Ej 2 RESUELTO · Pila + Lista → Listaordenada
+           CC P1 2023 — Ej 1 y 2 RESUELTOS
            ============================================================= -->
       <article class="thread" id="parcial-2023">
         <div class="thread-header">
-          <h2>CC P1 2023 — Ej 2 resuelto</h2>
+          <h2>CC P1 2023 — Ej 1 y 2 resueltos</h2>
           <span class="tag good">resuelto</span>
           <span class="tag">3 ejercicios</span>
-          <span class="tag warn">Pila + Lista · Listaordenada invertida</span>
+          <span class="tag warn">Empresa juegos + complemento</span>
         </div>
 
         <div class="post post-prof">
@@ -9586,10 +9587,189 @@ end Petrolera_Suma_Mayores;
             <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
             <div class="post-text">
               <ol>
-                <li><b>Empresa de juegos:</b> almacena juegos/características y datos de clientes. a) Lista ordenada de clientes menores a <code>x</code> años; b) Lista ordenada de clientes con edad mayor al promedio; c) Conservar.</li>
+                <li><b>Empresa de juegos:</b> almacena juegos/características en estructura dinámica y datos de clientes que los usan. a) Instanciar; b) Lista ordenada por nombre_juego de clientes menores a <code>x</code> años; c) Lista ordenada por nombre_juego de clientes con edad mayor al promedio; d) Conservar. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
                 <li><b>complemento_lista:</b> recibe pila de enteros y lista de enteros. Retorna lista con elementos de la pila <b>que NO están</b> en la lista, ordenados <b>mayor a menor</b>. Ej: P={3,4,9,1,12,15}, L={5,12,2,8,3} → R={15,9,4,1}. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
                 <li><b>Tracing recursivo</b> sobre string con <code>haceAlgo (p, x)</code> que imprime <code>x(p)</code> antes y después de la llamada recursiva. Traza con <code>p=1, x="abc123"</code>.</li>
               </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 1 · Empresa de juegos</span></div>
+            <div class="post-text">
+
+              <p><b>Estructura:</b> 2 niveles anidados. Lista de juegos (cada uno con su lista interna de clientes). El resultado es un record COMBINADO (juego + cliente) en lista ordenada por nombre_juego.</p>
+
+              <pre class="code"><span class="filename">empresa_juegos.adb</span><code class="ada">with Listanoordenada;
+with Listaordenada;
+
+procedure Empresa_Juegos is
+
+   --  INCISO A — Tipos e instanciaciones
+   subtype Nombre_T is String (1 .. 30);
+
+   type TipoCliente is record
+      ID     : Integer;
+      Nombre : Nombre_T;
+      Edad   : Integer;
+   end record;
+   package Lista_Clientes is new Listanoordenada (Tipoelem =&gt; TipoCliente);
+
+   type TipoJuego is record
+      IDJuego      : Integer;
+      Nombre_Juego : Nombre_T;
+      Clientes     : Lista_Clientes.Tipolista;
+   end record;
+   package Lista_Juegos is new Listanoordenada (Tipoelem =&gt; TipoJuego);
+
+   --  Tipo resultado: combinación juego + cliente
+   type TipoClienteEnJuego is record
+      IDJuego        : Integer;
+      Nombre_Juego   : Nombre_T;
+      IDCliente      : Integer;
+      Nombre_Cliente : Nombre_T;
+      Edad           : Integer;
+   end record;
+
+   --  Funciones de comparación (orden por Nombre_Juego)
+   function Menor_Por_NJuego (X, Y : TipoClienteEnJuego) return Boolean is
+   begin return X.Nombre_Juego &lt; Y.Nombre_Juego; end Menor_Por_NJuego;
+
+   function Mayor_Por_NJuego (X, Y : TipoClienteEnJuego) return Boolean is
+   begin return X.Nombre_Juego &gt; Y.Nombre_Juego; end Mayor_Por_NJuego;
+
+   package Lista_Result is new Listaordenada
+     (Tipoelem =&gt; TipoClienteEnJuego,
+      menor    =&gt; Menor_Por_NJuego,
+      mayor    =&gt; Mayor_Por_NJuego);
+
+
+   --  AUXILIAR — arma el item resultado (evita repetir 5 asignaciones)
+   function Armar_Item (J : TipoJuego; C : TipoCliente)
+     return TipoClienteEnJuego
+   is
+      Item : TipoClienteEnJuego;
+   begin
+      Item.IDJuego        := J.IDJuego;
+      Item.Nombre_Juego   := J.Nombre_Juego;
+      Item.IDCliente      := C.ID;
+      Item.Nombre_Cliente := C.Nombre;
+      Item.Edad           := C.Edad;
+      return Item;
+   end Armar_Item;
+
+
+   --  INCISO B — clientes menores de X años
+   --  Objetivo: lista ordenada por Nombre_Juego de (juego, cliente)
+   --            con cliente.Edad &lt; X.
+   --  Entrada:  Juegos, X
+   --  Salida:   Result (Lista_Result, ordenada)
+   --  Conserva: SÍ — Aux en ambos niveles.
+   procedure Clientes_Menores
+     (Juegos : in     Lista_Juegos.Tipolista;
+      X      : in     Integer;
+      Result :    out Lista_Result.Tipolista)
+   is
+      AuxJ : Lista_Juegos.Tipolista;
+      AuxC : Lista_Clientes.Tipolista;
+      J    : TipoJuego;
+      C    : TipoCliente;
+   begin
+      Lista_Result.Crearlistaordenada (Result);
+      AuxJ := Juegos;
+      while not Lista_Juegos.Vacia (AuxJ) loop
+         J    := Lista_Juegos.Info (AuxJ);
+         AuxC := J.Clientes;
+         while not Lista_Clientes.Vacia (AuxC) loop
+            C := Lista_Clientes.Info (AuxC);
+            if C.Edad &lt; X then
+               Lista_Result.Insertar (Result, Armar_Item (J, C));
+            end if;
+            AuxC := Lista_Clientes.Sig (AuxC);
+         end loop;
+         AuxJ := Lista_Juegos.Sig (AuxJ);
+      end loop;
+   end Clientes_Menores;
+
+
+   --  AUXILIAR — promedio de edades de TODOS los clientes
+   function Promedio_Edades (Juegos : Lista_Juegos.Tipolista) return Float is
+      AuxJ : Lista_Juegos.Tipolista;
+      AuxC : Lista_Clientes.Tipolista;
+      J    : TipoJuego;
+      C    : TipoCliente;
+      Suma : Integer;
+      Cant : Integer;
+   begin
+      AuxJ := Juegos;
+      Suma := 0;
+      Cant := 0;
+      while not Lista_Juegos.Vacia (AuxJ) loop
+         J    := Lista_Juegos.Info (AuxJ);
+         AuxC := J.Clientes;
+         while not Lista_Clientes.Vacia (AuxC) loop
+            C    := Lista_Clientes.Info (AuxC);
+            Suma := Suma + C.Edad;
+            Cant := Cant + 1;
+            AuxC := Lista_Clientes.Sig (AuxC);
+         end loop;
+         AuxJ := Lista_Juegos.Sig (AuxJ);
+      end loop;
+      if Cant = 0 then return 0.0; end if;
+      return Float (Suma) / Float (Cant);
+   end Promedio_Edades;
+
+
+   --  INCISO C — clientes con edad &gt; promedio
+   --  Requiere DOS pasadas: una para promedio, otra para filtrar.
+   procedure Clientes_Sobre_Promedio
+     (Juegos : in     Lista_Juegos.Tipolista;
+      Result :    out Lista_Result.Tipolista)
+   is
+      AuxJ : Lista_Juegos.Tipolista;
+      AuxC : Lista_Clientes.Tipolista;
+      J    : TipoJuego;
+      C    : TipoCliente;
+      Prom : Float;
+   begin
+      Lista_Result.Crearlistaordenada (Result);
+      Prom := Promedio_Edades (Juegos);
+      AuxJ := Juegos;
+      while not Lista_Juegos.Vacia (AuxJ) loop
+         J    := Lista_Juegos.Info (AuxJ);
+         AuxC := J.Clientes;
+         while not Lista_Clientes.Vacia (AuxC) loop
+            C := Lista_Clientes.Info (AuxC);
+            if Float (C.Edad) &gt; Prom then
+               Lista_Result.Insertar (Result, Armar_Item (J, C));
+            end if;
+            AuxC := Lista_Clientes.Sig (AuxC);
+         end loop;
+         AuxJ := Lista_Juegos.Sig (AuxJ);
+      end loop;
+   end Clientes_Sobre_Promedio;
+
+   --  INCISO D — Conservación:
+   --    * Lista de juegos: Aux en el while externo.
+   --    * Lista de clientes: Aux en el while interno.
+   --    * Promedio_Edades: usa su propios Aux internos (también conserva).
+
+begin
+   null;
+end Empresa_Juegos;
+</code></pre>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>Las 3 decisiones que tenés que poder defender:</b>
+                <ol style="margin:6px 0 0 18px">
+                  <li><b>Por qué un <code>TipoClienteEnJuego</code> nuevo</b> y no reusar <code>TipoCliente</code>: porque el resultado pide datos del juego + datos del cliente combinados. Es un record "compuesto" para el output.</li>
+                  <li><b>Por qué dos pasadas en el inciso C</b>: necesitás el promedio antes de comparar. No hay forma de saber si una edad supera el promedio sin recorrer todo primero.</li>
+                  <li><b>Por qué <code>Armar_Item</code> es función separada</b>: lo uso dos veces (en B y en C). Si lo escribiera inline, repetiría 5 asignaciones por inciso = código repetido (criterio del profe).</li>
+                </ol>
+              </div>
             </div>
           </div>
         </div>
@@ -9680,6 +9860,282 @@ end Complemento;
                 valora muchísimo. Si te animás a usarlo (sabiendo explicar por qué funciona),
                 ganás un punto extra de prolijidad. Alternativa más simple pero más fea:
                 usar <code>Listanoordenada</code> y al final ordenar manualmente.
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- =============================================================
+           HOSPITAL UNIVERSITARIO — RESUELTO · 5 niveles anidados
+           ============================================================= -->
+      <article class="thread" id="parcial-hospital">
+        <div class="thread-header">
+          <h2>Hospital · Residentes (boss de 5 niveles)</h2>
+          <span class="tag good">resuelto</span>
+          <span class="tag">3 incisos</span>
+          <span class="tag warn">Lista[Resi[Array[Lista[Serv[Lista[Eval]]]]]]</span>
+        </div>
+
+        <div class="post post-prof">
+          <div class="post-avatar">CÁ</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
+            <div class="post-text">
+              <p>Un hospital universitario forma médicos residentes. Cada residente rota por
+                distintos servicios del hospital durante su formación. El programa dura
+                <b>exactamente 3 años</b>. De cada residente se conoce su legajo, apellido y
+                especialidad elegida. En cada servicio por el que rota, recibe evaluaciones
+                de sus superiores. Cada evaluación tiene fecha, nota numérica y nombre del
+                evaluador. Un residente está <b>en riesgo académico</b> cuando su promedio
+                de notas en cualquier servicio es inferior a 6.</p>
+              <ol>
+                <li>Para un año en particular, detectar residentes en riesgo + informar en
+                  qué servicio están fallando. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
+                <li>Determinar el evaluador que más evaluaciones realizó en toda la historia. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
+                <li>No modificar los datos almacenados.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución completa</span></div>
+            <div class="post-text">
+
+              <p><b>Diagnóstico (Post #7 aplicado):</b></p>
+              <ul>
+                <li><b>Identificar:</b> Lista de residentes (variable) · array fijo de años (3) · lista de servicios · lista de evaluaciones · records en cada nivel.</li>
+                <li><b>5 niveles:</b> <code>Lista_Resi → Residente.Servicios → Array(1..3) → Lista_Serv → Servicio.Evaluaciones → Lista_Eval → Evaluacion</code></li>
+                <li><b>Instanciar de adentro hacia afuera:</b> Lista_Eval primero, Lista_Serv después, Lista_Resi al final.</li>
+              </ul>
+
+              <pre class="code"><span class="filename">hospital_residentes.adb</span><code class="ada">with Listanoordenada;
+
+procedure Hospital_Residentes is
+
+   --  ═════════ INCISO A · Tipos e instanciaciones ═════════
+   subtype Apellido_T     is String (1 .. 20);
+   subtype Especialidad_T is String (1 .. 30);
+   subtype Servicio_T     is String (1 .. 30);
+   subtype Evaluador_T    is String (1 .. 30);
+   subtype Fecha_T        is String (1 .. 10);
+   subtype TipoAnio       is Integer range 1 .. 3;
+
+   --  Nivel 1: evaluación
+   type TipoEvaluacion is record
+      Fecha     : Fecha_T;
+      Nota      : Float;
+      Evaluador : Evaluador_T;
+   end record;
+   package Lista_Eval is new Listanoordenada (Tipoelem =&gt; TipoEvaluacion);
+
+   --  Nivel 2: servicio (contiene la lista de evaluaciones)
+   type TipoServicio is record
+      Nombre       : Servicio_T;
+      Evaluaciones : Lista_Eval.Tipolista;
+   end record;
+   package Lista_Serv is new Listanoordenada (Tipoelem =&gt; TipoServicio);
+
+   --  Nivel 3: array de servicios por año (3 años fijos)
+   type TipoServiciosPorAnio is array (TipoAnio) of Lista_Serv.Tipolista;
+
+   --  Nivel 4: residente
+   type TipoResidente is record
+      Legajo       : Integer;
+      Apellido     : Apellido_T;
+      Especialidad : Especialidad_T;
+      Servicios    : TipoServiciosPorAnio;
+   end record;
+   package Lista_Resi is new Listanoordenada (Tipoelem =&gt; TipoResidente);
+
+   --  Tipo resultado del inciso a)
+   type TipoEnRiesgo is record
+      Legajo   : Integer;
+      Apellido : Apellido_T;
+      Servicio : Servicio_T;
+      Promedio : Float;
+   end record;
+   package Lista_Riesgo is new Listanoordenada (Tipoelem =&gt; TipoEnRiesgo);
+
+   --  Tipo conteo para inciso b)
+   type TipoConteoEvaluador is record
+      Nombre : Evaluador_T;
+      Count  : Integer;
+   end record;
+   package Lista_Conteo is new Listanoordenada (Tipoelem =&gt; TipoConteoEvaluador);
+
+
+   --  AUXILIAR · promedio de notas de una lista de evaluaciones
+   function Promedio_Notas (L : Lista_Eval.Tipolista) return Float is
+      Aux  : Lista_Eval.Tipolista;
+      E    : TipoEvaluacion;
+      Suma : Float;
+      Cant : Integer;
+   begin
+      Aux  := L;
+      Suma := 0.0;
+      Cant := 0;
+      while not Lista_Eval.Vacia (Aux) loop
+         E    := Lista_Eval.Info (Aux);
+         Suma := Suma + E.Nota;
+         Cant := Cant + 1;
+         Aux  := Lista_Eval.Sig (Aux);
+      end loop;
+      if Cant = 0 then return 0.0; end if;
+      return Suma / Float (Cant);
+   end Promedio_Notas;
+
+
+   --  AUXILIAR · incrementar conteo de un evaluador (suprimir + insertar)
+   procedure Sumar_Evaluador
+     (Lista_C : in out Lista_Conteo.Tipolista;
+      Nombre  : in     Evaluador_T)
+   is
+      Aux        : Lista_Conteo.Tipolista;
+      C, Nuevo   : TipoConteoEvaluador;
+      Encontrado : Boolean;
+   begin
+      Aux        := Lista_C;
+      Encontrado := False;
+      while not Lista_Conteo.Vacia (Aux) and then not Encontrado loop
+         C := Lista_Conteo.Info (Aux);
+         if C.Nombre = Nombre then
+            Encontrado := True;
+            --  Truco: los TADs de cátedra no permiten modificar Info in-place.
+            --  Suprimo el record viejo, lo actualizo en variable local, lo reinserto.
+            Lista_Conteo.Suprimir (Lista_C, C);
+            C.Count := C.Count + 1;
+            Lista_Conteo.InsertarPpio (Lista_C, C);
+         end if;
+         Aux := Lista_Conteo.Sig (Aux);
+      end loop;
+      if not Encontrado then
+         Nuevo.Nombre := Nombre;
+         Nuevo.Count  := 1;
+         Lista_Conteo.InsertarPpio (Lista_C, Nuevo);
+      end if;
+   end Sumar_Evaluador;
+
+
+   --  INCISO A · residentes en riesgo en un año dado
+   procedure Residentes_En_Riesgo
+     (Residentes : in     Lista_Resi.Tipolista;
+      Anio       : in     TipoAnio;
+      Result     :    out Lista_Riesgo.Tipolista)
+   is
+      AuxR : Lista_Resi.Tipolista;
+      AuxS : Lista_Serv.Tipolista;
+      R    : TipoResidente;
+      S    : TipoServicio;
+      Prom : Float;
+      Item : TipoEnRiesgo;
+   begin
+      Lista_Riesgo.Crearlista (Result);
+      AuxR := Residentes;
+      while not Lista_Resi.Vacia (AuxR) loop
+         R    := Lista_Resi.Info (AuxR);
+         AuxS := R.Servicios (Anio);   --  acceso directo al año
+         while not Lista_Serv.Vacia (AuxS) loop
+            S    := Lista_Serv.Info (AuxS);
+            Prom := Promedio_Notas (S.Evaluaciones);
+            if Prom &lt; 6.0 then
+               Item.Legajo   := R.Legajo;
+               Item.Apellido := R.Apellido;
+               Item.Servicio := S.Nombre;
+               Item.Promedio := Prom;
+               Lista_Riesgo.InsertarFin (Result, Item);
+            end if;
+            AuxS := Lista_Serv.Sig (AuxS);
+         end loop;
+         AuxR := Lista_Resi.Sig (AuxR);
+      end loop;
+   end Residentes_En_Riesgo;
+
+
+   --  INCISO B · evaluador con más evaluaciones (TODA la historia)
+   procedure Evaluador_Mas_Activo
+     (Residentes     : in     Lista_Resi.Tipolista;
+      Nombre_Ganador :    out Evaluador_T)
+   is
+      AuxR      : Lista_Resi.Tipolista;
+      AuxS      : Lista_Serv.Tipolista;
+      AuxE      : Lista_Eval.Tipolista;
+      AuxConteo : Lista_Conteo.Tipolista;
+      R         : TipoResidente;
+      S         : TipoServicio;
+      E         : TipoEvaluacion;
+      C         : TipoConteoEvaluador;
+      Conteo    : Lista_Conteo.Tipolista;
+      Mayor     : Integer;
+   begin
+      Lista_Conteo.Crearlista (Conteo);
+      Nombre_Ganador := (others =&gt; ' ');
+      Mayor          := 0;
+
+      --  Recorrido total: 4 niveles anidados (residente · año · servicio · evaluación)
+      AuxR := Residentes;
+      while not Lista_Resi.Vacia (AuxR) loop
+         R := Lista_Resi.Info (AuxR);
+         for Y in TipoAnio loop
+            AuxS := R.Servicios (Y);
+            while not Lista_Serv.Vacia (AuxS) loop
+               S    := Lista_Serv.Info (AuxS);
+               AuxE := S.Evaluaciones;
+               while not Lista_Eval.Vacia (AuxE) loop
+                  E := Lista_Eval.Info (AuxE);
+                  Sumar_Evaluador (Conteo, E.Evaluador);
+                  AuxE := Lista_Eval.Sig (AuxE);
+               end loop;
+               AuxS := Lista_Serv.Sig (AuxS);
+            end loop;
+         end loop;
+         AuxR := Lista_Resi.Sig (AuxR);
+      end loop;
+
+      --  Buscar en Conteo el de mayor count
+      AuxConteo := Conteo;
+      while not Lista_Conteo.Vacia (AuxConteo) loop
+         C := Lista_Conteo.Info (AuxConteo);
+         if C.Count &gt; Mayor then
+            Mayor          := C.Count;
+            Nombre_Ganador := C.Nombre;
+         end if;
+         AuxConteo := Lista_Conteo.Sig (AuxConteo);
+      end loop;
+   end Evaluador_Mas_Activo;
+
+
+   --  INCISO C · Conservación:
+   --    * Lista de residentes: Aux para recorrer.
+   --    * Array de años: solo lectura con índice (no modifica).
+   --    * Lista de servicios: Aux para recorrer.
+   --    * Lista de evaluaciones: Aux para recorrer.
+   --    * Records: solo se LEEN con Info, nunca se modifican in-place.
+
+begin
+   null;
+end Hospital_Residentes;
+</code></pre>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>Las 4 trampas más jodidas de este ejercicio:</b>
+                <ol style="margin:6px 0 0 18px">
+                  <li><b>Strings con tamaño fijo</b>: en un record no podés tener
+                    <code>String</code> a secas (sería ilegal). Usás <code>subtype Apellido_T is String (1..20);</code>
+                    y reusás. Si un nombre es más corto, lo "rellenás" con espacios.</li>
+                  <li><b>Conteo en lista</b>: TADs de cátedra no permiten "modificar in-place"
+                    el Info de un nodo. Para incrementar el count: <code>Suprimir + Insertar</code>
+                    con el record actualizado.</li>
+                  <li><b>5 niveles parecen 5 problemas</b>: en realidad son 4 <code>while</code>
+                    anidados + 1 <code>for</code> (los años). El código sale solo si seguís
+                    "afuera hacia adentro".</li>
+                  <li><b><code>R.Servicios (Anio)</code></b>: porque <code>Servicios</code> es
+                    un <code>array (TipoAnio)</code> dentro del record, indexar es directo.
+                    Por eso usar Array para los años (fijos) en vez de Lista fue clave.</li>
+                </ol>
               </div>
             </div>
           </div>
