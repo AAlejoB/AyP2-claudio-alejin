@@ -734,6 +734,7 @@
     <button data-cajon="teoria" class="active">📚 Teoría</button>
     <button data-cajon="practica">🛠️ Práctica</button>
     <button data-cajon="parciales">📝 Parciales</button>
+    <button data-cajon="ayudamemoria">🧠 Ayuda Memoria</button>
     <button data-cajon="apuntes">📋 Apuntes</button>
     <button data-cajon="ejercicios">🏋️ Ejercicios a resolver</button>
   </nav>
@@ -897,6 +898,28 @@
         <li><a href="#parcial-petrolera-1">Petrolera · v1</a></li>
         <li><a href="#parcial-google">Visitantes Google</a></li>
         <li><a href="#parcial-wpp">Set WhatsApp · 4 ej.</a></li>
+      </ul>
+    </div>
+
+    <h3 class="parcial p2">🧠 AYUDA MEMORIA</h3>
+
+    <div class="tp-group">
+      <div class="tp-title" data-jump="ayudamemoria">
+        <span>Frases que salvan parciales</span>
+        <span class="pill">11 bloques</span>
+      </div>
+      <ul class="ej-list">
+        <li><a href="#am-tads">📦 TADs (general)</a></li>
+        <li><a href="#am-pila">🥞 Pila · LIFO</a></li>
+        <li><a href="#am-cola">🚂 Cola · FIFO</a></li>
+        <li><a href="#am-lista">🔗 Lista enlazada</a></li>
+        <li><a href="#am-memoria">🧠 Memoria dinámica</a></li>
+        <li><a href="#am-genericos">📦 Genéricos</a></li>
+        <li><a href="#am-excep">⚠️ Excepciones</a></li>
+        <li><a href="#am-conservacion">📐 Conservación</a></li>
+        <li><a href="#am-ops">🛠️ Operaciones · mnemónicas</a></li>
+        <li><a href="#am-quirks">🎯 Trampas de Ada</a></li>
+        <li><a href="#am-parcial">🎓 Día del parcial</a></li>
       </ul>
     </div>
 
@@ -7654,6 +7677,353 @@ end Mediana;
     </section>
 
     <!-- ===================== CHEAT SHEET ===================== -->
+    <!-- ===================== AYUDA MEMORIA ===================== -->
+    <section class="tp" id="ayudamemoria">
+
+      <div class="tp-banner manual">
+        <span class="parcial-tag" style="background:rgba(180,140,240,.15); color:#bb88ff; border:1px solid rgba(180,140,240,.4);">🧠 Ayuda Memoria</span>
+        <h1>Frases que salvan parciales</h1>
+        <p>Las verdades de Ada y de los TADs en una sola línea cada una. Las que se te quedan
+          son las que sobreviven el momento de bloqueo en el parcial.</p>
+        <p style="margin-top:10px">
+          <span class="tag">🎯 Léelo en voz alta</span>
+          <span class="tag good">Repetir = recordar</span>
+        </p>
+        <div class="callout" style="margin-top:14px">
+          <b>Cómo usar esta pestaña:</b> léela <i>completa</i> el jueves a la noche, una sola vez,
+          en voz alta. El día del parcial, antes de entrar, repasá sólo los títulos en negrita.
+          Si te trabás en algún ejercicio, volvé mentalmente a la frase y arrancá de ahí.
+        </div>
+      </div>
+
+      <!-- ============ TADs GENERAL ============ -->
+      <article class="thread" id="am-tads">
+        <div class="thread-header">
+          <h2>📦 TADs (general)</h2>
+          <span class="tag">conceptos base</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🧠</div>
+          <div>
+            <div class="post-meta"><strong>Frases · TAD</strong></div>
+            <div class="post-content">
+              <div class="callout"><b>"TAD = qué hace, no cómo lo hace."</b><br>
+                Defino las operaciones que un tipo de dato sabe hacer, sin importar cómo están
+                implementadas adentro. Encapsulamiento puro.</div>
+              <div class="callout"><b>"En el <code>.ads</code> va la firma; en el <code>.adb</code> va el algoritmo."</b><br>
+                El cliente sólo ve el <code>.ads</code>. Si cambiás el <code>.adb</code> sin
+                tocar la spec, nadie se entera.</div>
+              <div class="callout"><b>"Un puntero es una flecha: te dice <i>dónde</i> está la cosa, no la cosa."</b><br>
+                Por eso copiar un puntero copia la flecha, no el contenido. Aux := L apunta al
+                mismo nodo que L.</div>
+              <div class="callout"><b>"<code>private</code> oculta los tripas del tipo."</b><br>
+                El cliente sabe que <code>Tipolista</code> existe, pero no que adentro es un puntero
+                a un nodo. Así puedo cambiar la implementación sin romper a nadie.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ PILA ============ -->
+      <article class="thread" id="am-pila">
+        <div class="thread-header">
+          <h2>🥞 Pila · LIFO</h2>
+          <span class="tag">last in, first out</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🥞</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Pila</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"En la pila, el último que llega es el primero que se va."</b><br>
+                LIFO = Last In, First Out. Como una pila de platos: agarrás el de arriba.</div>
+              <div class="callout"><b>"Meter pone arriba. Sacar saca de arriba. No hay 'Tope' en el package."</b><br>
+                Si necesitás espiar el tope sin destruir: <b>Sacar + Meter inmediato</b>.</div>
+              <div class="callout"><b>"La base es el primero que entró, queda al fondo."</b><br>
+                Para llegar a la base: vaciar TODA la pila a una auxiliar (el último que sale es
+                la base) y restaurar.</div>
+              <div class="callout warn"><b>"Para conservar pila: <i>dos whiles, siempre</i>."</b><br>
+                Uno que vacía a la auxiliar, otro que restaura. Si te olvidás del segundo, la
+                pila queda VACÍA y perdiste todo.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ COLA ============ -->
+      <article class="thread" id="am-cola">
+        <div class="thread-header">
+          <h2>🚂 Cola · FIFO</h2>
+          <span class="tag">first in, first out</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🚂</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Cola</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"En la cola, el primero que llega es el primero que se va."</b><br>
+                FIFO = First In, First Out. Como la fila del banco.</div>
+              <div class="callout"><b>"Inscola mete al final. Supcola saca del frente."</b><br>
+                Mnemónica: <i>Ins-erta al final, Sup-rime del frente</i>. No hay confusión
+                posible.</div>
+              <div class="callout"><b>"El frente es lo PRIMERO que se va; el final es lo ÚLTIMO que entró."</b><br>
+                Para conservar la cola y acceder al frente o al final: vaciar entera a una
+                auxiliar.</div>
+              <div class="callout warn"><b>"<code>Cola := Aux</code> es legal en Ada."</b><br>
+                Tipocoladinamica es un record (Frente, Final). Asignar copia ambos punteros.
+                Por eso podés reconstruir la cola tras vaciarla.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ LISTA ============ -->
+      <article class="thread" id="am-lista">
+        <div class="thread-header">
+          <h2>🔗 Lista enlazada</h2>
+          <span class="tag">nodos + punteros</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🔗</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Lista</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"Una lista es como un tren: cada vagón engancha al siguiente."</b><br>
+                Cada nodo tiene Info (la carga) y Sig (el enganche al próximo). El último engancha
+                a null.</div>
+              <div class="callout"><b>"<code>Aux := L</code> y avanzo con <code>Sig</code>. Nunca toco L."</b><br>
+                Aux copia el puntero raíz. Avanzar Aux es como caminar por el tren sin moverlo de
+                la estación.</div>
+              <div class="callout"><b>"<code>InsertarPpio</code> = O(1). <code>InsertarFin</code> = O(n)."</b><br>
+                Si el orden no importa, usá <code>InsertarPpio</code>: es instantáneo.</div>
+              <div class="callout"><b>"<code>Listaordenada</code> tiene <code>Insertar</code> que va al lugar correcto."</b><br>
+                <code>Listanoordenada</code> tiene <code>InsertarPpio</code> e <code>InsertarFin</code>.
+                Son TADs distintos, no confundir.</div>
+              <div class="callout warn"><b>"Para invertir el orden de <code>Listaordenada</code>: pasá <code>">"</code> como <code>menor</code>."</b><br>
+                Truco fino: <code>package L is new Listaordenada (menor =&gt; Mayor_Que, ...)</code>.
+                Los grandes se insertan primero → orden descendente.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ MEMORIA DINÁMICA ============ -->
+      <article class="thread" id="am-memoria">
+        <div class="thread-header">
+          <h2>🧠 Memoria dinámica</h2>
+          <span class="tag">access, new, free</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🧠</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Memoria</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"Estática = decidido en compilación. Dinámica = decidido al correr."</b><br>
+                Si sabés el tamaño antes de compilar, es estática. Si depende del usuario, es
+                dinámica.</div>
+              <div class="callout"><b>"<code>new</code> pide memoria, <code>Free</code> la devuelve."</b><br>
+                Si pedís y no devolvés, hay <i>memory leak</i>. En Ada se usa <code>Ada.Unchecked_Deallocation</code>
+                para definir Free.</div>
+              <div class="callout"><b>"Un <code>access</code> guarda una <i>dirección</i>, no el dato."</b><br>
+                <code>X : access Integer</code> es un puntero a un Integer, no un Integer.</div>
+              <div class="callout warn"><b>"<code>null</code> no tiene <code>.Info</code> ni <code>.Sig</code>."</b><br>
+                Antes de derreferenciar (poner el punto) siempre chequear con <code>and then</code>:
+                <code>if Ptr /= null and then Ptr.Info = X</code>.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ GENÉRICOS ============ -->
+      <article class="thread" id="am-genericos">
+        <div class="thread-header">
+          <h2>📦 Genéricos</h2>
+          <span class="tag">instanciar = sacar molde</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">📦</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Genéricos</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"Generic = molde. Hasta instanciarlo con tipos concretos, no lo podés usar."</b><br>
+                <code>generic type Tipoelem is private; package Lista is...</code> es un molde.
+                <code>package LInt is new Lista (Integer);</code> es el producto.</div>
+              <div class="callout"><b>"<code>package X is new Y (...)</code> = sacá un molde de Y, ponele estos tipos, llámalo X."</b><br>
+                Después usás X como un package normal: <code>X.Crearlista (L);</code>, <code>X.Vacia (L)</code>.</div>
+              <div class="callout"><b>"Cada instanciación es un tipo DISTINTO."</b><br>
+                <code>LInt = Lista (Integer)</code> y <code>LFloat = Lista (Float)</code> son
+                tipos incompatibles, aunque vengan del mismo molde.</div>
+              <div class="callout"><b>"En el parcial: instanciar arriba, usar abajo."</b><br>
+                Primero <code>package LInt is new Listanoordenada (Integer);</code>, después
+                <code>LInt.Crearlista (L);</code>. Nunca al revés.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ EXCEPCIONES ============ -->
+      <article class="thread" id="am-excep">
+        <div class="thread-header">
+          <h2>⚠️ Excepciones</h2>
+          <span class="tag">raise / when / others</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">⚠️</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Excepciones</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"<code>raise</code> = tirar la alarma. <code>when</code> = atraparla."</b><br>
+                Cuando algo no se puede hacer, el package lanza una excepción. El cliente decide
+                qué hacer con <code>begin ... exception when X =&gt; ...</code>.</div>
+              <div class="callout"><b>"<code>Pilavacia</code> (dinámica) ≠ <code>Underflow</code> (estática)."</b><br>
+                La cátedra es estricta: usá el nombre exacto del package. <code>Listavacia</code>,
+                <code>Colavacia</code>, <code>Arbol_Vacio</code>.</div>
+              <div class="callout"><b>"Pre/Post como COMENTARIOS, NO con aspectos Ada 2012."</b><br>
+                La cátedra no acepta <code>with Pre =&gt; ...</code>. Va arriba del subprograma
+                como comentario: <code>-- Pre: ...</code>.</div>
+              <div class="callout warn"><b>"<code>when others</code> es la red de seguridad final."</b><br>
+                Capturá las específicas primero, <code>when others</code> al último para todo lo
+                imprevisto.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ CONSERVACIÓN ============ -->
+      <article class="thread" id="am-conservacion">
+        <div class="thread-header">
+          <h2>📐 Conservación · los 4 patrones</h2>
+          <span class="tag good">EL CORAZÓN DEL PARCIAL</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">📐</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Conservación</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"Aux es tu mejor amigo: nunca toques el parámetro del cliente."</b><br>
+                Patrón 1. Aux := Parametro; while ... Aux := Sig (Aux).</div>
+              <div class="callout good"><b>"Sacar y meter enseguida = espiar la pila sin romper."</b><br>
+                Patrón 2. <code>Sacar (P, X); ...uso X...; Meter (P, X);</code>. Pila queda igual.</div>
+              <div class="callout good"><b>"Cola: vaciar entera a auxiliar, capturar lo que necesito, reasignar."</b><br>
+                Patrón 3. <code>while not Vacia (C): Supcola (C, X); Inscola (Aux, X); end loop; C := Aux;</code></div>
+              <div class="callout good"><b>"Pila base: dos whiles, uno para ir y otro para volver."</b><br>
+                Patrón 4. Vaciar P en Aux, procesar la base, restaurar P desde Aux.</div>
+              <div class="callout warn"><b>"Cada nivel de la estructura compuesta pide SU patrón."</b><br>
+                Vec[Pila[Lista]] = recorrer vec + patrón 2 + patrón 1. Aplicar uno por nivel.</div>
+              <div class="callout bad"><b>"Si te olvidás de conservar, perdés el ejercicio entero."</b><br>
+                No es opcional. La cátedra lo pone EXPLÍCITO en todos los parciales.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ OPS · MNEMÓNICAS ============ -->
+      <article class="thread" id="am-ops">
+        <div class="thread-header">
+          <h2>🛠️ Operaciones · mnemónicas</h2>
+          <span class="tag">memorizar las firmas exactas</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🛠️</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Operaciones</strong></div>
+            <div class="post-content">
+              <table class="dt">
+                <thead><tr><th>TAD</th><th>Operaciones (en orden de aparición)</th></tr></thead>
+                <tbody>
+                  <tr><td><b>Pila</b></td><td><code>Crearpila · Vacia · Meter · Sacar · Limpiar</code></td></tr>
+                  <tr><td><b>Cola</b></td><td><code>Crearcola · Vacia · Inscola · Supcola · Limpiar</code></td></tr>
+                  <tr><td><b>Lista no ord.</b></td><td><code>Crearlista · Vacia · Esta · Info · Sig · InsertarPpio · InsertarFin · Suprimir · Limpiar</code></td></tr>
+                  <tr><td><b>Lista ord.</b></td><td><code>Crearlistaordenada · Vacia · Esta · Info · Sig · Insertar · Suprimir · Limpiar</code></td></tr>
+                  <tr><td><b>ABB</b></td><td><code>Crear · Vacio · Insertar · Suprimir · Esta · Limpiar · Inorden · Preorden · Posorden · Izq · Der · Info</code></td></tr>
+                </tbody>
+              </table>
+              <div class="callout" style="margin-top:10px"><b>"Cuando dudes, vení acá."</b><br>
+                Estas son las únicas operaciones que existen en los packages de la cátedra.
+                <b>No inventes</b> (<code>Tope</code>, <code>Frente</code>, <code>Ultimo</code> no existen).</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ TRAMPAS DE ADA ============ -->
+      <article class="thread" id="am-quirks">
+        <div class="thread-header">
+          <h2>🎯 Trampas de Ada</h2>
+          <span class="tag warn">prolijidad = puntos</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🎯</div>
+          <div>
+            <div class="post-meta"><strong>Frases · Ada quirks</strong></div>
+            <div class="post-content">
+              <div class="callout"><b>"<code>and then</code> = short-circuit. <code>and</code> a secas evalúa los dos lados."</b><br>
+                Si el primero ya determina el resultado, <code>and then</code> no evalúa el
+                segundo. Vital para <code>if Ptr /= null and then Ptr.Info = X</code>.</div>
+              <div class="callout"><b>"<code>in</code> = lectura. <code>out</code> = escritura. <code>in out</code> = ambos."</b><br>
+                Las <code>function</code> siempre tienen parámetros <code>in</code> implícitos.
+                <code>Sacar</code> requiere <code>in out</code> porque modifica la pila.</div>
+              <div class="callout"><b>"<code>function</code> devuelve. <code>procedure</code> modifica."</b><br>
+                Si querés varios valores de salida, usá <code>procedure</code> con varios
+                <code>out</code>. Function devuelve UN solo valor.</div>
+              <div class="callout warn"><b>"Tipos derivados son DISTINTOS aunque parezcan iguales."</b><br>
+                <code>type Km is new Integer; type Mi is new Integer;</code> son incompatibles.
+                Para mezclar: <code>Mi (Integer (X))</code>.</div>
+              <div class="callout"><b>"Ada es case-INsensitive. <code>Crearpila = CrearPila = CREARPILA</code>."</b><br>
+                Pero por prolijidad, mantené UN solo estilo. La cátedra usa <code>Crearpila</code>
+                con C mayúscula.</div>
+              <div class="callout"><b>"Atributos: <code>'first</code>, <code>'last</code>, <code>'range</code>, <code>'length</code>, <code>'image</code>."</b><br>
+                <code>for I in T'Range loop</code> recorre cualquier array/vector sin
+                hardcodear índices.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ DÍA DEL PARCIAL ============ -->
+      <article class="thread" id="am-parcial">
+        <div class="thread-header">
+          <h2>🎓 Día del parcial · viernes 22/05 · 16hs</h2>
+          <span class="tag good">checklist mental</span>
+        </div>
+        <div class="post post-theory">
+          <div class="post-avatar">🎓</div>
+          <div>
+            <div class="post-meta"><strong>Frases · El gran día</strong></div>
+            <div class="post-content">
+              <div class="callout good"><b>"Primero spec del package, después tipos, después instanciación, después operaciones."</b><br>
+                Orden de escritura en la hoja. Ada compila top-down: lo que se usa abajo se
+                declara arriba.</div>
+              <div class="callout good"><b>"Cada inciso = su propio módulo con header Objetivo / Entrada / Salida / Conserva."</b><br>
+                El profe lo pidió textual. Es puntaje de modularización + claridad.</div>
+              <div class="callout"><b>"'No usar put, sacar como parámetro' = devolvelo en una variable <code>out</code>."</b><br>
+                Cuando el enunciado dice eso, NUNCA imprimas. Recibí una lista <code>out</code>
+                y volcala ahí.</div>
+              <div class="callout"><b>"Cada vez que dudes, volvé al patrón."</b><br>
+                Si te trabás, no inventes. Volvé mentalmente al Post #6 (Patrones de
+                conservación) y aplicá el que corresponde al nivel.</div>
+              <div class="callout warn"><b>"Si el código no compila mentalmente, no compila."</b><br>
+                Leelo de arriba abajo simulando ser el compilador. ¿Está declarado lo que uso?
+                ¿Las firmas matchean? ¿Los tipos son compatibles?</div>
+              <div class="callout bad"><b>"NO inventes operaciones que el package no tiene."</b><br>
+                No existe <code>Tope</code>, <code>VerFrente</code>, <code>BasePila</code>. Si
+                las necesitás, las construís con los patrones.</div>
+              <div class="callout good"><b>"Antes de entregar: releé. Una vez. Despacio."</b><br>
+                El 50% de los errores se ven en la relectura. Si tenés 10 min al final, no los
+                desperdicies.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <div class="callout good" style="margin-top:24px">
+        <b>🔵🟡 Vamos Boca, vamos vos.</b> Esta pestaña es para abrir 1 vez completa y después
+        sólo escanear los <b>títulos en negrita</b>. Las frases entran por repetición. El
+        viernes a las 16hs vas a tener todo esto en la cabeza sin pensarlo.
+      </div>
+
+    </section>
+
     <section class="tp" id="cheat">
 
       <div class="tp-banner">
@@ -9802,11 +10172,12 @@ end Complemento;
      Tabs por cajón (cada cajón puede mostrar varias secciones)
      ============================================================ */
   const CAJONES = {
-    teoria:     ['manual'],
-    practica:   ['tp1', 'tp2', 'tp3', 'tp4', 'tp5'],
-    parciales:  ['parciales'],
-    apuntes:    ['cheat'],
-    ejercicios: ['ejercicios']
+    teoria:       ['manual'],
+    practica:     ['tp1', 'tp2', 'tp3', 'tp4', 'tp5'],
+    parciales:    ['parciales'],
+    ayudamemoria: ['ayudamemoria'],
+    apuntes:      ['cheat'],
+    ejercicios:   ['ejercicios']
   };
   const tabs = document.querySelectorAll('#tabs button');
   const sections = document.querySelectorAll('section.tp');
