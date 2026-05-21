@@ -767,7 +767,7 @@
     <div class="tp-group">
       <div class="tp-title" data-jump="manual">
         <span>Manual de Supervivencia</span>
-        <span class="pill">6 posts</span>
+        <span class="pill">7 posts</span>
       </div>
       <ul class="ej-list">
         <li><a href="#manual-post1">#1 · TAD, Packages, Genéricos</a></li>
@@ -775,7 +775,8 @@
         <li><a href="#manual-post3">#3 · Estructuras compuestas</a></li>
         <li><a href="#manual-post4">#4 · Memoria dinámica</a></li>
         <li><a href="#manual-post5">#5 · Listas enlazadas</a></li>
-        <li><a href="#manual-post6">#6 · 🆕 Patrones de conservación</a></li>
+        <li><a href="#manual-post6">#6 · Patrones de conservación</a></li>
+        <li><a href="#manual-post7">#7 · 🆕 Diagnóstico de estructura</a></li>
       </ul>
     </div>
 
@@ -2095,6 +2096,222 @@ end;
                 revisá solo los <i>encabezados de cada patrón</i> y la tabla del Patrón 5. Si te
                 olvidás de uno en el momento, volvé a este post mentalmente: la imagen de los
                 "dos whiles" del patrón 4 es la más útil.
+              </p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ POST #7 — DIAGNÓSTICO DE ESTRUCTURA ============ -->
+      <article class="thread" id="manual-post7">
+        <div class="thread-header">
+          <h2>Post #7 — Diagnóstico de estructura · cómo leer un enunciado</h2>
+          <span class="tag">post #7</span>
+          <span class="tag good">crítico para parcial</span>
+          <span class="tag warn">léelo a fondo</span>
+        </div>
+
+        <div class="post post-theory">
+          <div class="post-avatar">📚</div>
+          <div>
+            <div class="post-meta"><strong>Manual</strong><span class="role">metodología</span><span>Post #7</span></div>
+            <div class="post-content">
+
+              <h3>🧠 El porqué</h3>
+              <p>
+                <b>La mitad del parcial es identificar bien la estructura.</b> Si te equivocás
+                acá, todo el código que escribas después está mal aunque sea sintácticamente
+                perfecto. La otra mitad es aplicar los patrones de conservación (Post #6).
+              </p>
+              <p>
+                Este post te da una receta de 4 pasos para <b>desarmar cualquier enunciado</b>:
+              </p>
+              <div class="callout">
+                <ol style="margin:0">
+                  <li><b>Identificar</b> cuál es cada TAD según pistas del texto.</li>
+                  <li><b>Detectar</b> los niveles anidados ("X de Y de Z").</li>
+                  <li><b>Instanciar</b> de adentro hacia afuera.</li>
+                  <li><b>Navegar</b> de afuera hacia adentro.</li>
+                </ol>
+              </div>
+
+              <h3>📋 Paso 1 · Identificar cada TAD según pistas del enunciado</h3>
+
+              <p>El enunciado nunca te dice "usá una pila". Te dice "el último que llega es el primero
+                que se va". Vos tenés que traducir. Esta tabla es tu diccionario:</p>
+
+              <table class="dt">
+                <thead><tr><th>Frase del enunciado</th><th>TAD a usar</th><th>Por qué</th></tr></thead>
+                <tbody>
+                  <tr><td>"última operación", "último que llegó", "deshacer", "stack", "balance de paréntesis"</td><td><b>🥞 Pila</b></td><td>LIFO: el último entra primero sale. Acceso solo al tope.</td></tr>
+                  <tr><td>"fila", "turnos", "primero que llega primero sale", "buffer"</td><td><b>🚂 Cola</b></td><td>FIFO: el primero entra primero sale.</td></tr>
+                  <tr><td>"cantidad variable", "puede crecer", "futura ampliación", "se agregan/quitan elementos"</td><td><b>🔗 Lista dinámica</b></td><td>Pila/cola/lista. Sin tope fijo.</td></tr>
+                  <tr><td>"ordenado por X", "ordenado alfabéticamente", "ordenado de mayor a menor"</td><td><b>📑 Listaordenada</b></td><td>Inserta en lugar. Pasás función "menor" para definir orden.</td></tr>
+                  <tr><td>"no importa el orden", "buscar si existe"</td><td><b>📃 Listanoordenada</b></td><td>InsertarPpio O(1). Esta para chequear pertenencia.</td></tr>
+                  <tr><td>"árbol", "jerarquía", "padres e hijos", "raíz"</td><td><b>🌳 ABB</b></td><td>Búsqueda eficiente. Recorridos pre/in/pos orden.</td></tr>
+                  <tr><td>"12 meses", "días de la semana", "horas del día (8-20)", "5 días hábiles"</td><td><b>📦 Array fijo</b> (indexado por enum o range)</td><td>Tamaño conocido y constante. Acceso O(1).</td></tr>
+                  <tr><td>"matriz", "tabla N×M", "filas y columnas"</td><td><b>📊 Array bidimensional</b></td><td>Dos índices: Fila × Columna.</td></tr>
+                  <tr><td>"agrupado por categoría", "por tipo", "por mes y categoría"</td><td><b>📦 Array indexado por enum</b></td><td>Si las categorías son fijas y conocidas.</td></tr>
+                  <tr><td>"lista circular"</td><td><b>🔄 Lista con último → primero</b></td><td>El Sig del último apunta a la cabeza.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>📋 Paso 2 · Detectar la estructura compuesta</h3>
+
+              <p>
+                Cuando el enunciado dice <b>"X de Y de Z"</b>, está describiendo una estructura
+                <b>anidada</b>. Reglas:
+              </p>
+
+              <table class="dt">
+                <thead><tr><th>El enunciado dice...</th><th>Significa</th></tr></thead>
+                <tbody>
+                  <tr><td>"<b>Vector</b> de pilas"</td><td>Array donde cada celda es una Pila.</td></tr>
+                  <tr><td>"<b>Pila</b> de listas"</td><td>Una sola Pila. Cada elemento de la pila es una Lista.</td></tr>
+                  <tr><td>"<b>Cola</b> de records"</td><td>Una sola Cola. Cada elemento de la cola es un record (struct).</td></tr>
+                  <tr><td>"Lista de <b>vectores</b>"</td><td>Una sola Lista. Cada nodo contiene un vector.</td></tr>
+                  <tr><td>"Matriz de <b>listas</b>"</td><td>Array bidim. Cada celda es una Lista.</td></tr>
+                  <tr><td>"Pila de cola de <b>listas</b> de enteros"</td><td>3 niveles: pila → cola → lista → integers.</td></tr>
+                </tbody>
+              </table>
+
+              <div class="callout warn" style="margin-top:8px">
+                <b>Regla clave:</b> el TAD del que se habla PRIMERO es el <b>más externo</b>.
+                "Vector de pilas" = vector afuera, pilas adentro. "Pila de colas" = pila afuera,
+                colas adentro.
+              </div>
+
+              <h3>🔧 Paso 3 · Instanciar de ADENTRO hacia AFUERA</h3>
+
+              <p>
+                Cuando ya identificaste los niveles, el código se escribe <b>de adentro hacia
+                afuera</b>. Razón: cada nivel exterior necesita conocer el tipo del nivel
+                interior para instanciarlo como <code>Tipoelem</code>.
+              </p>
+
+              <p><b>Ejemplo:</b> "vector de pilas de listas de enteros"</p>
+
+              <pre class="code"><span class="filename">walkthrough.adb</span><code class="ada">--  NIVEL 1 (el más interno): lista de enteros
+package Lista_Int    is new Listanoordenada (Tipoelem =&gt; Integer);
+
+--  NIVEL 2 (medio): pila cuyo elemento es Lista_Int.Tipolista
+package Pila_Listas  is new Piladinamica   (Tipoelem =&gt; Lista_Int.Tipolista);
+
+--  NIVEL 3 (más externo): vector indexado de pilas
+subtype Indice is Integer range 1 .. 10;
+type TipoEstructura is array (Indice) of Pila_Listas.Tipopiladinamica;
+</code></pre>
+
+              <div class="callout"><b>La regla en una frase:</b>
+                <i>"El <code>Tipoelem</code> del nivel <code>N</code> es el tipo principal del nivel <code>N-1</code>."</i><br>
+                Tipo principal de una Pila = <code>Tipopiladinamica</code>. De Cola =
+                <code>Tipocoladinamica</code>. De Lista = <code>Tipolista</code>.
+              </div>
+
+              <h3>🔍 Paso 4 · Navegar de AFUERA hacia ADENTRO (acceso a los datos)</h3>
+
+              <p>
+                Una vez que tenés la estructura, accedés <b>de afuera hacia adentro</b>. Cada
+                nivel tiene su forma de acceso:
+              </p>
+
+              <table class="dt">
+                <thead><tr><th>Tipo</th><th>Cómo acceder al elemento que querés</th></tr></thead>
+                <tbody>
+                  <tr><td><b>Array <code>V</code></b></td><td><code>V(I)</code> (con <code>I in V'Range</code>)</td></tr>
+                  <tr><td><b>Pila <code>P</code></b></td><td>Sin operación directa. Para ver tope: <code>Sacar (P, X)</code>. Para ver base: dos whiles a pila auxiliar.</td></tr>
+                  <tr><td><b>Cola <code>C</code></b></td><td>Para ver frente: <code>Supcola (C, X)</code> (es el primero). Para ver final: vaciar entera a auxiliar (es el último).</td></tr>
+                  <tr><td><b>Lista <code>L</code></b></td><td><code>Aux := L</code>, después <code>Info (Aux)</code> y <code>Aux := Sig (Aux)</code> para recorrer.</td></tr>
+                  <tr><td><b>Record <code>R</code></b></td><td><code>R.Campo</code> directo. Es el único nivel que NO requiere operación del package.</td></tr>
+                  <tr><td><b>ABB <code>T</code></b></td><td><code>Izq (T)</code>, <code>Der (T)</code>, <code>Info (T)</code>. Para buscar: <code>Esta</code>.</td></tr>
+                </tbody>
+              </table>
+
+              <h3>🎯 Walkthrough completo · "pila de colas de listas de enteros" (Recu 2022 Ej 2)</h3>
+
+              <p>Hagamos el ejercicio del Recuperatorio 2022 paso a paso aplicando los 4 pasos:</p>
+
+              <div class="callout" style="margin:10px 0"><b>Enunciado:</b> <i>"Estructura P = pila de
+                colas de listas de enteros. Procedimiento Negativos que retorne una lista con
+                los números negativos de la lista al final de la cola del tope de la pila."</i></div>
+
+              <p><b>Paso 1 — Identificar:</b></p>
+              <ul>
+                <li>"pila" → 🥞 Piladinamica (necesito Sacar/Meter)</li>
+                <li>"colas" → 🚂 Coladinamica (necesito Inscola/Supcola)</li>
+                <li>"listas de enteros" → 🔗 Listanoordenada con Integer (necesito Info/Sig)</li>
+              </ul>
+
+              <p><b>Paso 2 — Detectar niveles:</b></p>
+              <ul>
+                <li><b>Externo:</b> Pila</li>
+                <li><b>Medio:</b> Cola</li>
+                <li><b>Interno:</b> Lista de enteros</li>
+              </ul>
+
+              <p><b>Paso 3 — Instanciar de adentro hacia afuera:</b></p>
+              <pre class="code"><code class="ada">package Lista_Int      is new Listanoordenada (Tipoelem =&gt; Integer);
+package Cola_de_Listas is new Coladinamica
+                              (Tipoelem =&gt; Lista_Int.Tipolista);
+package Pila_de_Colas  is new Piladinamica
+                              (Tipoelem =&gt; Cola_de_Listas.Tipocoladinamica);
+</code></pre>
+
+              <p><b>Paso 4 — Navegar de afuera hacia adentro:</b></p>
+              <ol>
+                <li><b>Pila (externo):</b> el tope se obtiene con <code>Sacar (P, ColaTope)</code>. Ahora tengo la cola del tope en <code>ColaTope</code>.</li>
+                <li><b>Cola (medio):</b> la lista del final se obtiene vaciando la cola entera y guardando la última lista sacada. <code>while not Vacia (ColaTope) loop Supcola (ColaTope, Lista_F); ...</code></li>
+                <li><b>Lista (interno):</b> los negativos se obtienen recorriendo con Aux. <code>AuxLista := Lista_F; while not Vacia (AuxLista) loop ...</code></li>
+              </ol>
+
+              <p>Ese es el código que está en el thread <a href="#parcial-recu-2022">📌 Recu 2022 (Ej 2)</a>. Mirálo de nuevo con esta lente.</p>
+
+              <h3>📐 Tabla resumen · "ESTO ES UNA X POR ESTA RAZÓN"</h3>
+
+              <p>Tu pregunta literal en formato tabla. Cuando leas un enunciado, parate y buscá las pistas:</p>
+
+              <table class="dt">
+                <thead><tr><th>Pistas en el texto</th><th>Es...</th><th>Justificación para oral</th></tr></thead>
+                <tbody>
+                  <tr><td>"último que se agregó", "deshacer", "stack de llamadas"</td><td><b>PILA</b></td><td>"Es pila porque solo me importa el último elemento agregado (LIFO)."</td></tr>
+                  <tr><td>"primero en llegar primero en salir", "turno", "buffer"</td><td><b>COLA</b></td><td>"Es cola porque respeto el orden de llegada (FIFO)."</td></tr>
+                  <tr><td>"cantidad variable de X", "se pueden agregar/sacar elementos"</td><td><b>LISTA dinámica</b></td><td>"Es lista porque la cantidad varía y no necesito acceso al medio."</td></tr>
+                  <tr><td>"ordenado por X", "lista ordenada"</td><td><b>LISTAORDENADA</b></td><td>"Es lista ordenada porque el enunciado pide orden y aprovecho el TAD."</td></tr>
+                  <tr><td>"buscar si existe X" + "no importa orden"</td><td><b>LISTANOORDENADA</b></td><td>"Es lista no ordenada porque solo necesito Esta y InsertarPpio O(1)."</td></tr>
+                  <tr><td>"12 meses del año", "horarios fijos", "días lun-vie"</td><td><b>ARRAY (vector)</b></td><td>"Es array porque el tamaño está acotado y conocido en compilación. Acceso O(1)."</td></tr>
+                  <tr><td>"matriz", "tabla", "filas y columnas"</td><td><b>ARRAY BIDIM</b></td><td>"Es matriz porque hay dos dimensiones con índices independientes."</td></tr>
+                  <tr><td>"datos personales", "información de un X" (con varios campos)</td><td><b>RECORD</b></td><td>"Es record porque agrupo campos relacionados con tipos distintos."</td></tr>
+                  <tr><td>"árbol binario de búsqueda", "menor a la izquierda, mayor a la derecha"</td><td><b>ABB</b></td><td>"Es ABB porque busco eficiencia logarítmica en búsquedas."</td></tr>
+                </tbody>
+              </table>
+
+              <h3>❌ Errores típicos al identificar</h3>
+
+              <div class="callout bad"><b>"Vector" porque me parece más fácil.</b> Si el enunciado dice "cantidad variable", usar vector con tope fijo es ERROR — perdés eficiencia y no podés crecer.</div>
+
+              <div class="callout bad"><b>"Listanoordenada" porque sé hacer InsertarPpio.</b> Si el enunciado pide "ordenado", usá <code>Listaordenada</code>. Ordenar a mano después es feo y perdés puntos.</div>
+
+              <div class="callout bad"><b>Confundir "pila DE listas" con "lista DE pilas".</b> El primer TAD es el externo. <i>Pila de listas</i> = una pila cuyo Tipoelem es Lista. <i>Lista de pilas</i> = una lista cuyo Tipoelem es Pila. Muy distintos.</div>
+
+              <div class="callout bad"><b>Olvidarse del record cuando hay varios campos.</b> Si el enunciado describe entidades con varios datos (Nombre + Edad + DNI), eso es un <code>record</code>. No 3 listas separadas.</div>
+
+              <h3>🎤 Guión para verbalizar en oral</h3>
+
+              <div class="callout good">
+                <p><b>Frase modelo cuando el profe te pregunte "¿por qué elegiste esa estructura?":</b></p>
+                <p style="margin-top:8px"><i>"El enunciado me dice <b>[pista textual]</b>, lo que indica
+                <b>[característica del TAD]</b>. Por eso elegí <b>[TAD]</b>. Para los niveles
+                anidados, identifiqué que <b>[X]</b> es lo más externo porque el texto lo nombra
+                primero, y <b>[Y]</b> es lo más interno. Instancié de adentro hacia afuera
+                porque cada nivel necesita el tipo del anterior. Para conservar, apliqué los
+                patrones de cada TAD."</i></p>
+              </div>
+
+              <p style="margin-top:14px;color:var(--text-mute)">
+                <b>Cómo usar este post:</b> leelo HOY antes de los Posts del Manual #1 a #5,
+                porque te da la metodología. El #6 (patrones) lo aplicás DESPUÉS de identificar
+                bien. Si tenés tiempo, agarrá uno de los 3 modelos pendientes y aplicá los 4
+                pasos por escrito antes de tirar código.
               </p>
             </div>
           </div>
@@ -8693,9 +8910,11 @@ procedure Estacion_Combustibles is
 
    --  AUXILIAR: suma de consumos de UN surtidor (evita repetir código)
    function Total_Consumo (Consumos : Lista_Consumos.Tipolista) return Float is
-      Aux   : Lista_Consumos.Tipolista := Consumos;
-      Total : Float := 0.0;
+      Aux   : Lista_Consumos.Tipolista;
+      Total : Float;
    begin
+      Aux   := Consumos;
+      Total := 0.0;
       while not Lista_Consumos.Vacia (Aux) loop
          Total := Total + Lista_Consumos.Info (Aux);
          Aux   := Lista_Consumos.Sig (Aux);
@@ -8708,11 +8927,12 @@ procedure Estacion_Combustibles is
      (Estacion     : in     Lista_Surtidores.Tipolista;
       Numero_Mayor :    out Integer)
    is
-      Aux       : Lista_Surtidores.Tipolista := Estacion;
+      Aux       : Lista_Surtidores.Tipolista;
       Actual    : Tiposurtidor;
       Total_Act : Float;
       Mayor     : Float;
    begin
+      Aux          := Estacion;
       Actual       := Lista_Surtidores.Info (Aux);
       Numero_Mayor := Actual.Numero;
       Mayor        := Total_Consumo (Actual.Consumos);
@@ -8812,11 +9032,12 @@ procedure Torneo_Ajedrez is
       L1        :    out Lista_Jugadores.Tipolista;
       L2        :    out Lista_Jugadores.Tipolista)
    is
-      Aux : Lista_Jugadores.Tipolista := Jugadores;
+      Aux : Lista_Jugadores.Tipolista;
       J   : Tipojugador;
    begin
       Lista_Jugadores.Crearlista (L1);
       Lista_Jugadores.Crearlista (L2);
+      Aux := Jugadores;
 
       while not Lista_Jugadores.Vacia (Aux) loop
          J := Lista_Jugadores.Info (Aux);
@@ -9148,9 +9369,10 @@ procedure Aulas_Pares_Base is
      (L      : in     Lista_Recs.Tipolista;
       Result : in out Lista_Pares.Tipolista)
    is
-      Aux : Lista_Recs.Tipolista := L;
+      Aux : Lista_Recs.Tipolista;
       R   : Tiporecord;
    begin
+      Aux := L;
       while not Lista_Recs.Vacia (Aux) loop
          R := Lista_Recs.Info (Aux);
          if R.Codigo mod 2 = 0 then
@@ -9297,8 +9519,9 @@ procedure Petrolera_Suma_Mayores is
       AuxCola : Cola_Listas.Tipocoladinamica;
       Frente  : Lista_Int.Tipolista;
       L       : Lista_Int.Tipolista;
-      Suma    : Integer := 0;
+      Suma    : Integer;
    begin
+      Suma := 0;
       for I in E'Range loop
          if not Cola_Listas.Vacia (E(I)) then
             --  Patrón 3: vaciar cola entera a auxiliar.
