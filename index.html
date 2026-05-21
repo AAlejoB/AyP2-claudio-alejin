@@ -767,7 +767,7 @@
     <div class="tp-group">
       <div class="tp-title" data-jump="manual">
         <span>Manual de Supervivencia</span>
-        <span class="pill">7 posts</span>
+        <span class="pill">8 posts</span>
       </div>
       <ul class="ej-list">
         <li><a href="#manual-post1">#1 · TAD, Packages, Genéricos</a></li>
@@ -776,7 +776,8 @@
         <li><a href="#manual-post4">#4 · Memoria dinámica</a></li>
         <li><a href="#manual-post5">#5 · Listas enlazadas</a></li>
         <li><a href="#manual-post6">#6 · Patrones de conservación</a></li>
-        <li><a href="#manual-post7">#7 · 🆕 Diagnóstico de estructura</a></li>
+        <li><a href="#manual-post7">#7 · Diagnóstico de estructura</a></li>
+        <li><a href="#manual-post8">#8 · 🆕 Catálogo de TADs · firmas</a></li>
       </ul>
     </div>
 
@@ -2361,6 +2362,357 @@ package Pila_de_Colas  is new Piladinamica
                 bien. Si tenés tiempo, agarrá uno de los 3 modelos pendientes y aplicá los 4
                 pasos por escrito antes de tirar código.
               </p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============ POST #8 — CATÁLOGO COMPLETO DE TADs ============ -->
+      <article class="thread" id="manual-post8">
+        <div class="thread-header">
+          <h2>Post #8 — Catálogo completo de TADs · firmas exactas</h2>
+          <span class="tag">post #8</span>
+          <span class="tag good">REFERENCIA del parcial</span>
+          <span class="tag warn">tenelo abierto el viernes</span>
+        </div>
+
+        <div class="post post-theory">
+          <div class="post-avatar">📚</div>
+          <div>
+            <div class="post-meta"><strong>Manual</strong><span class="role">catálogo / referencia</span><span>Post #8</span></div>
+            <div class="post-content">
+
+              <h3>🧠 El porqué</h3>
+              <p>
+                Si te equivocás en una firma, el código no compila y perdés puntos. Si inventás
+                operaciones que no existen (<code>Tope</code>, <code>Frente</code>,
+                <code>UltimoCola</code>), perdés más puntos. Este post tiene <b>TODAS las
+                operaciones</b> de los 9 packages que llevás al parcial, copiadas de los
+                <code>.ads</code> reales — no inventadas, no aproximadas.
+              </p>
+
+              <div class="callout warn">
+                <b>⚠️ LA TRAMPA MÁS GRANDE de la noche:</b> el nombre del tipo elemento NO es
+                igual en todos los packages. Memorízalos:
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Package</th><th>Nombre del tipo elemento</th></tr></thead>
+                  <tbody>
+                    <tr><td>Listanoordenada · Listaordenada</td><td><code>Tipoelem</code></td></tr>
+                    <tr><td>Piladinamica · Coladinamica</td><td><code>Tipoelem</code></td></tr>
+                    <tr><td><b>Pile (estática)</b></td><td><b><code>Tipoelemento</code></b> ⚠️</td></tr>
+                    <tr><td><b>Vec_simple · Vec_completo</b></td><td><b><code>Tipodato</code></b> ⚠️</td></tr>
+                    <tr><td><b>Matriz_simple · Matrizcompleta</b></td><td><b><code>Tipodato</code></b> ⚠️</td></tr>
+                  </tbody>
+                </table>
+                Si instanciás con el nombre equivocado, NO COMPILA.
+              </div>
+
+
+              <h3>🥞 1. <code>Piladinamica</code></h3>
+              <pre class="code"><span class="filename">piladinamica.ads</span><code class="ada">generic
+   type Tipoelem is private;
+package Piladinamica is
+
+   Pilavacia : exception;
+   type Tipopiladinamica is private;
+
+   procedure Crearpila (Pila : out Tipopiladinamica);
+   function  Vacia     (Pila : in  Tipopiladinamica) return Boolean;
+   procedure Meter     (Pila : in out Tipopiladinamica; Elemento : in  Tipoelem);
+   procedure Sacar     (Pila : in out Tipopiladinamica; Elemento : out Tipoelem);
+   procedure Limpiar   (Pila : in out Tipopiladinamica);
+
+private
+   --  tiene Tiponodo con access...
+end Piladinamica;
+</code></pre>
+              <table class="dt">
+                <thead><tr><th>Operación</th><th>Qué hace</th><th>Excepción</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Crearpila (P)</code></td><td>Deja P vacía (puntero a null)</td><td>—</td></tr>
+                  <tr><td><code>Vacia (P)</code></td><td>True si P está vacía</td><td>—</td></tr>
+                  <tr><td><code>Meter (P, X)</code></td><td>Apila X arriba</td><td>—</td></tr>
+                  <tr><td><code>Sacar (P, X)</code></td><td>Desapila el tope → X</td><td><code>Pilavacia</code></td></tr>
+                  <tr><td><code>Limpiar (P)</code></td><td>Libera memoria, deja vacía</td><td>—</td></tr>
+                </tbody>
+              </table>
+              <div class="callout bad" style="margin-top:8px"><b>NO existen:</b> <code>Tope</code>, <code>VerTope</code>, <code>Cima</code>. Para espiar: <code>Sacar + Meter</code> (Patrón 2).</div>
+
+
+              <h3>🥞 2. <code>Pile</code> (pila estática) ⚠️ tipo elemento distinto</h3>
+              <pre class="code"><span class="filename">pilae.ads</span><code class="ada">generic
+   type Tipoelemento is private;   --  ⚠️ Tipoelemento, no Tipoelem
+package Pilae is
+
+   type Tipopila (Max : Positive) is private;   --  con discriminante
+   Underflow, Overflow : exception;
+
+   procedure Limpiar (Pila : in out Tipopila);
+   function  Vacia   (Pila : in Tipopila) return Boolean;
+   function  Llena   (Pila : in Tipopila) return Boolean;
+   procedure Meter   (Pila : in out Tipopila; Nuevoelemento  : in  Tipoelemento);
+   procedure Sacar   (Pila : in out Tipopila; Elementosacado : out Tipoelemento);
+
+private
+   type Arreglopila is array (Positive range <>) of Tipoelemento;
+   type Tipopila (Max : Positive) is record
+      Cabeza    : Natural := 0;
+      Elementos : Arreglopila (1 .. Max);
+   end record;
+end Pilae;
+</code></pre>
+              <table class="dt">
+                <thead><tr><th>Operación</th><th>Qué hace</th><th>Excepción</th></tr></thead>
+                <tbody>
+                  <tr><td>(declaración)</td><td><code>P : Pile.Tipopila (Max =&gt; 100);</code> ya queda vacía</td><td>—</td></tr>
+                  <tr><td><code>Vacia (P)</code></td><td>True si Cabeza = 0</td><td>—</td></tr>
+                  <tr><td><code>Llena (P)</code></td><td>True si Cabeza = Max</td><td>—</td></tr>
+                  <tr><td><code>Meter (P, X)</code></td><td>Apila si hay lugar</td><td><code>Overflow</code></td></tr>
+                  <tr><td><code>Sacar (P, X)</code></td><td>Desapila el tope → X</td><td><code>Underflow</code></td></tr>
+                  <tr><td><code>Limpiar (P)</code></td><td>Cabeza := 0</td><td>—</td></tr>
+                </tbody>
+              </table>
+              <div class="callout warn" style="margin-top:8px">
+                <b>Diferencias con Piladinamica:</b>
+                <ul>
+                  <li>Tipo elemento es <code>Tipoelemento</code>, NO <code>Tipoelem</code>.</li>
+                  <li>Excepciones son <code>Underflow/Overflow</code>, NO <code>Pilavacia</code>.</li>
+                  <li>Tiene <code>Llena</code> (porque tope acotado), Piladinamica no.</li>
+                  <li><b>NO tiene Crearpila</b>: la pila se inicializa al declarar con <code>(Max =&gt; N)</code>.</li>
+                  <li>El argumento de <code>Meter</code> se llama <code>Nuevoelemento</code> (no <code>Elemento</code>) — aunque es solo informativo, el llamado es por posición.</li>
+                </ul>
+              </div>
+
+
+              <h3>🚂 3. <code>Coladinamica</code></h3>
+              <pre class="code"><span class="filename">coladinamica.ads</span><code class="ada">generic
+   type Tipoelem is private;
+package Coladinamica is
+
+   Colavacia : exception;
+   type Tipocoladinamica is private;
+
+   procedure Crearcola (Cola : out Tipocoladinamica);
+   function  Vacia     (Cola : in Tipocoladinamica) return Boolean;
+   procedure Inscola   (Cola : in out Tipocoladinamica; Elemento : in  Tipoelem);
+   procedure Supcola   (Cola : in out Tipocoladinamica; Elemento : out Tipoelem);
+   procedure Limpiar   (Cola : in out Tipocoladinamica);
+
+private
+   --  Record con dos punteros: Frente, Final
+end Coladinamica;
+</code></pre>
+              <table class="dt">
+                <thead><tr><th>Operación</th><th>Qué hace</th><th>Excepción</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Crearcola (C)</code></td><td>Frente y Final a null</td><td>—</td></tr>
+                  <tr><td><code>Vacia (C)</code></td><td>True si está vacía</td><td>—</td></tr>
+                  <tr><td><code>Inscola (C, X)</code></td><td><b>Mete al FINAL</b></td><td>—</td></tr>
+                  <tr><td><code>Supcola (C, X)</code></td><td><b>Saca del FRENTE</b> → X</td><td><code>Colavacia</code></td></tr>
+                  <tr><td><code>Limpiar (C)</code></td><td>Libera memoria, deja vacía</td><td>—</td></tr>
+                </tbody>
+              </table>
+              <div class="callout bad" style="margin-top:8px"><b>NO existen:</b> <code>Frente</code>, <code>Final</code>, <code>VerFrente</code>, <code>UltimoCola</code>. Para espiar: Patrón 3 (vaciar a auxiliar).</div>
+
+
+              <h3>🔗 4. <code>Listanoordenada</code> (TP4)</h3>
+              <pre class="code"><span class="filename">listanoordenada.ads</span><code class="ada">generic
+   type Tipoelem is private;
+package Listanoordenada is
+
+   Listavacia : exception;
+   type Tipolista is private;
+
+   procedure Crearlista     (Lista : out Tipolista);
+   procedure Limpiar        (Lista : in out Tipolista);
+   function  Vacia          (Lista : in Tipolista) return Boolean;
+   function  Esta           (Lista : Tipolista; Elemento : Tipoelem) return Boolean;
+   function  Info           (Lista : in Tipolista) return Tipoelem;
+   function  Sig            (Lista : in Tipolista) return Tipolista;
+   procedure InsertarPpio   (Lista : in out Tipolista; Elemento : in Tipoelem);
+   procedure InsertarFin    (Lista : in out Tipolista; Elemento : in Tipoelem);
+   procedure Suprimir       (Lista : in out Tipolista; Elemento : in Tipoelem);
+
+private
+   --  Access a Tiponodo (Info + Sig)
+end Listanoordenada;
+</code></pre>
+              <table class="dt">
+                <thead><tr><th>Operación</th><th>Qué hace</th><th>Costo</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Crearlista (L)</code></td><td>L := null</td><td>O(1)</td></tr>
+                  <tr><td><code>Vacia (L)</code></td><td>True si L = null</td><td>O(1)</td></tr>
+                  <tr><td><code>Esta (L, X)</code></td><td>True si X está en L</td><td>O(n)</td></tr>
+                  <tr><td><code>Info (L)</code></td><td>Devuelve el primer elemento</td><td>O(1) · raise <code>Listavacia</code> si vacía</td></tr>
+                  <tr><td><code>Sig (L)</code></td><td>Devuelve la cola (sin el primero)</td><td>O(1) · raise <code>Listavacia</code> si vacía</td></tr>
+                  <tr><td><code>InsertarPpio (L, X)</code></td><td>Inserta X adelante</td><td>O(1) ✅</td></tr>
+                  <tr><td><code>InsertarFin (L, X)</code></td><td>Inserta X atrás</td><td>O(n)</td></tr>
+                  <tr><td><code>Suprimir (L, X)</code></td><td>Suprime la primera ocurrencia de X</td><td>O(n)</td></tr>
+                  <tr><td><code>Limpiar (L)</code></td><td>Libera memoria, L := null</td><td>O(n)</td></tr>
+                </tbody>
+              </table>
+              <div class="callout" style="margin-top:8px"><b>Recorrido típico:</b> <code>Aux := L; while not Vacia (Aux) loop X := Info (Aux); ... Aux := Sig (Aux); end loop;</code></div>
+
+
+              <h3>📑 5. <code>Listaordenada</code></h3>
+              <pre class="code"><span class="filename">listaordenada.ads</span><code class="ada">generic
+   type Tipoelem is private;
+   with function menor (X, Y : Tipoelem) return Boolean;
+   with function mayor (X, Y : Tipoelem) return Boolean;
+package Listaordenada is
+
+   Listavacia : exception;
+   type Tipolista is private;
+
+   procedure Crearlistaordenada (Lista : out Tipolista);
+   procedure Limpiar            (Lista : in out Tipolista);
+   function  Vacia              (Lista : in Tipolista) return Boolean;
+   function  Esta               (Lista : Tipolista; Elemento : Tipoelem) return Boolean;
+   function  Info               (Lista : in Tipolista) return Tipoelem;
+   function  Sig                (Lista : in Tipolista) return Tipolista;
+   procedure Insertar           (Lista : in out Tipolista; Elemento : in Tipoelem);
+   procedure Suprimir           (Lista : in out Tipolista; Elemento : in Tipoelem);
+
+end Listaordenada;
+</code></pre>
+              <div class="callout warn" style="margin-top:8px">
+                <b>Diferencias con Listanoordenada:</b>
+                <ul>
+                  <li><b>Crearlistaordenada</b>, no <code>Crearlista</code>.</li>
+                  <li>Tiene UN solo <code>Insertar</code> (no Ppio/Fin) — inserta <i>en su lugar</i> según <code>menor</code>.</li>
+                  <li><b>Requiere 2 funciones genéricas formales</b>: <code>menor</code> y <code>mayor</code>. Si no las pasás, no compila.</li>
+                  <li><b>Truco descendente:</b> pasá <code>menor =&gt; Mayor_Que</code> (función que devuelve <code>X &gt; Y</code>).</li>
+                </ul>
+              </div>
+
+
+              <h3>📦 6. <code>Vec_simple</code> ⚠️ tipo elemento es Tipodato</h3>
+              <pre class="code"><span class="filename">vec_simple.ads</span><code class="ada">generic
+   type Tipodato is private;        --  ⚠️ NO es Tipoelem
+   type Indice   is (&lt;&gt;);            --  cualquier tipo discreto
+   with procedure Put (X : in  Tipodato);
+   with procedure Get (X : out Tipodato);
+package Vec_simple is
+   type Tipovec is array (Indice) of Tipodato;
+   procedure Leer     (vec : out Tipovec);
+   procedure Imprimir (Vec : in out Tipovec);
+end Vec_simple;
+</code></pre>
+              <table class="dt">
+                <thead><tr><th>Operación</th><th>Qué hace</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Leer (V)</code></td><td>Lee desde teclado todos los elementos (usa <code>Get</code> formal)</td></tr>
+                  <tr><td><code>Imprimir (V)</code></td><td>Imprime todos los elementos (usa <code>Put</code> formal)</td></tr>
+                  <tr><td><code>V (I)</code></td><td>Acceso directo (no es función del package, es del lenguaje)</td></tr>
+                  <tr><td><code>V'Range</code></td><td>Rango de índices (para <code>for I in V'Range loop</code>)</td></tr>
+                </tbody>
+              </table>
+
+
+              <h3>📦 7. <code>Vec_completo</code> ⚠️ tipo Tipodato + 4 funciones formales</h3>
+              <pre class="code"><span class="filename">Vec_completo.ads</span><code class="ada">generic
+   type Tipodato is private;
+   type Indice   is (&lt;&gt;);
+   Valorinicial : Tipodato;
+   with procedure Put (X : in  Tipodato);
+   with procedure Get (X : out Tipodato);
+   with function "+"  (A, B : Tipodato) return Tipodato;
+   with function "*"  (A, B : Tipodato) return Tipodato;
+   with function Raiz (A : Tipodato) return Float;
+   with function mayor (X, Y : in Tipodato) return Boolean;
+package Vec_completo is
+   type Tipovec is array (Indice) of Tipodato;
+   procedure Leer         (vec : out Tipovec);
+   procedure Imprimir     (Vec : in Tipovec);
+   function  Comparacion  (vec1, vec2 : in Tipovec) return Boolean;
+   procedure Ordenamiento (vec : in out Tipovec);
+   procedure Busqueda     (vec : in Tipovec; dato : in Tipodato;
+                           encontrado : out Boolean; pos : out Indice);
+end Vec_completo;
+</code></pre>
+
+
+              <h3>📊 8. <code>Matriz_simple</code> ⚠️ tipo Tipodato + 2 índices</h3>
+              <pre class="code"><span class="filename">matriz_simple.ads</span><code class="ada">generic
+   type Tipodato is private;
+   type fila    is (&lt;&gt;);
+   type columna is (&lt;&gt;);
+   with procedure Put (X : in  Tipodato);
+   with procedure Get (X : out Tipodato);
+package Matriz_Simple is
+   type Tipomat is array (fila, columna) of Tipodato;
+   procedure Leer_Matriz     (Mat : out Tipomat);
+   procedure Imprimir_Matriz (Mat : in Tipomat);
+end Matriz_Simple;
+</code></pre>
+
+
+              <h3>📊 9. <code>Matrizcompleta</code> ⚠️ varias operaciones extra</h3>
+              <pre class="code"><span class="filename">Matrizcompleta.ads</span><code class="ada">generic
+   type Tipodato is private;
+   type Fila    is (&lt;&gt;);
+   type Columna is (&lt;&gt;);
+   with procedure Put (X : in  Tipodato);
+   with procedure Get (X : out Tipodato);
+   with function "+" (X, Y : Tipodato) return Tipodato;
+   with function "&gt;" (A, B : Tipodato) return Boolean;
+package Matrizcompleta is
+   type Tmat   is array (Fila, Columna) of Tipodato;
+   type Tmat_T is array (Columna, Fila) of Tipodato;
+   procedure Leer         (Mat : out Tmat);
+   procedure Imprimir     (Mat : in Tmat);
+   procedure Get_Dato     (Dato : out Tipodato);
+   function  Comparar     (Mat, Matb : Tmat; Porc : Float) return Boolean;
+   procedure Ordenamiento (Mat : in out Tmat; Col : in Columna);
+   procedure Busqueda     (Mat : in Tmat; Elemento : in Tipodato;
+                           Encontrado : out Boolean;
+                           Posif : out Fila; Posic : out Columna);
+   procedure Traspuesta   (Mat : in Tmat; Mat_T : out Tmat_T);
+   procedure Imprimir_T   (Mat : in Tmat_T);
+end Matrizcompleta;
+</code></pre>
+
+
+              <h3>🚨 Tabla CHULETA · todo en una pasada</h3>
+              <p>Para revisar antes del parcial (5 minutos):</p>
+
+              <table class="dt">
+                <thead><tr><th>Package</th><th>Tipo principal</th><th>Crear</th><th>Operaciones (en orden)</th><th>Excepción</th></tr></thead>
+                <tbody>
+                  <tr><td><b>Piladinamica</b></td><td><code>Tipopiladinamica</code></td><td><code>Crearpila</code></td><td><code>Vacia · Meter · Sacar · Limpiar</code></td><td><code>Pilavacia</code></td></tr>
+                  <tr><td><b>Pile</b> (estática)</td><td><code>Tipopila</code></td><td>auto-init con <code>(Max =&gt; N)</code></td><td><code>Vacia · Llena · Meter · Sacar · Limpiar</code></td><td><code>Underflow · Overflow</code></td></tr>
+                  <tr><td><b>Coladinamica</b></td><td><code>Tipocoladinamica</code></td><td><code>Crearcola</code></td><td><code>Vacia · Inscola · Supcola · Limpiar</code></td><td><code>Colavacia</code></td></tr>
+                  <tr><td><b>Listanoordenada</b></td><td><code>Tipolista</code></td><td><code>Crearlista</code></td><td><code>Vacia · Esta · Info · Sig · InsertarPpio · InsertarFin · Suprimir · Limpiar</code></td><td><code>Listavacia</code></td></tr>
+                  <tr><td><b>Listaordenada</b></td><td><code>Tipolista</code></td><td><code>Crearlistaordenada</code></td><td><code>Vacia · Esta · Info · Sig · Insertar · Suprimir · Limpiar</code></td><td><code>Listavacia</code></td></tr>
+                  <tr><td><b>Vec_simple</b></td><td><code>Tipovec</code></td><td>declaración</td><td><code>Leer · Imprimir</code></td><td>—</td></tr>
+                  <tr><td><b>Vec_completo</b></td><td><code>Tipovec</code></td><td>declaración</td><td><code>Leer · Imprimir · Comparacion · Ordenamiento · Busqueda</code></td><td>—</td></tr>
+                  <tr><td><b>Matriz_simple</b></td><td><code>Tipomat</code></td><td>declaración</td><td><code>Leer_Matriz · Imprimir_Matriz</code></td><td>—</td></tr>
+                  <tr><td><b>Matrizcompleta</b></td><td><code>Tmat</code></td><td>declaración</td><td><code>Leer · Imprimir · Get_Dato · Comparar · Ordenamiento · Busqueda · Traspuesta · Imprimir_T</code></td><td>—</td></tr>
+                </tbody>
+              </table>
+
+
+              <h3>❌ Lo que NO existe (y te tienta inventar)</h3>
+              <div class="callout bad">
+                <ul>
+                  <li><b>Pila:</b> NO existe <code>Tope</code>, <code>VerTope</code>, <code>Cima</code>, <code>Cima(P)</code>. Para "ver el tope": <code>Sacar (P, X); ...usar X...; Meter (P, X);</code></li>
+                  <li><b>Cola:</b> NO existe <code>Frente</code>, <code>VerFrente</code>, <code>Final</code>, <code>UltimoCola</code>. Para "ver el frente/final": Patrón 3.</li>
+                  <li><b>Lista:</b> NO existe <code>EnePosicion (L, N)</code>, <code>ElementoEnPos</code>, ni acceso directo por índice. Solo <code>Info/Sig</code> linealmente.</li>
+                  <li><b>Lista:</b> NO existe <code>Modificar</code> ni <code>Cambiar</code>. Para "modificar" un elemento: <code>Suprimir</code> el viejo + <code>InsertarPpio</code> el nuevo (ver Hospital Ej b).</li>
+                  <li><b>Todos:</b> NO existe <code>Cantidad</code>, <code>Tamanio</code>, <code>Length</code>. Si necesitás contar, recorrés y acumulás.</li>
+                </ul>
+              </div>
+
+
+              <h3>🎤 Cómo usar este post el viernes</h3>
+              <div class="callout good">
+                <ul>
+                  <li><b>Antes del parcial:</b> abrí esta pestaña en una ventana aparte (o imprimí solo la "Tabla CHULETA").</li>
+                  <li><b>Durante el parcial:</b> cuando dudes una firma, mirá la tabla. NO improvises.</li>
+                  <li><b>Si te trabás:</b> escribí en la hoja el nombre del package que vas a instanciar, después su tipo principal, después las operaciones que necesitás. Ya tenés media solución.</li>
+                </ul>
+                <b>Frase para repetir:</b> <i>"No invento operaciones que no existen. Si necesito una que el package no tiene, la construyo con los patrones del Post #6."</i>
+              </div>
             </div>
           </div>
         </div>
