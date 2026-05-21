@@ -2173,6 +2173,62 @@ end;
                 colas adentro.
               </div>
 
+              <h3>🆕 Paso 2.5 · MAPEAR (el "servidor" entre identificar e instanciar)</h3>
+
+              <p>
+                Antes de escribir UNA línea de código, completá esta tabla. Es el puente que
+                automatiza el salto entre "identifiqué los niveles" y "voy a codear las
+                instanciaciones". Llenala SIEMPRE de adentro hacia afuera (nivel 1 = el más
+                interno).
+              </p>
+
+              <table class="dt">
+                <thead><tr><th>Nivel</th><th>Tipo del elemento</th><th>Mi nombre de package</th><th>Tipo que exporta</th></tr></thead>
+                <tbody>
+                  <tr><td>1 (interno)</td><td><code>Integer</code> / <code>Float</code> / record propio</td><td><code>Lista_Int</code> (ejemplo)</td><td><code>Tipolista</code></td></tr>
+                  <tr><td>2 (medio)</td><td><code>NombreNivel1.TipoExportado</code></td><td><code>Cola_de_Listas</code> (ejemplo)</td><td><code>Tipocoladinamica</code></td></tr>
+                  <tr><td>3 (externo)</td><td><code>NombreNivel2.TipoExportado</code></td><td><code>Pila_de_Colas</code> (ejemplo)</td><td><code>Tipopiladinamica</code></td></tr>
+                </tbody>
+              </table>
+
+              <p style="margin-top:8px"><b>Tipos exportados por cada TAD (memorizalos):</b></p>
+
+              <table class="dt">
+                <thead><tr><th>TAD</th><th>Tipo que exporta</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Listanoordenada</code> / <code>Listaordenada</code></td><td><code>Tipolista</code></td></tr>
+                  <tr><td><code>Piladinamica</code></td><td><code>Tipopiladinamica</code></td></tr>
+                  <tr><td><code>Pile</code> (estática)</td><td><code>Tipopila</code></td></tr>
+                  <tr><td><code>Coladinamica</code></td><td><code>Tipocoladinamica</code></td></tr>
+                  <tr><td><code>ArbolBinarioBusqueda</code></td><td><code>Tipo_Arbol</code></td></tr>
+                </tbody>
+              </table>
+
+              <div class="callout good" style="margin-top:8px">
+                <b>Por qué funciona como "servidor":</b> una vez completa la tabla, la
+                instanciación es <i>literalmente</i> escribir cada fila como una línea de
+                código. La columna "Tipo del elemento" va al <code>Tipoelem =&gt;</code> de la
+                instanciación. La columna "Mi nombre de package" va al <code>package X is new ...</code>.
+                Es traducción mecánica.
+              </div>
+
+              <p><b>Ejemplo aplicado · "pila de colas de listas de enteros":</b></p>
+
+              <table class="dt">
+                <thead><tr><th>Nivel</th><th>Tipo del elemento</th><th>Package</th><th>Tipo exportado</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><code>Integer</code></td><td><code>Lista_Int</code></td><td><code>Tipolista</code></td></tr>
+                  <tr><td>2</td><td><code>Lista_Int.Tipolista</code></td><td><code>Cola_de_Listas</code></td><td><code>Tipocoladinamica</code></td></tr>
+                  <tr><td>3</td><td><code>Cola_de_Listas.Tipocoladinamica</code></td><td><code>Pila_de_Colas</code></td><td><code>Tipopiladinamica</code></td></tr>
+                </tbody>
+              </table>
+
+              <p>Y las 3 instanciaciones salen mecánicamente:</p>
+              <pre class="code"><code class="ada">package Lista_Int      is new Listanoordenada (Tipoelem =&gt; Integer);
+package Cola_de_Listas is new Coladinamica    (Tipoelem =&gt; Lista_Int.Tipolista);
+package Pila_de_Colas  is new Piladinamica    (Tipoelem =&gt; Cola_de_Listas.Tipocoladinamica);
+</code></pre>
+
               <h3>🔧 Paso 3 · Instanciar de ADENTRO hacia AFUERA</h3>
 
               <p>
@@ -8830,6 +8886,21 @@ end;
           <div class="post-body">
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución</span></div>
             <div class="post-text">
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"stock mensual, último año" (12 meses)</td><td>tamaño fijo y conocido</td><td>Array indexado por mes</td></tr>
+                    <tr><td>"distintas categorías" (Electro, Hogar...)</td><td>conjunto cerrado</td><td>Array indexado por enum</td></tr>
+                    <tr><td>"productos dentro de cada categoría"</td><td>cantidad variable</td><td>Listanoordenada (record producto)</td></tr>
+                    <tr><td>"cantidad de surtidores sujeta a cambios"</td><td>dinámico, crece/decrece</td><td>Listanoordenada (record surtidor)</td></tr>
+                    <tr><td>"consumo por cada automóvil"</td><td>cantidad variable por surtidor</td><td>Listanoordenada (Float)</td></tr>
+                    <tr><td>"no recorrer toda la estructura"</td><td>eficiencia O(1) en acceso</td><td>Arrays anidados con índices directos</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Ej 1 · Depósito ChangoMas — estructura matricial de listas</b></p>
               <p>Mes (1..12) y Categoría (enum) son dimensiones <i>fijas y conocidas</i> → arreglo con acceso directo O(1). Productos varían en cantidad → <code>Listanoordenada</code>.</p>
               <pre class="code"><span class="filename">deposito_changomas.adb</span><code class="ada">with Listanoordenada;
@@ -8995,6 +9066,20 @@ end Estacion_Combustibles;
           <div class="post-body">
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución</span></div>
             <div class="post-text">
+
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"lista de jugadores"</td><td>cantidad variable</td><td>Listanoordenada (record jugador)</td></tr>
+                    <tr><td>"número, pieza, tiempo" del jugador</td><td>varios campos</td><td>Record</td></tr>
+                    <tr><td>"pieza" ∈ {c,a,t,p,r,d}</td><td>conjunto cerrado y conocido</td><td>Enumerativo (TipoPieza)</td></tr>
+                    <tr><td>"vector de pilas de listas de enteros"</td><td>3 niveles anidados</td><td>Array + Piladinamica + Listanoordenada</td></tr>
+                    <tr><td>"mayor de la lista del TOPE de cada pila"</td><td>acceso al tope sin destruir</td><td>Patrón 2 (Sacar + Meter inmediato)</td></tr>
+                  </tbody>
+                </table>
+              </div>
 
               <p><b>Ej 1 · Torneo de ajedrez — filtro doble en una pasada</b></p>
               <p>Cantidad de jugadores variable → <code>Listanoordenada</code>. Las listas L1 y L2 son del mismo tipo. Una sola pasada decide cada jugador con <code>if/elsif</code>.</p>
@@ -9191,6 +9276,20 @@ end Mayor_de_Topes;
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · Negativos</span></div>
             <div class="post-text">
 
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"pila" (la estructura P)</td><td>LIFO · acceso solo al tope</td><td>Piladinamica</td></tr>
+                    <tr><td>"colas" (dentro de cada elemento de P)</td><td>FIFO · acceso al frente y final</td><td>Coladinamica</td></tr>
+                    <tr><td>"listas de enteros" (dentro de las colas)</td><td>cantidad variable</td><td>Listanoordenada (Integer)</td></tr>
+                    <tr><td>"lista al FINAL de la cola del TOPE"</td><td>último de cola + tope de pila</td><td>Patrón 2 (pila) + Patrón 3 (cola)</td></tr>
+                    <tr><td>"números NEGATIVOS"</td><td>filtro X &lt; 0 en la lista</td><td>recorrer con Aux y filtrar</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Lectura concepto a concepto:</b></p>
               <ul>
                 <li><b>"pila de colas de listas de enteros":</b> 3 niveles anidados. <code>P</code> es pila → cada elemento es cola → cada elemento de cola es lista de enteros.</li>
@@ -9336,6 +9435,20 @@ end Negativos_Recu_2022;
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · pares en base</span></div>
             <div class="post-text">
 
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"matriz M"</td><td>tabla bidimensional</td><td>Array (Fila, Col)</td></tr>
+                    <tr><td>"pila de listas" (en cada celda)</td><td>apilamiento dentro de matriz</td><td>Piladinamica</td></tr>
+                    <tr><td>"listas de records"</td><td>cantidad variable + multi-campo</td><td>Listanoordenada (record)</td></tr>
+                    <tr><td>"BASE de cada pila"</td><td>el más antiguo (fondo)</td><td>Patrón 4 (dos whiles)</td></tr>
+                    <tr><td>"números pares"</td><td>filtro del campo numérico</td><td>R.Codigo mod 2 = 0</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Estructura:</b> matriz 2D donde cada celda es una pila; cada elemento de la pila es una lista de records; cada record tiene un campo numérico. <b>Patrones:</b> 4 (base de pila) + 1 (recorrer lista con Aux). Asumo que el record tiene al menos un campo <code>Codigo : Integer</code>.</p>
 
               <pre class="code"><span class="filename">aulas_pares_base.adb</span><code class="ada">with Listanoordenada;
@@ -9465,6 +9578,19 @@ end Aulas_Pares_Base;
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · suma de mayores del frente</span></div>
             <div class="post-text">
 
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"vector de colas"</td><td>índice fijo + FIFO</td><td>Array of Coladinamica</td></tr>
+                    <tr><td>"listas de enteros" (en cada cola)</td><td>cantidad variable</td><td>Listanoordenada (Integer)</td></tr>
+                    <tr><td>"mayor de la lista del FRENTE"</td><td>primer elemento de cada cola</td><td>Patrón 3 (capturar el primer Supcola)</td></tr>
+                    <tr><td>"sumar... e IMPRIMIR el resultado"</td><td>acumular + Put</td><td>Variable Suma + Ada.Text_IO</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Estructura:</b> vector indexado donde cada celda es una cola; cada cola contiene listas de enteros. Patrones: <b>3</b> (vaciar cola a auxiliar para acceder al frente conservando) + <b>1</b> (Aux para recorrer lista).</p>
 
               <p><b>Trampa específica:</b> el primer <code>Supcola</code> me da el frente. Lo capturo en una variable separada antes de seguir vaciando.</p>
@@ -9591,6 +9717,28 @@ end Petrolera_Suma_Mayores;
           <div class="post-body">
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 1 · Empresa de juegos</span></div>
             <div class="post-text">
+
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD (Ej 1 · Empresa de juegos)</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"estructura dinámica" para juegos</td><td>crece/decrece</td><td>Listanoordenada (record juego)</td></tr>
+                    <tr><td>"datos de clientes que usan sus juegos"</td><td>clientes asociados al juego</td><td>Listanoordenada anidada en el record juego</td></tr>
+                    <tr><td>"Obtener lista ORDENADA por nombre_juego"</td><td>resultado ordenado</td><td>Listaordenada (con función comparadora)</td></tr>
+                    <tr><td>"clientes con edad mayor al PROMEDIO"</td><td>requiere agregado previo</td><td>Dos pasadas: calcular promedio + filtrar</td></tr>
+                  </tbody>
+                </table>
+                <p style="margin:10px 0 0"><b>Ej 2 · complemento_lista:</b></p>
+                <table class="dt" style="margin-top:6px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"recibe PILA y LISTA"</td><td>dos estructuras de entrada</td><td>Piladinamica + Listanoordenada</td></tr>
+                    <tr><td>"ordenados MAYOR a MENOR"</td><td>descendente</td><td>Listaordenada con <code>menor =&gt; Mayor_Que</code></td></tr>
+                    <tr><td>"que NO están en la lista"</td><td>complemento (filtro negativo)</td><td><code>not Esta (L, X)</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
 
               <p><b>Estructura:</b> 2 niveles anidados. Lista de juegos (cada uno con su lista interna de clientes). El resultado es un record COMBINADO (juego + cliente) en lista ordenada por nombre_juego.</p>
 
@@ -9896,6 +10044,23 @@ end Complemento;
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución completa</span></div>
             <div class="post-text">
 
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"forma médicos residentes" + "cada residente"</td><td>cantidad variable</td><td>Listanoordenada (record residente)</td></tr>
+                    <tr><td>"legajo, apellido, especialidad"</td><td>varios campos del residente</td><td>Record</td></tr>
+                    <tr><td>"programa dura EXACTAMENTE 3 años"</td><td>tamaño FIJO y conocido</td><td>Array (1..3) dentro del record</td></tr>
+                    <tr><td>"rota por distintos servicios" (varios por año)</td><td>cantidad variable</td><td>Listanoordenada (record servicio)</td></tr>
+                    <tr><td>"recibe EVALUACIONES" (varias por servicio)</td><td>cantidad variable</td><td>Listanoordenada (record evaluación)</td></tr>
+                    <tr><td>"fecha, nota, evaluador"</td><td>varios campos de la evaluación</td><td>Record</td></tr>
+                    <tr><td>"promedio inferior a 6"</td><td>agregado por servicio</td><td>Función auxiliar <code>Promedio_Notas</code></td></tr>
+                    <tr><td>"evaluador que MÁS evaluaciones realizó"</td><td>conteo por nombre</td><td>Lista de (Nombre, Count) + supr+insert</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Diagnóstico (Post #7 aplicado):</b></p>
               <ul>
                 <li><b>Identificar:</b> Lista de residentes (variable) · array fijo de años (3) · lista de servicios · lista de evaluaciones · records en cada nivel.</li>
@@ -10163,6 +10328,19 @@ end Hospital_Residentes;
           <div class="post-body">
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · Reemplazar</span></div>
             <div class="post-text">
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"vector de colas"</td><td>índice fijo + FIFO</td><td>Array of Coladinamica</td></tr>
+                    <tr><td>"records" en cada cola</td><td>varios campos por elemento</td><td>Record (Nombre + Num)</td></tr>
+                    <tr><td>"REEMPLAZAR campo numérico por cant. de chars"</td><td>operación MODIFICATORIA</td><td>Vaciar + actualizar + reinsertar (NO conserva)</td></tr>
+                    <tr><td>"cantidad de caracteres de la cadena"</td><td>contar chars no-espacio</td><td>Función <code>Largo_Real</code> con for sobre String</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Atención — este ejercicio MODIFICA</b> la estructura. El enunciado pide
                 "reemplazar", no "conservar". Es la EXCEPCIÓN a la regla general. Pero el orden
                 de la cola SÍ se mantiene (FIFO), porque al volver a meter cada record actualizado
@@ -10273,6 +10451,19 @@ end Petrolera_Reemplazar;
           <div class="post-body">
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 2 · Intersección</span></div>
             <div class="post-text">
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"recibe LISTA L1 y PILA P1"</td><td>dos estructuras de entrada</td><td>Listanoordenada + Piladinamica</td></tr>
+                    <tr><td>"INTERSECCIÓN" (elementos en ambas)</td><td>filtro de pertenencia positiva</td><td><code>Esta (L1, X)</code> AND otra cond.</td></tr>
+                    <tr><td>"ordenada ASCENDENTEMENTE"</td><td>orden creciente (menor primero)</td><td>Listaordenada con <code>menor =&gt; Menor_Que</code></td></tr>
+                    <tr><td>"sin repeticiones"</td><td>filtrar duplicados</td><td><code>not Esta (L2, X)</code> antes de insertar</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Es el primo del CC P1 2023 Ej 2</b> pero con dos diferencias clave: orden
                 <b>ascendente</b> (no descendente) y filtro de <b>intersección</b> (en ambas) en
                 vez de <b>complemento</b> (en pila pero no en lista).</p>
@@ -10385,6 +10576,37 @@ end Google_Interseccion;
           <div class="post-body">
             <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 1 · ListaPalabras</span></div>
             <div class="post-text">
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD (Ej 1 · ListaPalabras)</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"lista de palabras"</td><td>cantidad variable</td><td>Listanoordenada (subtype TipoPalabra)</td></tr>
+                    <tr><td>"empiezan con vocal"</td><td>filtro por primer carácter</td><td>Función <code>Es_Vocal (Palabra'First)</code></td></tr>
+                    <tr><td>"reemplazar 'x' por 'y'"</td><td>modificar caracteres del string</td><td>For loop sobre <code>P'Range</code></td></tr>
+                  </tbody>
+                </table>
+                <p style="margin:10px 0 0"><b>Ej 2 · CuentaPar:</b></p>
+                <table class="dt" style="margin-top:6px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"pila de vectores de listas"</td><td>3 niveles anidados</td><td>Pila[Vec[Lista]]</td></tr>
+                    <tr><td>"total de nodos con valor PAR"</td><td>contar X mod 2 = 0</td><td>Recorrido completo + acumulador</td></tr>
+                    <tr><td>"La estructura debe conservarse"</td><td>conservar pila externa</td><td>Patrón 4 (dos whiles)</td></tr>
+                  </tbody>
+                </table>
+                <p style="margin:10px 0 0"><b>Ej 3 · Unión:</b></p>
+                <table class="dt" style="margin-top:6px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"recibe pila... y cola..."</td><td>dos estructuras de entrada</td><td>Piladinamica + Coladinamica</td></tr>
+                    <tr><td>"ordenados MAYOR a MENOR"</td><td>descendente</td><td>Listaordenada con <code>menor =&gt; Mayor_Que</code></td></tr>
+                    <tr><td>"sin repetidos"</td><td>filtrar duplicados</td><td><code>not Esta (Result, X)</code></td></tr>
+                    <tr><td>"sólo MÚLTIPLOS DE 4"</td><td>filtro por mod</td><td><code>X mod 4 = 0</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
               <p><b>Concepto:</b> manejo de strings con tamaño fijo + recorrido carácter por carácter. Es el único de la noche que toca <code>Character</code> y <code>String</code> directamente.</p>
 
               <pre class="code"><span class="filename">whatsapp_listapalabras.adb</span><code class="ada">with Listanoordenada;
