@@ -1920,6 +1920,66 @@ end if;
                 volvé y aplicá uno de los 5 patrones de abajo.
               </div>
 
+              <h3>🎯 Los 4 patrones lado a lado · matriz comparativa</h3>
+
+              <p>
+                Antes de leer cada patrón en detalle, mirá esta matriz. Te da en 30 segundos
+                qué patrón corresponde a qué situación. <b>Para el parcial: tené esta tabla en la
+                cabeza.</b>
+              </p>
+
+              <table class="dt">
+                <thead><tr><th>Patrón</th><th>Cuándo lo usás</th><th>Operación clave</th><th>Estructura típica</th><th>Costo</th><th>Error típico</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><b>1 · Aux en lista</b></td>
+                    <td>Recorrer una lista sin modificarla</td>
+                    <td><code>Aux := L</code> · <code>Aux := Sig (Aux)</code></td>
+                    <td>Listanoordenada · Listaordenada</td>
+                    <td>O(n) recorrido</td>
+                    <td>Avanzar <code>L</code> en vez de <code>Aux</code></td>
+                  </tr>
+                  <tr>
+                    <td><b>2 · Sacar + Meter</b></td>
+                    <td>Espiar el TOPE de la pila sin destruir</td>
+                    <td><code>Sacar (P, X); ...; Meter (P, X);</code></td>
+                    <td>Piladinamica</td>
+                    <td>O(1) por acceso</td>
+                    <td>Olvidar el <code>Meter</code> de vuelta</td>
+                  </tr>
+                  <tr>
+                    <td><b>3 · Cola a auxiliar</b></td>
+                    <td>Acceder al FRENTE o FINAL de cola conservando</td>
+                    <td>Vaciar a <code>Aux</code> con Supcola+Inscola · <code>C := Aux</code></td>
+                    <td>Coladinamica</td>
+                    <td>O(n)</td>
+                    <td>No reasignar <code>C := Aux</code> al final</td>
+                  </tr>
+                  <tr>
+                    <td><b>4 · Dos whiles</b></td>
+                    <td>Acceder a la BASE (fondo) de la pila</td>
+                    <td>While 1: vaciar a Aux · While 2: restaurar</td>
+                    <td>Piladinamica</td>
+                    <td>O(n)</td>
+                    <td>Olvidar el while de restaurar (pila queda vacía)</td>
+                  </tr>
+                  <tr>
+                    <td><b>5 · Combinar</b></td>
+                    <td>Estructuras compuestas (Vec[Pila[Lista]]...)</td>
+                    <td>Aplicar 1-4 según el nivel</td>
+                    <td>Cualquier combinación</td>
+                    <td>Suma de los anidados</td>
+                    <td>Mezclar patrones entre niveles</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="callout good" style="margin-top:10px">
+                <b>Cómo leerla:</b> primera columna = patrón. Si dudás qué patrón usar, leé
+                la columna "Cuándo lo usás" o "Estructura típica" y la cosa salta sola. La
+                columna "Error típico" te dice qué NO hacer.
+              </div>
+
               <h3>📐 Patrón 1 — Lista: <code>Aux</code> para recorrer sin modificar</h3>
               <p>
                 El más simple y el más usado. <code>Tipolista</code> es internamente un puntero
@@ -2123,9 +2183,65 @@ end;
                 <ol style="margin:0">
                   <li><b>Identificar</b> cuál es cada TAD según pistas del texto.</li>
                   <li><b>Detectar</b> los niveles anidados ("X de Y de Z").</li>
+                  <li><b>Mapear</b> (2.5) cada nivel con su package y tipo exportado.</li>
                   <li><b>Instanciar</b> de adentro hacia afuera.</li>
                   <li><b>Navegar</b> de afuera hacia adentro.</li>
                 </ol>
+              </div>
+
+              <h3>🎯 Los 5 pasos lado a lado · matriz comparativa</h3>
+
+              <p>
+                Cada paso tiene una pregunta que responder, una entrada (lo que ya tenés) y una
+                salida (lo que producís). La última columna te dice a qué herramienta del foro
+                ir si te trabás.
+              </p>
+
+              <table class="dt">
+                <thead><tr><th>Paso</th><th>Pregunta a responder</th><th>Entrada</th><th>Salida</th><th>Herramienta del foro</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><b>1 · Identificar</b></td>
+                    <td>¿Qué TADs aparecen en el enunciado?</td>
+                    <td>Texto del enunciado</td>
+                    <td>Lista de TADs detectados (Pila, Cola, Lista, Array, Record)</td>
+                    <td>Post #7 · Tabla "Frase → TAD"</td>
+                  </tr>
+                  <tr>
+                    <td><b>2 · Detectar niveles</b></td>
+                    <td>¿Cuántos niveles anidados? ¿En qué orden?</td>
+                    <td>TADs del paso 1</td>
+                    <td>Estructura anidada: "X de Y de Z"</td>
+                    <td>Post #7 · Tabla "X de Y de Z"</td>
+                  </tr>
+                  <tr>
+                    <td><b>2.5 · Mapear</b></td>
+                    <td>¿Qué Tipoelem y package va en cada nivel?</td>
+                    <td>Estructura anidada</td>
+                    <td>Tabla: Nivel / Tipoelem / Package / Tipo exportado</td>
+                    <td>Post #7 · Paso 2.5 + Post #8 (firmas)</td>
+                  </tr>
+                  <tr>
+                    <td><b>3 · Instanciar</b></td>
+                    <td>¿Cómo codeo las instanciaciones?</td>
+                    <td>Tabla del paso 2.5</td>
+                    <td>Líneas de <code>package X is new Y (Tipoelem =&gt; ...);</code></td>
+                    <td>Post #8 · Firmas exactas (Tipoelem vs Tipodato vs Tipoelemento)</td>
+                  </tr>
+                  <tr>
+                    <td><b>4 · Navegar</b></td>
+                    <td>¿Cómo accedo a cada nivel? ¿Qué patrón aplico?</td>
+                    <td>Estructura ya instanciada</td>
+                    <td>Código del procedimiento</td>
+                    <td>Post #6 · Patrones + Post #8 · Operaciones</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="callout good" style="margin-top:10px">
+                <b>Cómo leerla:</b> seguí los pasos en orden de arriba hacia abajo. La salida
+                de un paso es <b>literalmente</b> la entrada del siguiente. Si te trabás en
+                un paso, la última columna te dice exactamente dónde ir en el foro.
               </div>
 
               <h3>📋 Paso 1 · Identificar cada TAD según pistas del enunciado</h3>
