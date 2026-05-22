@@ -1479,7 +1479,7 @@ end Procesar_Frente;
                 en este orden:
                 <ol>
                   <li>Instanciás el package del nivel más interno con el tipo concreto:
-                      <pre class="code" style="margin:6px 0 0"><code class="ada">package LInt is new Listanoordenada (Integer);</code></pre></li>
+                      <pre class="code" style="margin:6px 0 0"><code class="ada">package LInt is new Lista (Integer);</code></pre></li>
                   <li>Instanciás el siguiente nivel usando el tipo del anterior:
                       <pre class="code" style="margin:6px 0 0"><code class="ada">package PList is new Piladinamica (LInt.Tipolista);</code></pre></li>
                   <li>Y así hasta el más externo:
@@ -1751,9 +1751,9 @@ Free (Q);               --  intenta liberar lo mismo otra vez: UB
                       <td>cuando el orden importa al buscar</td>
                       <td><code>Insertar</code> mantiene el orden — recibe <code>Menor</code> y
                           <code>Mayor</code> como subprogramas formales</td></tr>
-                  <tr><td><code>Listanoordenada</code></td>
+                  <tr><td><code>Lista</code></td>
                       <td>cuando el orden lo decide el cliente</td>
-                      <td>tiene <code>InsertarPpio</code> (O(1)) y <code>InsertarFin</code>
+                      <td>tiene <code>Insertar</code> (O(1)) y <code>Insertar</code>
                           (O(n))</td></tr>
                 </tbody>
               </table>
@@ -1762,14 +1762,14 @@ Free (Q);               --  intenta liberar lo mismo otra vez: UB
               <table class="dt">
                 <thead><tr><th>Operación</th><th>Costo</th><th>Notas</th></tr></thead>
                 <tbody>
-                  <tr><td><code>Crearlista</code></td><td>O(1)</td><td>devuelve lista en null</td></tr>
+                  <tr><td><code>Crear</code></td><td>O(1)</td><td>devuelve lista en null</td></tr>
                   <tr><td><code>Vacia</code></td><td>O(1)</td><td>true si lista = null</td></tr>
                   <tr><td><code>Esta</code></td><td>O(n)</td><td>recorrido lineal con corte temprano</td></tr>
                   <tr><td><code>Info</code></td><td>O(1)</td><td>devuelve el dato del primer nodo</td></tr>
                   <tr><td><code>Sig</code></td><td>O(1)</td><td>devuelve el puntero al siguiente</td></tr>
                   <tr><td><code>Insertar</code> (ordenada)</td><td>O(n)</td><td>encuentra posición y enlaza</td></tr>
-                  <tr><td><code>InsertarPpio</code></td><td>O(1)</td><td>el nuevo nodo es la nueva cabeza</td></tr>
-                  <tr><td><code>InsertarFin</code></td><td>O(n)</td><td>recorre hasta el último</td></tr>
+                  <tr><td><code>Insertar</code></td><td>O(1)</td><td>el nuevo nodo es la nueva cabeza</td></tr>
+                  <tr><td><code>Insertar</code></td><td>O(n)</td><td>recorre hasta el último</td></tr>
                   <tr><td><code>Suprimir</code></td><td>O(n)</td><td>busca, desenlaza, libera</td></tr>
                   <tr><td><code>Limpiar</code></td><td>O(n)</td><td>libera todos los nodos</td></tr>
                 </tbody>
@@ -1783,8 +1783,8 @@ Free (Q);               --  intenta liberar lo mismo otra vez: UB
                       <pre class="code" style="margin:6px 0 0"><code class="ada">function Menor (X, Y : T) return Boolean is (X &lt; Y);
 function Mayor (X, Y : T) return Boolean is (X &gt; Y);
 package Mi_Lista is new Listaordenada (T, Menor, Mayor);</code></pre></li>
-                  <li><b>Para <code>Listanoordenada</code>:</b> sólo el tipo de elemento.
-                      <pre class="code" style="margin:6px 0 0"><code class="ada">package Mi_Lista is new Listanoordenada (T);</code></pre></li>
+                  <li><b>Para <code>Lista</code>:</b> sólo el tipo de elemento.
+                      <pre class="code" style="margin:6px 0 0"><code class="ada">package Mi_Lista is new Lista (T);</code></pre></li>
                   <li><b>Internamente:</b> ambas usan <code>Ada.Unchecked_Deallocation</code> para
                       liberar nodos en <code>Suprimir</code> y <code>Limpiar</code>.</li>
                   <li><b>Recorrido fuera del package:</b> sólo accedés con <code>Info</code>,
@@ -1844,7 +1844,7 @@ end if;
                       <code>Ptr /= null and then Ptr.Info = X</code> es seguro;
                       <code>Ptr /= null and Ptr.Info = X</code> evalúa <code>Ptr.Info</code> aún si
                       <code>Ptr</code> es null → Constraint_Error.</li>
-                  <li><b><code>Info</code> de la lista de la cátedra LANZA <code>Listavacia</code>
+                  <li><b><code>Info</code> de la lista de la cátedra LANZA <code>Lista_Vacia</code>
                       si la lista está vacía.</b> Verificar antes con <code>not Vacia (L)</code>.</li>
                   <li><b><code>Info</code> devuelve una COPIA, no acceso al campo.</b> Modificar
                       lo que devuelve <code>Info</code> no modifica el nodo. Para modificar
@@ -1855,7 +1855,7 @@ end if;
                   <li><b>Para "vaciar" una lista, usá <code>Limpiar</code> del package, no
                       <code>Mi_Lista := null;</code></b>. Si solo asignás null, dejás todos los
                       nodos en el heap como fuga.</li>
-                  <li><b>InsertarFin tiene costo O(n).</b> Si vas a hacer muchas inserciones al
+                  <li><b>Insertar tiene costo O(n).</b> Si vas a hacer muchas inserciones al
                       final, considerá mantener un puntero al último, o usar listas dobles.</li>
                 </ul>
               </div>
@@ -1866,7 +1866,7 @@ end if;
                 dato y un puntero al siguiente. La última apunta a null. La cátedra ofrece dos
                 variantes: <i>ordenada</i>, donde <code>Insertar</code> mantiene el orden usando
                 funciones Menor y Mayor que se pasan como formales genéricos; y <i>no ordenada</i>,
-                que ofrece <code>InsertarPpio</code> y <code>InsertarFin</code>. Internamente usan
+                que ofrece <code>Insertar</code> y <code>Insertar</code>. Internamente usan
                 memoria dinámica con <code>access</code> y forward declaration del nodo.
                 Los patrones de uso clásicos son: recorrido lineal con <code>Info/Sig</code>,
                 recorrido con dos punteros (ant, ptr) para supresión, e inserción ordenada con
@@ -1935,7 +1935,7 @@ end if;
                     <td><b>1 · Aux en lista</b></td>
                     <td>Recorrer una lista sin modificarla</td>
                     <td><code>Aux := L</code> · <code>Aux := Sig (Aux)</code></td>
-                    <td>Listanoordenada · Listaordenada</td>
+                    <td>Lista · Listaordenada</td>
                     <td>O(n) recorrido</td>
                     <td>Avanzar <code>L</code> en vez de <code>Aux</code></td>
                   </tr>
@@ -2114,7 +2114,7 @@ end;
                     punteros). De ahí que "copiar el tipo" copia el puntero, no los nodos.</li>
                   <li>Tener fresco el Post #4 (memoria dinámica) y Post #5 (listas enlazadas).</li>
                   <li>Tener clavadas las firmas de cada package: <code>Crearpila/Vacia/Meter/Sacar</code>,
-                    <code>Crearcola/Vacia/Inscola/Supcola</code>, <code>Crearlista/Vacia/Info/Sig/InsertarPpio</code>.</li>
+                    <code>Crearcola/Vacia/Inscola/Supcola</code>, <code>Crear/Vacia/Info/Sig/Insertar</code>.</li>
                 </ul>
               </div>
 
@@ -2256,7 +2256,7 @@ end;
                   <tr><td>"fila", "turnos", "primero que llega primero sale", "buffer"</td><td><b>🚂 Cola</b></td><td>FIFO: el primero entra primero sale.</td></tr>
                   <tr><td>"cantidad variable", "puede crecer", "futura ampliación", "se agregan/quitan elementos"</td><td><b>🔗 Lista dinámica</b></td><td>Pila/cola/lista. Sin tope fijo.</td></tr>
                   <tr><td>"ordenado por X", "ordenado alfabéticamente", "ordenado de mayor a menor"</td><td><b>📑 Listaordenada</b></td><td>Inserta en lugar. Pasás función "menor" para definir orden.</td></tr>
-                  <tr><td>"no importa el orden", "buscar si existe"</td><td><b>📃 Listanoordenada</b></td><td>InsertarPpio O(1). Esta para chequear pertenencia.</td></tr>
+                  <tr><td>"no importa el orden", "buscar si existe"</td><td><b>📃 Lista</b></td><td>Insertar O(1). Esta para chequear pertenencia.</td></tr>
                   <tr><td>"árbol", "jerarquía", "padres e hijos", "raíz"</td><td><b>🌳 ABB</b></td><td>Búsqueda eficiente. Recorridos pre/in/pos orden.</td></tr>
                   <tr><td>"12 meses", "días de la semana", "horas del día (8-20)", "5 días hábiles"</td><td><b>📦 Array fijo</b> (indexado por enum o range)</td><td>Tamaño conocido y constante. Acceso O(1).</td></tr>
                   <tr><td>"matriz", "tabla N×M", "filas y columnas"</td><td><b>📊 Array bidimensional</b></td><td>Dos índices: Fila × Columna.</td></tr>
@@ -2313,7 +2313,7 @@ end;
               <table class="dt">
                 <thead><tr><th>TAD</th><th>Tipo que exporta</th></tr></thead>
                 <tbody>
-                  <tr><td><code>Listanoordenada</code> / <code>Listaordenada</code></td><td><code>Tipolista</code></td></tr>
+                  <tr><td><code>Lista</code> / <code>Listaordenada</code></td><td><code>Tipolista</code></td></tr>
                   <tr><td><code>Piladinamica</code></td><td><code>Tipopiladinamica</code></td></tr>
                   <tr><td><code>Pile</code> (estática)</td><td><code>Tipopila</code></td></tr>
                   <tr><td><code>Coladinamica</code></td><td><code>Tipocoladinamica</code></td></tr>
@@ -2341,7 +2341,7 @@ end;
               </table>
 
               <p>Y las 3 instanciaciones salen mecánicamente:</p>
-              <pre class="code"><code class="ada">package Lista_Int      is new Listanoordenada (Tipoelem =&gt; Integer);
+              <pre class="code"><code class="ada">package Lista_Int      is new Lista (Tipoelem =&gt; Integer);
 package Cola_de_Listas is new Coladinamica    (Tipoelem =&gt; Lista_Int.Tipolista);
 package Pila_de_Colas  is new Piladinamica    (Tipoelem =&gt; Cola_de_Listas.Tipocoladinamica);
 </code></pre>
@@ -2357,7 +2357,7 @@ package Pila_de_Colas  is new Piladinamica    (Tipoelem =&gt; Cola_de_Listas.Tip
               <p><b>Ejemplo:</b> "vector de pilas de listas de enteros"</p>
 
               <pre class="code"><span class="filename">walkthrough.adb</span><code class="ada">--  NIVEL 1 (el más interno): lista de enteros
-package Lista_Int    is new Listanoordenada (Tipoelem =&gt; Integer);
+package Lista_Int    is new Lista (Tipoelem =&gt; Integer);
 
 --  NIVEL 2 (medio): pila cuyo elemento es Lista_Int.Tipolista
 package Pila_Listas  is new Piladinamica   (Tipoelem =&gt; Lista_Int.Tipolista);
@@ -2404,7 +2404,7 @@ type TipoEstructura is array (Indice) of Pila_Listas.Tipopiladinamica;
               <ul>
                 <li>"pila" → 🥞 Piladinamica (necesito Sacar/Meter)</li>
                 <li>"colas" → 🚂 Coladinamica (necesito Inscola/Supcola)</li>
-                <li>"listas de enteros" → 🔗 Listanoordenada con Integer (necesito Info/Sig)</li>
+                <li>"listas de enteros" → 🔗 Lista con Integer (necesito Info/Sig)</li>
               </ul>
 
               <p><b>Paso 2 — Detectar niveles:</b></p>
@@ -2415,7 +2415,7 @@ type TipoEstructura is array (Indice) of Pila_Listas.Tipopiladinamica;
               </ul>
 
               <p><b>Paso 3 — Instanciar de adentro hacia afuera:</b></p>
-              <pre class="code"><code class="ada">package Lista_Int      is new Listanoordenada (Tipoelem =&gt; Integer);
+              <pre class="code"><code class="ada">package Lista_Int      is new Lista (Tipoelem =&gt; Integer);
 package Cola_de_Listas is new Coladinamica
                               (Tipoelem =&gt; Lista_Int.Tipolista);
 package Pila_de_Colas  is new Piladinamica
@@ -2442,7 +2442,7 @@ package Pila_de_Colas  is new Piladinamica
                   <tr><td>"primero en llegar primero en salir", "turno", "buffer"</td><td><b>COLA</b></td><td>"Es cola porque respeto el orden de llegada (FIFO)."</td></tr>
                   <tr><td>"cantidad variable de X", "se pueden agregar/sacar elementos"</td><td><b>LISTA dinámica</b></td><td>"Es lista porque la cantidad varía y no necesito acceso al medio."</td></tr>
                   <tr><td>"ordenado por X", "lista ordenada"</td><td><b>LISTAORDENADA</b></td><td>"Es lista ordenada porque el enunciado pide orden y aprovecho el TAD."</td></tr>
-                  <tr><td>"buscar si existe X" + "no importa orden"</td><td><b>LISTANOORDENADA</b></td><td>"Es lista no ordenada porque solo necesito Esta y InsertarPpio O(1)."</td></tr>
+                  <tr><td>"buscar si existe X" + "no importa orden"</td><td><b>LISTANOORDENADA</b></td><td>"Es lista no ordenada porque solo necesito Esta y Insertar O(1)."</td></tr>
                   <tr><td>"12 meses del año", "horarios fijos", "días lun-vie"</td><td><b>ARRAY (vector)</b></td><td>"Es array porque el tamaño está acotado y conocido en compilación. Acceso O(1)."</td></tr>
                   <tr><td>"matriz", "tabla", "filas y columnas"</td><td><b>ARRAY BIDIM</b></td><td>"Es matriz porque hay dos dimensiones con índices independientes."</td></tr>
                   <tr><td>"datos personales", "información de un X" (con varios campos)</td><td><b>RECORD</b></td><td>"Es record porque agrupo campos relacionados con tipos distintos."</td></tr>
@@ -2454,7 +2454,7 @@ package Pila_de_Colas  is new Piladinamica
 
               <div class="callout bad"><b>"Vector" porque me parece más fácil.</b> Si el enunciado dice "cantidad variable", usar vector con tope fijo es ERROR — perdés eficiencia y no podés crecer.</div>
 
-              <div class="callout bad"><b>"Listanoordenada" porque sé hacer InsertarPpio.</b> Si el enunciado pide "ordenado", usá <code>Listaordenada</code>. Ordenar a mano después es feo y perdés puntos.</div>
+              <div class="callout bad"><b>"Lista" porque sé hacer Insertar.</b> Si el enunciado pide "ordenado", usá <code>Listaordenada</code>. Ordenar a mano después es feo y perdés puntos.</div>
 
               <div class="callout bad"><b>Confundir "pila DE listas" con "lista DE pilas".</b> El primer TAD es el externo. <i>Pila de listas</i> = una pila cuyo Tipoelem es Lista. <i>Lista de pilas</i> = una lista cuyo Tipoelem es Pila. Muy distintos.</div>
 
@@ -2513,7 +2513,7 @@ package Pila_de_Colas  is new Piladinamica
                 <table class="dt" style="margin-top:8px">
                   <thead><tr><th>Package</th><th>Nombre del tipo elemento</th></tr></thead>
                   <tbody>
-                    <tr><td>Listanoordenada · Listaordenada</td><td><code>Tipoelem</code></td></tr>
+                    <tr><td>Lista · Listaordenada</td><td><code>Tipoelem</code></td></tr>
                     <tr><td>Piladinamica · Coladinamica</td><td><code>Tipoelem</code></td></tr>
                     <tr><td><b>Pile (estática)</b></td><td><b><code>Tipoelemento</code></b> ⚠️</td></tr>
                     <tr><td><b>Vec_simple · Vec_completo</b></td><td><b><code>Tipodato</code></b> ⚠️</td></tr>
@@ -2631,38 +2631,36 @@ end Coladinamica;
               <div class="callout bad" style="margin-top:8px"><b>NO existen:</b> <code>Frente</code>, <code>Final</code>, <code>VerFrente</code>, <code>UltimoCola</code>. Para espiar: Patrón 3 (vaciar a auxiliar).</div>
 
 
-              <h3>🔗 4. <code>Listanoordenada</code> (TP4)</h3>
+              <h3>🔗 4. <code>Lista</code> (lista común · de Zahir)</h3>
               <pre class="code"><span class="filename">listanoordenada.ads</span><code class="ada">generic
    type Tipoelem is private;
-package Listanoordenada is
+package Lista is
 
-   Listavacia : exception;
+   Lista_Vacia : exception;
    type Tipolista is private;
 
-   procedure Crearlista     (Lista : out Tipolista);
+   procedure Crear     (Lista : out Tipolista);
    procedure Limpiar        (Lista : in out Tipolista);
    function  Vacia          (Lista : in Tipolista) return Boolean;
    function  Esta           (Lista : Tipolista; Elemento : Tipoelem) return Boolean;
    function  Info           (Lista : in Tipolista) return Tipoelem;
    function  Sig            (Lista : in Tipolista) return Tipolista;
-   procedure InsertarPpio   (Lista : in out Tipolista; Elemento : in Tipoelem);
-   procedure InsertarFin    (Lista : in out Tipolista; Elemento : in Tipoelem);
+   procedure Insertar       (Lista : in out Tipolista; Elemento : in Tipoelem);
    procedure Suprimir       (Lista : in out Tipolista; Elemento : in Tipoelem);
 
 private
    --  Access a Tiponodo (Info + Sig)
-end Listanoordenada;
+end Lista;
 </code></pre>
               <table class="dt">
                 <thead><tr><th>Operación</th><th>Qué hace</th><th>Costo</th></tr></thead>
                 <tbody>
-                  <tr><td><code>Crearlista (L)</code></td><td>L := null</td><td>O(1)</td></tr>
+                  <tr><td><code>Crear (L)</code></td><td>L := null</td><td>O(1)</td></tr>
                   <tr><td><code>Vacia (L)</code></td><td>True si L = null</td><td>O(1)</td></tr>
                   <tr><td><code>Esta (L, X)</code></td><td>True si X está en L</td><td>O(n)</td></tr>
-                  <tr><td><code>Info (L)</code></td><td>Devuelve el primer elemento</td><td>O(1) · raise <code>Listavacia</code> si vacía</td></tr>
-                  <tr><td><code>Sig (L)</code></td><td>Devuelve la cola (sin el primero)</td><td>O(1) · raise <code>Listavacia</code> si vacía</td></tr>
-                  <tr><td><code>InsertarPpio (L, X)</code></td><td>Inserta X adelante</td><td>O(1) ✅</td></tr>
-                  <tr><td><code>InsertarFin (L, X)</code></td><td>Inserta X atrás</td><td>O(n)</td></tr>
+                  <tr><td><code>Info (L)</code></td><td>Devuelve el primer elemento</td><td>O(1) · raise <code>Lista_Vacia</code> si vacía</td></tr>
+                  <tr><td><code>Sig (L)</code></td><td>Devuelve la cola (sin el primero)</td><td>O(1) · raise <code>Lista_Vacia</code> si vacía</td></tr>
+                  <tr><td><code>Insertar (L, X)</code></td><td>Inserta X al principio (único Insertar del package)</td><td>O(1) ✅</td></tr>
                   <tr><td><code>Suprimir (L, X)</code></td><td>Suprime la primera ocurrencia de X</td><td>O(n)</td></tr>
                   <tr><td><code>Limpiar (L)</code></td><td>Libera memoria, L := null</td><td>O(n)</td></tr>
                 </tbody>
@@ -2673,11 +2671,11 @@ end Listanoordenada;
               <h3>📑 5. <code>Listaordenada</code></h3>
               <pre class="code"><span class="filename">listaordenada.ads</span><code class="ada">generic
    type Tipoelem is private;
-   with function menor (X, Y : Tipoelem) return Boolean;
-   with function mayor (X, Y : Tipoelem) return Boolean;
+   with function "&lt;" (X, Y : TipoElem) return Boolean;
+   with function "&gt;" (X, Y : TipoElem) return Boolean;
 package Listaordenada is
 
-   Listavacia : exception;
+   Lista_Vacia : exception;
    type Tipolista is private;
 
    procedure Crearlistaordenada (Lista : out Tipolista);
@@ -2692,12 +2690,12 @@ package Listaordenada is
 end Listaordenada;
 </code></pre>
               <div class="callout warn" style="margin-top:8px">
-                <b>Diferencias con Listanoordenada:</b>
+                <b>Diferencias con Lista:</b>
                 <ul>
-                  <li><b>Crearlistaordenada</b>, no <code>Crearlista</code>.</li>
-                  <li>Tiene UN solo <code>Insertar</code> (no Ppio/Fin) — inserta <i>en su lugar</i> según <code>menor</code>.</li>
-                  <li><b>Requiere 2 funciones genéricas formales</b>: <code>menor</code> y <code>mayor</code>. Si no las pasás, no compila.</li>
-                  <li><b>Truco descendente:</b> pasá <code>menor =&gt; Mayor_Que</code> (función que devuelve <code>X &gt; Y</code>).</li>
+                  <li><b>Crearlistaordenada</b>, no <code>Crear</code>.</li>
+                  <li><code>Insertar</code> inserta <i>en su lugar</i> según el operador <code>"&lt;"</code> formal.</li>
+                  <li><b>Requiere 2 operadores genéricos formales</b>: <code>"&lt;"</code> y <code>"&gt;"</code>. Para tipos como Integer/Float ya están definidos (Ada los pasa solos), para records hay que pasarlos explícitos.</li>
+                  <li><b>Truco descendente:</b> pasá <code>"&lt;" =&gt; Mayor_Que</code> (función que devuelve <code>X &gt; Y</code>).</li>
                 </ul>
               </div>
 
@@ -2798,8 +2796,8 @@ end Matrizcompleta;
                   <tr><td><b>Piladinamica</b></td><td><code>Tipopiladinamica</code></td><td><code>Crearpila</code></td><td><code>Vacia · Meter · Sacar · Limpiar</code></td><td><code>Pilavacia</code></td></tr>
                   <tr><td><b>Pile</b> (estática)</td><td><code>Tipopila</code></td><td>auto-init con <code>(Max =&gt; N)</code></td><td><code>Vacia · Llena · Meter · Sacar · Limpiar</code></td><td><code>Underflow · Overflow</code></td></tr>
                   <tr><td><b>Coladinamica</b></td><td><code>Tipocoladinamica</code></td><td><code>Crearcola</code></td><td><code>Vacia · Inscola · Supcola · Limpiar</code></td><td><code>Colavacia</code></td></tr>
-                  <tr><td><b>Listanoordenada</b></td><td><code>Tipolista</code></td><td><code>Crearlista</code></td><td><code>Vacia · Esta · Info · Sig · InsertarPpio · InsertarFin · Suprimir · Limpiar</code></td><td><code>Listavacia</code></td></tr>
-                  <tr><td><b>Listaordenada</b></td><td><code>Tipolista</code></td><td><code>Crearlistaordenada</code></td><td><code>Vacia · Esta · Info · Sig · Insertar · Suprimir · Limpiar</code></td><td><code>Listavacia</code></td></tr>
+                  <tr><td><b>Lista</b></td><td><code>Tipolista</code></td><td><code>Crear</code></td><td><code>Vacia · Esta · Info · Sig · Insertar · Suprimir · Limpiar</code></td><td><code>Lista_Vacia</code></td></tr>
+                  <tr><td><b>Listaordenada</b></td><td><code>Tipolista</code></td><td><code>Crearlistaordenada</code></td><td><code>Vacia · Esta · Info · Sig · Insertar · Suprimir · Limpiar</code></td><td><code>Lista_Vacia</code></td></tr>
                   <tr><td><b>Vec_simple</b></td><td><code>Tipovec</code></td><td>declaración</td><td><code>Leer · Imprimir</code></td><td>—</td></tr>
                   <tr><td><b>Vec_completo</b></td><td><code>Tipovec</code></td><td>declaración</td><td><code>Leer · Imprimir · Comparacion · Ordenamiento · Busqueda</code></td><td>—</td></tr>
                   <tr><td><b>Matriz_simple</b></td><td><code>Tipomat</code></td><td>declaración</td><td><code>Leer_Matriz · Imprimir_Matriz</code></td><td>—</td></tr>
@@ -2814,7 +2812,7 @@ end Matrizcompleta;
                   <li><b>Pila:</b> NO existe <code>Tope</code>, <code>VerTope</code>, <code>Cima</code>, <code>Cima(P)</code>. Para "ver el tope": <code>Sacar (P, X); ...usar X...; Meter (P, X);</code></li>
                   <li><b>Cola:</b> NO existe <code>Frente</code>, <code>VerFrente</code>, <code>Final</code>, <code>UltimoCola</code>. Para "ver el frente/final": Patrón 3.</li>
                   <li><b>Lista:</b> NO existe <code>EnePosicion (L, N)</code>, <code>ElementoEnPos</code>, ni acceso directo por índice. Solo <code>Info/Sig</code> linealmente.</li>
-                  <li><b>Lista:</b> NO existe <code>Modificar</code> ni <code>Cambiar</code>. Para "modificar" un elemento: <code>Suprimir</code> el viejo + <code>InsertarPpio</code> el nuevo (ver Hospital Ej b).</li>
+                  <li><b>Lista:</b> NO existe <code>Modificar</code> ni <code>Cambiar</code>. Para "modificar" un elemento: <code>Suprimir</code> el viejo + <code>Insertar</code> el nuevo (ver Hospital Ej b).</li>
                   <li><b>Todos:</b> NO existe <code>Cantidad</code>, <code>Tamanio</code>, <code>Length</code>. Si necesitás contar, recorrés y acumulás.</li>
                 </ul>
               </div>
@@ -5998,10 +5996,10 @@ end Promedio;
         <div class="callout" style="margin-top:14px">
           <b>Stack del TP4:</b> reúso <code>Piladinamica</code>, <code>Coladinamica</code>,
           <code>Listaordenada</code> del material auxiliar y <b>agrego un nuevo package</b>
-          <code>Listanoordenada</code> para cubrir el ítem 2.b. Todo se construye con
+          <code>Lista</code> para cubrir el ítem 2.b. Todo se construye con
           <code>access</code> + <code>new</code> + <code>Unchecked_Deallocation</code> (o sea,
           aplicando lo del TP3). En cada ejercicio respeto la convención del autor (Ortega Zahir):
-          <code>Tipoelem</code>, <code>Tipolista</code>, <code>Crearlista</code>,
+          <code>Tipoelem</code>, <code>Tipolista</code>, <code>Crear</code>,
           <code>Insertar</code>, <code>Suprimir</code>, etc.
         </div>
       </div>
@@ -6180,12 +6178,12 @@ end Coladinamica;
             <div class="post-content">
               <pre class="code"><span class="filename">listaordenada.ads</span><code class="ada">generic
    type Tipoelem is private;
-   with function Menor (X, Y : Tipoelem) return Boolean;
-   with function Mayor (X, Y : Tipoelem) return Boolean;
+   with function "&lt;" (X, Y : Tipoelem) return Boolean;
+   with function "&gt;" (X, Y : Tipoelem) return Boolean;
 package Listaordenada is
 
    type Tipolista is private;
-   Listavacia : exception;
+   Lista_Vacia : exception;
 
    procedure Crearlistaordenada (Lista : out Tipolista);
    procedure Limpiar            (Lista : in out Tipolista);
@@ -6205,8 +6203,8 @@ private
    end record;
 end Listaordenada;
 </code></pre>
-              <p>El cuerpo recibe <code>Menor</code> y <code>Mayor</code> como subprogramas formales,
-              y la inserción mantiene la lista en orden ascendente.</p>
+              <p>El cuerpo recibe los operadores <code>"&lt;"</code> y <code>"&gt;"</code> como
+              subprogramas formales. Si querés orden descendente, pasás funciones invertidas.</p>
             </div>
           </div>
         </div>
@@ -6230,20 +6228,19 @@ end Listaordenada;
               <h3>💻 Especificación</h3>
               <pre class="code"><span class="filename">listanoordenada.ads</span><code class="ada">generic
    type Tipoelem is private;
-package Listanoordenada is
+package Lista is
 
    type Tipolista is private;
-   Listavacia : exception;
+   Lista_Vacia : exception;
 
-   procedure Crearlista     (Lista : out Tipolista);
+   procedure Crear     (Lista : out Tipolista);
    procedure Limpiar        (Lista : in out Tipolista);
    function  Vacia          (Lista : in Tipolista) return Boolean;
    function  Esta           (Lista : Tipolista; Elemento : Tipoelem) return Boolean;
    function  Info           (Lista : in Tipolista) return Tipoelem;
    function  Sig            (Lista : in Tipolista) return Tipolista;
 
-   procedure InsertarPpio   (Lista : in out Tipolista; Elemento : in Tipoelem);
-   procedure InsertarFin    (Lista : in out Tipolista; Elemento : in Tipoelem);
+   procedure Insertar       (Lista : in out Tipolista; Elemento : in Tipoelem);
 
    --  Suprime la primera ocurrencia de Elemento (si existe).
    procedure Suprimir       (Lista : in out Tipolista; Elemento : in Tipoelem);
@@ -6255,19 +6252,19 @@ private
       Info : Tipoelem;
       Sig  : Tipolista;
    end record;
-end Listanoordenada;
+end Lista;
 </code></pre>
 
               <h3>💻 Cuerpo</h3>
               <pre class="code"><span class="filename">listanoordenada.adb</span><code class="ada">with Ada.Unchecked_Deallocation;
-package body Listanoordenada is
+package body Lista is
 
    procedure Free is new Ada.Unchecked_Deallocation (Tiponodo, Tipolista);
 
-   procedure Crearlista (Lista : out Tipolista) is
+   procedure Crear (Lista : out Tipolista) is
    begin
       Lista := null;
-   end Crearlista;
+   end Crear;
 
    procedure Limpiar (Lista : in out Tipolista) is
       Tmp : Tipolista := Lista;
@@ -6296,38 +6293,26 @@ package body Listanoordenada is
 
    function Info (Lista : in Tipolista) return Tipoelem is
    begin
-      if Vacia (Lista) then raise Listavacia; end if;
+      if Vacia (Lista) then raise Lista_Vacia; end if;
       return Lista.Info;
    end Info;
 
    function Sig (Lista : in Tipolista) return Tipolista is
    begin
-      if Vacia (Lista) then raise Listavacia; end if;
+      if Vacia (Lista) then raise Lista_Vacia; end if;
       return Lista.Sig;
    end Sig;
 
-   procedure InsertarPpio (Lista : in out Tipolista; Elemento : in Tipoelem) is
+   --  Insertar al principio (O(1)) — único Insertar del package de Zahir
+   procedure Insertar (Lista : in out Tipolista; Elemento : in Tipoelem) is
    begin
       Lista := new Tiponodo'(Elemento, Lista);
-   end InsertarPpio;
-
-   procedure InsertarFin (Lista : in out Tipolista; Elemento : in Tipoelem) is
-      Nuevo : Tipolista := new Tiponodo'(Elemento, null);
-      Ptr   : Tipolista;
-   begin
-      if Lista = null then
-         Lista := Nuevo;
-      else
-         Ptr := Lista;
-         while Ptr.Sig /= null loop Ptr := Ptr.Sig; end loop;
-         Ptr.Sig := Nuevo;
-      end if;
-   end InsertarFin;
+   end Insertar;
 
    procedure Suprimir (Lista : in out Tipolista; Elemento : in Tipoelem) is
       Ant, Ptr : Tipolista;
    begin
-      if Vacia (Lista) then raise Listavacia; end if;
+      if Vacia (Lista) then raise Lista_Vacia; end if;
       if Lista.Info = Elemento then
          Ptr := Lista; Lista := Lista.Sig; Free (Ptr); return;
       end if;
@@ -6340,7 +6325,7 @@ package body Listanoordenada is
       end loop;
    end Suprimir;
 
-end Listanoordenada;
+end Lista;
 </code></pre>
 
               <div class="callout">
@@ -6682,9 +6667,9 @@ end Tp4_Ej5;
 
               <div class="callout warn">
                 <b>Si te exigen devolver dos listas separadas (no sólo imprimir):</b> recorré una vez
-                con <code>InsertarFin</code> sobre <code>L_Lic</code> o <code>L_Post</code> según la
+                con <code>Insertar</code> sobre <code>L_Lic</code> o <code>L_Post</code> según la
                 categoría. El orden alfabético se preserva porque la entrada ya está ordenada y
-                <code>InsertarFin</code> respeta el orden de inserción.
+                <code>Insertar</code> respeta el orden de inserción.
               </div>
             </div>
           </div>
@@ -6723,15 +6708,15 @@ end Tp4_Ej5;
 
               <h3>💻 Código</h3>
               <pre class="code"><span class="filename">tp4_ej6.adb</span><code class="ada">with Ada.Text_IO; use Ada.Text_IO;
-with Listanoordenada;
+with Lista;
 
 procedure Tp4_Ej6 is
 
    ---------- Lista de caracteres (el "valor" de cada nodo de A y B) ----------
-   package LC is new Listanoordenada (Character);
+   package LC is new Lista (Character);
 
    ---------- Lista cuyos nodos son LC.Tipolista ----------
-   package LL is new Listanoordenada (LC.Tipolista);
+   package LL is new Lista (LC.Tipolista);
 
    --  Pre : ninguna.
    --  Post: True ⇔ X y Y tienen los mismos caracteres en el mismo orden.
@@ -6752,9 +6737,9 @@ procedure Tp4_Ej6 is
       Resultado : LC.Tipolista;
       Ptr       : LC.Tipolista := X;
    begin
-      LC.Crearlista (Resultado);
+      LC.Crear (Resultado);
       while not LC.Vacia (Ptr) loop
-         LC.InsertarFin (Resultado, LC.Info (Ptr));
+         LC.Insertar (Resultado, LC.Info (Ptr));
          Ptr := LC.Sig (Ptr);
       end loop;
       return Resultado;
@@ -6766,10 +6751,10 @@ procedure Tp4_Ej6 is
    procedure Generar_B (A : in LL.Tipolista; B : out LL.Tipolista) is
       P : LL.Tipolista := A;
    begin
-      LL.Crearlista (B);
+      LL.Crear (B);
       while not LL.Vacia (P) and then not LL.Vacia (LL.Sig (P)) loop
          if Iguales (LL.Info (P), LL.Info (LL.Sig (P))) then
-            LL.InsertarFin (B, Copiar (LL.Info (P)));
+            LL.Insertar (B, Copiar (LL.Info (P)));
             --  saltear todas las copias consecutivas
             declare
                Ref : LC.Tipolista := LL.Info (P);
@@ -6851,7 +6836,7 @@ end record;
               <h3>💻 Código</h3>
               <pre class="code"><span class="filename">tp4_ej7.adb</span><code class="ada">with Ada.Text_IO;          use Ada.Text_IO;
 with Ada.Sequential_IO;
-with Listanoordenada;
+with Lista;
 with Listaordenada;
 
 procedure Tp4_Ej7 is
@@ -6868,7 +6853,7 @@ procedure Tp4_Ej7 is
       Numero   : Tel;
    end record;
 
-   package LEmp is new Listanoordenada (Emp);
+   package LEmp is new Lista (Emp);
 
    type Entrada is record
       Numero    : Tel;
@@ -6900,7 +6885,7 @@ procedure Tp4_Ej7 is
 
    --  Pre : Archivo abierto en modo In_File, ordenado alfabéticamente por apellido.
    --  Post: Dir contiene una entrada por cada número telefónico distinto, con
-   --        los empleados ordenados alfabéticamente (gracias a InsertarFin).
+   --        los empleados ordenados alfabéticamente (gracias a Insertar).
    procedure Cargar (Archivo : in out IO_Reg.File_Type; Dir : out LDir.Tipolista) is
       R : Reg_Archivo;
       P : LDir.Tipolista;
@@ -6913,7 +6898,7 @@ procedure Tp4_Ej7 is
          P := Dir; Encontrado := False;
          while not LDir.Vacia (P) loop
             if LDir.Info (P).Numero = R.Numero then
-               LEmp.InsertarFin (LDir.Info (P).Empleados, R.Empleado);
+               LEmp.Insertar (LDir.Info (P).Empleados, R.Empleado);
                Encontrado := True;
                exit;
             end if;
@@ -6924,8 +6909,8 @@ procedure Tp4_Ej7 is
                Nueva : Entrada;
             begin
                Nueva.Numero := R.Numero;
-               LEmp.Crearlista (Nueva.Empleados);
-               LEmp.InsertarFin (Nueva.Empleados, R.Empleado);
+               LEmp.Crear (Nueva.Empleados);
+               LEmp.Insertar (Nueva.Empleados, R.Empleado);
                LDir.Insertar (Dir, Nueva);
             end;
          end if;
@@ -6954,7 +6939,7 @@ end Tp4_Ej7;
 
               <div class="callout warn">
                 <b>Detalle de Ada con records mutables dentro de listas:</b> al hacer
-                <code>LDir.Info (P).Empleados</code> y luego <code>LEmp.InsertarFin</code> sobre eso,
+                <code>LDir.Info (P).Empleados</code> y luego <code>LEmp.Insertar</code> sobre eso,
                 <i>tiene que poder modificar el record</i>. Si <code>Info</code> devuelve una copia,
                 no funciona. La firma de <code>Listaordenada.Info</code> de la cátedra devuelve un
                 <i>valor</i> (copia), así que para modificar de verdad hace falta o (a) modificar la
@@ -7008,13 +6993,13 @@ end Tp4_Ej7;
               <h3>💻 Código</h3>
               <pre class="code"><span class="filename">tp4_ej8.adb</span><code class="ada">with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Listanoordenada;
+with Lista;
 with Piladinamica;
 with Coladinamica;
 
 procedure Tp4_Ej8 is
 
-   package LInt  is new Listanoordenada (Integer);
+   package LInt  is new Lista (Integer);
    package PList is new Piladinamica   (LInt.Tipolista);
    package CPila is new Coladinamica   (PList.Tipopiladinamica);
 
@@ -7103,13 +7088,13 @@ end Tp4_Ej8;
               <h3>💻 Código</h3>
               <pre class="code"><span class="filename">tp4_ej9.adb</span><code class="ada">with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Listanoordenada;
+with Lista;
 with Piladinamica;
 with Coladinamica;
 
 procedure Tp4_Ej9 is
 
-   package LInt  is new Listanoordenada (Integer);
+   package LInt  is new Lista (Integer);
    package CList is new Coladinamica (LInt.Tipolista);
    package PCola is new Piladinamica (CList.Tipocoladinamica);
 
@@ -7198,7 +7183,7 @@ end Tp4_Ej9;
 
               <h3>💻 Código</h3>
               <pre class="code"><span class="filename">tp4_ej10.adb</span><code class="ada">with Ada.Text_IO; use Ada.Text_IO;
-with Listanoordenada;
+with Lista;
 with Coladinamica;
 
 procedure Tp4_Ej10 is
@@ -7213,7 +7198,7 @@ procedure Tp4_Ej10 is
       Patentes : CPat.Tipocoladinamica;
    end record;
 
-   package LEmp is new Listanoordenada (Empleado);
+   package LEmp is new Lista (Empleado);
 
    --  Pre : ninguna.
    --  Post: si algún empleado tenía autos, atiende uno (lo saca de su cola)
@@ -7290,14 +7275,14 @@ end Tp4_Ej10;
 
               <h3>💻 Código</h3>
               <pre class="code"><span class="filename">tp4_ej11_postres.adb</span><code class="ada">with Ada.Text_IO; use Ada.Text_IO;
-with Listanoordenada;
+with Lista;
 
 procedure Tp4_Ej11 is
 
    subtype Nombre_Postre      is String (1 .. 20);
    subtype Nombre_Ingrediente is String (1 .. 20);
 
-   package LIng is new Listanoordenada (Nombre_Ingrediente);
+   package LIng is new Lista (Nombre_Ingrediente);
 
    type Postre is record
       Nombre        : Nombre_Postre;
@@ -7408,7 +7393,7 @@ end Tp4_Ej11;
                 <b>Decisión clave:</b> la lista de ingredientes la dejé como <code>Listaordenada</code>
                 — así <code>Insertar</code> mantiene orden alfabético sin esfuerzo. Si querés permitir
                 duplicados (p.ej. "azúcar" en dos pasos de la receta), pasá a
-                <code>Listanoordenada</code> con <code>InsertarFin</code>.
+                <code>Lista</code> con <code>Insertar</code>.
               </div>
               <div class="callout warn">
                 <b>Cuidado con el shift en alta/baja:</b> al hacer <code>Postres (K+1) := Postres (K)</code>
@@ -8138,7 +8123,7 @@ end Spell_Checker;
 
               <h3>💻 Código</h3>
               <pre class="code"><span class="filename">tp5_ej8.adb</span><code class="ada">with Ada.Text_IO; use Ada.Text_IO;
-with Listanoordenada;
+with Lista;
 
 procedure Tp5_Ej8 is
 
@@ -8149,7 +8134,7 @@ procedure Tp5_Ej8 is
       Largo : Largo_Range     := 0;
    end record;
 
-   package Hist_Pkg is new Listanoordenada (Clave);
+   package Hist_Pkg is new Lista (Clave);
 
    --  ----- Reglas de validación -----
 
@@ -8194,7 +8179,7 @@ procedure Tp5_Ej8 is
       end if;
 
       --  Aceptada: la anterior va al historial
-      Hist_Pkg.InsertarPpio (Hist, Anterior);
+      Hist_Pkg.Insertar (Hist, Anterior);
    end Cambiar_Clave;
 
    --  Lectura "encriptada": muestra '*' por cada char tipeado.
@@ -8527,13 +8512,13 @@ end Mediana;
               <div class="callout"><b>"<code>Aux := L</code> y avanzo con <code>Sig</code>. Nunca toco L."</b><br>
                 Aux copia el puntero raíz. Avanzar Aux es como caminar por el tren sin moverlo de
                 la estación.</div>
-              <div class="callout"><b>"<code>InsertarPpio</code> = O(1). <code>InsertarFin</code> = O(n)."</b><br>
-                Si el orden no importa, usá <code>InsertarPpio</code>: es instantáneo.</div>
+              <div class="callout"><b>"<code>Insertar</code> = O(1). <code>Insertar</code> = O(n)."</b><br>
+                Si el orden no importa, usá <code>Insertar</code>: es instantáneo.</div>
               <div class="callout"><b>"<code>Listaordenada</code> tiene <code>Insertar</code> que va al lugar correcto."</b><br>
-                <code>Listanoordenada</code> tiene <code>InsertarPpio</code> e <code>InsertarFin</code>.
+                <code>Lista</code> tiene <code>Insertar</code> e <code>Insertar</code>.
                 Son TADs distintos, no confundir.</div>
               <div class="callout warn"><b>"Para invertir el orden de <code>Listaordenada</code>: pasá <code>">"</code> como <code>menor</code>."</b><br>
-                Truco fino: <code>package L is new Listaordenada (menor =&gt; Mayor_Que, ...)</code>.
+                Truco fino: <code>package L is new Listaordenada ("&lt;" =&gt; Mayor_Que, ...)</code>.
                 Los grandes se insertan primero → orden descendente.</div>
             </div>
           </div>
@@ -8582,13 +8567,13 @@ end Mediana;
                 <code>generic type Tipoelem is private; package Lista is...</code> es un molde.
                 <code>package LInt is new Lista (Integer);</code> es el producto.</div>
               <div class="callout"><b>"<code>package X is new Y (...)</code> = sacá un molde de Y, ponele estos tipos, llámalo X."</b><br>
-                Después usás X como un package normal: <code>X.Crearlista (L);</code>, <code>X.Vacia (L)</code>.</div>
+                Después usás X como un package normal: <code>X.Crear (L);</code>, <code>X.Vacia (L)</code>.</div>
               <div class="callout"><b>"Cada instanciación es un tipo DISTINTO."</b><br>
                 <code>LInt = Lista (Integer)</code> y <code>LFloat = Lista (Float)</code> son
                 tipos incompatibles, aunque vengan del mismo molde.</div>
               <div class="callout"><b>"En el parcial: instanciar arriba, usar abajo."</b><br>
-                Primero <code>package LInt is new Listanoordenada (Integer);</code>, después
-                <code>LInt.Crearlista (L);</code>. Nunca al revés.</div>
+                Primero <code>package LInt is new Lista (Integer);</code>, después
+                <code>LInt.Crear (L);</code>. Nunca al revés.</div>
             </div>
           </div>
         </div>
@@ -8609,7 +8594,7 @@ end Mediana;
                 Cuando algo no se puede hacer, el package lanza una excepción. El cliente decide
                 qué hacer con <code>begin ... exception when X =&gt; ...</code>.</div>
               <div class="callout"><b>"<code>Pilavacia</code> (dinámica) ≠ <code>Underflow</code> (estática)."</b><br>
-                La cátedra es estricta: usá el nombre exacto del package. <code>Listavacia</code>,
+                La cátedra es estricta: usá el nombre exacto del package. <code>Lista_Vacia</code>,
                 <code>Colavacia</code>, <code>Arbol_Vacio</code>.</div>
               <div class="callout"><b>"Pre/Post como COMENTARIOS, NO con aspectos Ada 2012."</b><br>
                 La cátedra no acepta <code>with Pre =&gt; ...</code>. Va arriba del subprograma
@@ -8666,7 +8651,7 @@ end Mediana;
                 <tbody>
                   <tr><td><b>Pila</b></td><td><code>Crearpila · Vacia · Meter · Sacar · Limpiar</code></td></tr>
                   <tr><td><b>Cola</b></td><td><code>Crearcola · Vacia · Inscola · Supcola · Limpiar</code></td></tr>
-                  <tr><td><b>Lista no ord.</b></td><td><code>Crearlista · Vacia · Esta · Info · Sig · InsertarPpio · InsertarFin · Suprimir · Limpiar</code></td></tr>
+                  <tr><td><b>Lista</b></td><td><code>Crear · Vacia · Esta · Info · Sig · Insertar · Suprimir · Limpiar</code></td></tr>
                   <tr><td><b>Lista ord.</b></td><td><code>Crearlistaordenada · Vacia · Esta · Info · Sig · Insertar · Suprimir · Limpiar</code></td></tr>
                   <tr><td><b>ABB</b></td><td><code>Crear · Vacio · Insertar · Suprimir · Esta · Limpiar · Inorden · Preorden · Posorden · Izq · Der · Info</code></td></tr>
                 </tbody>
@@ -9361,17 +9346,17 @@ end;
                   <tbody>
                     <tr><td>"stock mensual, último año" (12 meses)</td><td>tamaño fijo y conocido</td><td>Array indexado por mes</td></tr>
                     <tr><td>"distintas categorías" (Electro, Hogar...)</td><td>conjunto cerrado</td><td>Array indexado por enum</td></tr>
-                    <tr><td>"productos dentro de cada categoría"</td><td>cantidad variable</td><td>Listanoordenada (record producto)</td></tr>
-                    <tr><td>"cantidad de surtidores sujeta a cambios"</td><td>dinámico, crece/decrece</td><td>Listanoordenada (record surtidor)</td></tr>
-                    <tr><td>"consumo por cada automóvil"</td><td>cantidad variable por surtidor</td><td>Listanoordenada (Float)</td></tr>
+                    <tr><td>"productos dentro de cada categoría"</td><td>cantidad variable</td><td>Lista (record producto)</td></tr>
+                    <tr><td>"cantidad de surtidores sujeta a cambios"</td><td>dinámico, crece/decrece</td><td>Lista (record surtidor)</td></tr>
+                    <tr><td>"consumo por cada automóvil"</td><td>cantidad variable por surtidor</td><td>Lista (Float)</td></tr>
                     <tr><td>"no recorrer toda la estructura"</td><td>eficiencia O(1) en acceso</td><td>Arrays anidados con índices directos</td></tr>
                   </tbody>
                 </table>
               </div>
 
               <p><b>Ej 1 · Depósito ChangoMas — estructura matricial de listas</b></p>
-              <p>Mes (1..12) y Categoría (enum) son dimensiones <i>fijas y conocidas</i> → arreglo con acceso directo O(1). Productos varían en cantidad → <code>Listanoordenada</code>.</p>
-              <pre class="code"><span class="filename">deposito_changomas.adb</span><code class="ada">with Listanoordenada;
+              <p>Mes (1..12) y Categoría (enum) son dimensiones <i>fijas y conocidas</i> → arreglo con acceso directo O(1). Productos varían en cantidad → <code>Lista</code>.</p>
+              <pre class="code"><span class="filename">deposito_changomas.adb</span><code class="ada">with Lista;
 
 procedure Deposito_ChangoMas is
 
@@ -9385,8 +9370,8 @@ procedure Deposito_ChangoMas is
                           Jul, Ago, Sep, Oct, Nov, Dic);
    type TipoCategoria is (Electro, Hogar, Alimentos, Limpieza, Otros);
 
-   package Lista_Productos is new Listanoordenada (Tipoelem =&gt; Tipoproducto);
-   package Lista_Codigos   is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Productos is new Lista (Tipoelem =&gt; Tipoproducto);
+   package Lista_Codigos   is new Lista (Tipoelem =&gt; Integer);
 
    type TipoCategoriasMes is array (TipoCategoria) of Lista_Productos.Tipolista;
    type TipoDeposito      is array (TipoMes)       of TipoCategoriasMes;
@@ -9405,12 +9390,12 @@ procedure Deposito_ChangoMas is
       Aux      : Lista_Productos.Tipolista;
       Producto : Tipoproducto;
    begin
-      Lista_Codigos.Crearlista (Reporte);
+      Lista_Codigos.Crear (Reporte);
       Aux := Deposito (Mes)(Electro);
       while not Lista_Productos.Vacia (Aux) loop
          Producto := Lista_Productos.Info (Aux);
          if Producto.Unidades &lt; N then
-            Lista_Codigos.InsertarPpio (Reporte, Producto.Codigo);
+            Lista_Codigos.Insertar (Reporte, Producto.Codigo);
          end if;
          Aux := Lista_Productos.Sig (Aux);
       end loop;
@@ -9425,19 +9410,19 @@ end Deposito_ChangoMas;
 
               <p style="margin-top:18px"><b>Ej 2 · Estación de combustibles — lista de surtidores, lista de consumos</b></p>
               <p>Cantidad de surtidores y autos variables → dos listas anidadas. Auxiliar <code>Total_Consumo</code> evita código repetido.</p>
-              <pre class="code"><span class="filename">estacion_combustibles.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">estacion_combustibles.adb</span><code class="ada">with Lista;
 
 procedure Estacion_Combustibles is
 
    --  INCISO A
-   package Lista_Consumos is new Listanoordenada (Tipoelem =&gt; Float);
+   package Lista_Consumos is new Lista (Tipoelem =&gt; Float);
 
    type Tiposurtidor is record
       Numero   : Integer;
       Consumos : Lista_Consumos.Tipolista;
    end record;
 
-   package Lista_Surtidores is new Listanoordenada (Tipoelem =&gt; Tiposurtidor);
+   package Lista_Surtidores is new Lista (Tipoelem =&gt; Tiposurtidor);
 
    --  AUXILIAR: suma de consumos de UN surtidor (evita repetir código)
    function Total_Consumo (Consumos : Lista_Consumos.Tipolista) return Float is
@@ -9540,18 +9525,18 @@ end Estacion_Combustibles;
                 <table class="dt" style="margin-top:8px">
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
-                    <tr><td>"lista de jugadores"</td><td>cantidad variable</td><td>Listanoordenada (record jugador)</td></tr>
+                    <tr><td>"lista de jugadores"</td><td>cantidad variable</td><td>Lista (record jugador)</td></tr>
                     <tr><td>"número, pieza, tiempo" del jugador</td><td>varios campos</td><td>Record</td></tr>
                     <tr><td>"pieza" ∈ {c,a,t,p,r,d}</td><td>conjunto cerrado y conocido</td><td>Enumerativo (TipoPieza)</td></tr>
-                    <tr><td>"vector de pilas de listas de enteros"</td><td>3 niveles anidados</td><td>Array + Piladinamica + Listanoordenada</td></tr>
+                    <tr><td>"vector de pilas de listas de enteros"</td><td>3 niveles anidados</td><td>Array + Piladinamica + Lista</td></tr>
                     <tr><td>"mayor de la lista del TOPE de cada pila"</td><td>acceso al tope sin destruir</td><td>Patrón 2 (Sacar + Meter inmediato)</td></tr>
                   </tbody>
                 </table>
               </div>
 
               <p><b>Ej 1 · Torneo de ajedrez — filtro doble en una pasada</b></p>
-              <p>Cantidad de jugadores variable → <code>Listanoordenada</code>. Las listas L1 y L2 son del mismo tipo. Una sola pasada decide cada jugador con <code>if/elsif</code>.</p>
-              <pre class="code"><span class="filename">torneo_ajedrez.adb</span><code class="ada">with Listanoordenada;
+              <p>Cantidad de jugadores variable → <code>Lista</code>. Las listas L1 y L2 son del mismo tipo. Una sola pasada decide cada jugador con <code>if/elsif</code>.</p>
+              <pre class="code"><span class="filename">torneo_ajedrez.adb</span><code class="ada">with Lista;
 
 procedure Torneo_Ajedrez is
 
@@ -9565,7 +9550,7 @@ procedure Torneo_Ajedrez is
    end record;
 
    --  Una sola instanciación: la lista original, L1 y L2 son del mismo tipo.
-   package Lista_Jugadores is new Listanoordenada (Tipoelem =&gt; Tipojugador);
+   package Lista_Jugadores is new Lista (Tipoelem =&gt; Tipojugador);
 
    --  INCISO B — Filtrar Rey/Tiempo y Peón/Jaque mate
    --  Objetivo: una pasada → dos listas filtradas.
@@ -9580,8 +9565,8 @@ procedure Torneo_Ajedrez is
       Aux : Lista_Jugadores.Tipolista;
       J   : Tipojugador;
    begin
-      Lista_Jugadores.Crearlista (L1);
-      Lista_Jugadores.Crearlista (L2);
+      Lista_Jugadores.Crear (L1);
+      Lista_Jugadores.Crear (L2);
       Aux := Jugadores;
 
       while not Lista_Jugadores.Vacia (Aux) loop
@@ -9589,11 +9574,11 @@ procedure Torneo_Ajedrez is
 
          --  L1: pieza = Rey y usó los 10 minutos (terminó por tiempo)
          if J.Pieza = Rey and then J.Tiempo = 10 then
-            Lista_Jugadores.InsertarPpio (L1, J);
+            Lista_Jugadores.Insertar (L1, J);
 
          --  L2: pieza = Peón y terminó por jaque mate (tiempo &lt; 10)
          elsif J.Pieza = Peon and then J.Tiempo &lt; 10 then
-            Lista_Jugadores.InsertarPpio (L2, J);
+            Lista_Jugadores.Insertar (L2, J);
          end if;
 
          Aux := Lista_Jugadores.Sig (Aux);
@@ -9613,7 +9598,7 @@ end Torneo_Ajedrez;
 
               <p style="margin-top:18px"><b>Ej 2 · Mayor del tope de cada pila — vector de pilas de listas</b></p>
               <p>El truco para CONSERVAR la pila sin operación <code>Tope</code>: <b><code>Sacar</code> el tope, usarlo, y <code>Meter</code>lo de nuevo</b>. La pila queda idéntica.</p>
-              <pre class="code"><span class="filename">mayor_de_topes.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">mayor_de_topes.adb</span><code class="ada">with Lista;
 with Piladinamica;
 
 procedure Mayor_de_Topes is
@@ -9621,7 +9606,7 @@ procedure Mayor_de_Topes is
    --  INCISO A — Tipos e instanciaciones
 
    --  Lista interna: enteros (cada elemento de la pila es una lista de enteros)
-   package Lista_Int is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Int is new Lista (Tipoelem =&gt; Integer);
 
    --  Pila cuyos elementos son listas de enteros
    package Pila_de_Listas is new Piladinamica (Tipoelem =&gt; Lista_Int.Tipolista);
@@ -9663,7 +9648,7 @@ procedure Mayor_de_Topes is
       Lista_Tope : Lista_Int.Tipolista;
       M          : Integer;
    begin
-      Lista_Int.Crearlista (Resultado);
+      Lista_Int.Crear (Resultado);
 
       for I in E'Range loop
          if not Pila_de_Listas.Vacia (E (I)) then
@@ -9672,7 +9657,7 @@ procedure Mayor_de_Topes is
             --  2) Calcular el mayor de esa lista (sin modificarla)
             M := Mayor_de (Lista_Tope);
             --  3) Sumar al resultado
-            Lista_Int.InsertarFin (Resultado, M);
+            Lista_Int.Insertar (Resultado, M);
             --  4) Restaurar la pila volviendo a meter la lista del tope
             Pila_de_Listas.Meter (E (I), Lista_Tope);
          end if;
@@ -9751,7 +9736,7 @@ end Mayor_de_Topes;
                   <tbody>
                     <tr><td>"pila" (la estructura P)</td><td>LIFO · acceso solo al tope</td><td>Piladinamica</td></tr>
                     <tr><td>"colas" (dentro de cada elemento de P)</td><td>FIFO · acceso al frente y final</td><td>Coladinamica</td></tr>
-                    <tr><td>"listas de enteros" (dentro de las colas)</td><td>cantidad variable</td><td>Listanoordenada (Integer)</td></tr>
+                    <tr><td>"listas de enteros" (dentro de las colas)</td><td>cantidad variable</td><td>Lista (Integer)</td></tr>
                     <tr><td>"lista al FINAL de la cola del TOPE"</td><td>último de cola + tope de pila</td><td>Patrón 2 (pila) + Patrón 3 (cola)</td></tr>
                     <tr><td>"números NEGATIVOS"</td><td>filtro X &lt; 0 en la lista</td><td>recorrer con Aux y filtrar</td></tr>
                   </tbody>
@@ -9774,7 +9759,7 @@ end Mayor_de_Topes;
                 </ol>
               </div>
 
-              <pre class="code"><span class="filename">negativos_recu_2022.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">negativos_recu_2022.adb</span><code class="ada">with Lista;
 with Coladinamica;
 with Piladinamica;
 
@@ -9783,7 +9768,7 @@ procedure Negativos_Recu_2022 is
    --  INCISO A — Tipos e instanciaciones (3 niveles)
 
    --  Nivel 1: lista de enteros (la más interna)
-   package Lista_Int      is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Int      is new Lista (Tipoelem =&gt; Integer);
 
    --  Nivel 2: cola cuyos elementos son listas de enteros
    package Cola_de_Listas is new Coladinamica
@@ -9812,7 +9797,7 @@ procedure Negativos_Recu_2022 is
       AuxLista  : Lista_Int.Tipolista;       --  para recorrer Lista_F
       E         : Integer;
    begin
-      Lista_Int.Crearlista (Result);
+      Lista_Int.Crear (Result);
 
       if Pila_de_Colas.Vacia (P) then
          return;
@@ -9839,7 +9824,7 @@ procedure Negativos_Recu_2022 is
       while not Lista_Int.Vacia (AuxLista) loop
          E := Lista_Int.Info (AuxLista);
          if E &lt; 0 then
-            Lista_Int.InsertarFin (Result, E);
+            Lista_Int.Insertar (Result, E);
          end if;
          AuxLista := Lista_Int.Sig (AuxLista);
       end loop;
@@ -9910,7 +9895,7 @@ end Negativos_Recu_2022;
                   <tbody>
                     <tr><td>"matriz M"</td><td>tabla bidimensional</td><td>Array (Fila, Col)</td></tr>
                     <tr><td>"pila de listas" (en cada celda)</td><td>apilamiento dentro de matriz</td><td>Piladinamica</td></tr>
-                    <tr><td>"listas de records"</td><td>cantidad variable + multi-campo</td><td>Listanoordenada (record)</td></tr>
+                    <tr><td>"listas de records"</td><td>cantidad variable + multi-campo</td><td>Lista (record)</td></tr>
                     <tr><td>"BASE de cada pila"</td><td>el más antiguo (fondo)</td><td>Patrón 4 (dos whiles)</td></tr>
                     <tr><td>"números pares"</td><td>filtro del campo numérico</td><td>R.Codigo mod 2 = 0</td></tr>
                   </tbody>
@@ -9919,7 +9904,7 @@ end Negativos_Recu_2022;
 
               <p><b>Estructura:</b> matriz 2D donde cada celda es una pila; cada elemento de la pila es una lista de records; cada record tiene un campo numérico. <b>Patrones:</b> 4 (base de pila) + 1 (recorrer lista con Aux). Asumo que el record tiene al menos un campo <code>Codigo : Integer</code>.</p>
 
-              <pre class="code"><span class="filename">aulas_pares_base.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">aulas_pares_base.adb</span><code class="ada">with Lista;
 with Piladinamica;
 
 procedure Aulas_Pares_Base is
@@ -9930,9 +9915,9 @@ procedure Aulas_Pares_Base is
       Otro   : Integer;     --  ejemplo de otro campo
    end record;
 
-   package Lista_Recs  is new Listanoordenada (Tipoelem =&gt; Tiporecord);
+   package Lista_Recs  is new Lista (Tipoelem =&gt; Tiporecord);
    package Pila_Listas is new Piladinamica   (Tipoelem =&gt; Lista_Recs.Tipolista);
-   package Lista_Pares is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Pares is new Lista (Tipoelem =&gt; Integer);
 
    subtype Indice is Integer range 1 .. 10;
    type TipoMatriz is array (Indice, Indice) of Pila_Listas.Tipopiladinamica;
@@ -9949,7 +9934,7 @@ procedure Aulas_Pares_Base is
       while not Lista_Recs.Vacia (Aux) loop
          R := Lista_Recs.Info (Aux);
          if R.Codigo mod 2 = 0 then
-            Lista_Pares.InsertarFin (Result, R.Codigo);
+            Lista_Pares.Insertar (Result, R.Codigo);
          end if;
          Aux := Lista_Recs.Sig (Aux);
       end loop;
@@ -9970,7 +9955,7 @@ procedure Aulas_Pares_Base is
       Base    : Lista_Recs.Tipolista;
       X       : Lista_Recs.Tipolista;
    begin
-      Lista_Pares.Crearlista (Result);
+      Lista_Pares.Crear (Result);
 
       for I in M'Range(1) loop
          for J in M'Range(2) loop
@@ -10052,7 +10037,7 @@ end Aulas_Pares_Base;
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
                     <tr><td>"vector de colas"</td><td>índice fijo + FIFO</td><td>Array of Coladinamica</td></tr>
-                    <tr><td>"listas de enteros" (en cada cola)</td><td>cantidad variable</td><td>Listanoordenada (Integer)</td></tr>
+                    <tr><td>"listas de enteros" (en cada cola)</td><td>cantidad variable</td><td>Lista (Integer)</td></tr>
                     <tr><td>"mayor de la lista del FRENTE"</td><td>primer elemento de cada cola</td><td>Patrón 3 (capturar el primer Supcola)</td></tr>
                     <tr><td>"sumar... e IMPRIMIR el resultado"</td><td>acumular + Put</td><td>Variable Suma + Ada.Text_IO</td></tr>
                   </tbody>
@@ -10065,13 +10050,13 @@ end Aulas_Pares_Base;
 
               <pre class="code"><span class="filename">petrolera_suma_mayores.adb</span><code class="ada">with Ada.Text_IO;
 with Ada.Integer_Text_IO;
-with Listanoordenada;
+with Lista;
 with Coladinamica;
 
 procedure Petrolera_Suma_Mayores is
 
    --  INCISO A — Tipos e instanciaciones
-   package Lista_Int    is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Int    is new Lista (Tipoelem =&gt; Integer);
    package Cola_Listas  is new Coladinamica    (Tipoelem =&gt; Lista_Int.Tipolista);
 
    subtype Indice is Integer range 1 .. 10;
@@ -10191,8 +10176,8 @@ end Petrolera_Suma_Mayores;
                 <table class="dt" style="margin-top:8px">
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
-                    <tr><td>"estructura dinámica" para juegos</td><td>crece/decrece</td><td>Listanoordenada (record juego)</td></tr>
-                    <tr><td>"datos de clientes que usan sus juegos"</td><td>clientes asociados al juego</td><td>Listanoordenada anidada en el record juego</td></tr>
+                    <tr><td>"estructura dinámica" para juegos</td><td>crece/decrece</td><td>Lista (record juego)</td></tr>
+                    <tr><td>"datos de clientes que usan sus juegos"</td><td>clientes asociados al juego</td><td>Lista anidada en el record juego</td></tr>
                     <tr><td>"Obtener lista ORDENADA por nombre_juego"</td><td>resultado ordenado</td><td>Listaordenada (con función comparadora)</td></tr>
                     <tr><td>"clientes con edad mayor al PROMEDIO"</td><td>requiere agregado previo</td><td>Dos pasadas: calcular promedio + filtrar</td></tr>
                   </tbody>
@@ -10201,8 +10186,8 @@ end Petrolera_Suma_Mayores;
                 <table class="dt" style="margin-top:6px">
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
-                    <tr><td>"recibe PILA y LISTA"</td><td>dos estructuras de entrada</td><td>Piladinamica + Listanoordenada</td></tr>
-                    <tr><td>"ordenados MAYOR a MENOR"</td><td>descendente</td><td>Listaordenada con <code>menor =&gt; Mayor_Que</code></td></tr>
+                    <tr><td>"recibe PILA y LISTA"</td><td>dos estructuras de entrada</td><td>Piladinamica + Lista</td></tr>
+                    <tr><td>"ordenados MAYOR a MENOR"</td><td>descendente</td><td>Listaordenada con <code>"&lt;" =&gt; Mayor_Que</code></td></tr>
                     <tr><td>"que NO están en la lista"</td><td>complemento (filtro negativo)</td><td><code>not Esta (L, X)</code></td></tr>
                   </tbody>
                 </table>
@@ -10210,7 +10195,7 @@ end Petrolera_Suma_Mayores;
 
               <p><b>Estructura:</b> 2 niveles anidados. Lista de juegos (cada uno con su lista interna de clientes). El resultado es un record COMBINADO (juego + cliente) en lista ordenada por nombre_juego.</p>
 
-              <pre class="code"><span class="filename">empresa_juegos.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">empresa_juegos.adb</span><code class="ada">with Lista;
 with Listaordenada;
 
 procedure Empresa_Juegos is
@@ -10223,14 +10208,14 @@ procedure Empresa_Juegos is
       Nombre : Nombre_T;
       Edad   : Integer;
    end record;
-   package Lista_Clientes is new Listanoordenada (Tipoelem =&gt; TipoCliente);
+   package Lista_Clientes is new Lista (Tipoelem =&gt; TipoCliente);
 
    type TipoJuego is record
       IDJuego      : Integer;
       Nombre_Juego : Nombre_T;
       Clientes     : Lista_Clientes.Tipolista;
    end record;
-   package Lista_Juegos is new Listanoordenada (Tipoelem =&gt; TipoJuego);
+   package Lista_Juegos is new Lista (Tipoelem =&gt; TipoJuego);
 
    --  Tipo resultado: combinación juego + cliente
    type TipoClienteEnJuego is record
@@ -10250,8 +10235,8 @@ procedure Empresa_Juegos is
 
    package Lista_Result is new Listaordenada
      (Tipoelem =&gt; TipoClienteEnJuego,
-      menor    =&gt; Menor_Por_NJuego,
-      mayor    =&gt; Mayor_Por_NJuego);
+      "&lt;"      =&gt; Menor_Por_NJuego,
+      "&gt;"      =&gt; Mayor_Por_NJuego);
 
 
    --  AUXILIAR — arma el item resultado (evita repetir 5 asignaciones)
@@ -10391,7 +10376,7 @@ end Empresa_Juegos;
               pero le paso <code>"&gt;"</code> como función <b>menor</b>. Eso invierte el orden:
               los grandes se insertan primero. Es el truco más limpio.</p>
 
-              <pre class="code"><span class="filename">complemento.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">complemento.adb</span><code class="ada">with Lista;
 with Listaordenada;
 with Piladinamica;
 
@@ -10400,7 +10385,7 @@ procedure Complemento is
    --  INCISO A — Tipos e instanciaciones
 
    package Pila_Int  is new Piladinamica    (Tipoelem =&gt; Integer);
-   package Lista_Int is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Int is new Lista (Tipoelem =&gt; Integer);
 
    --  TRUCO: para ordenar de MAYOR A MENOR, paso "&gt;" como función "menor".
    --  Listaordenada usa "menor" para decidir el orden de inserción:
@@ -10414,8 +10399,8 @@ procedure Complemento is
 
    package Lista_Ord is new Listaordenada
      (Tipoelem =&gt; Integer,
-      menor    =&gt; Mayor_Que,    --  INVERTIDO ↓ descendente
-      mayor    =&gt; Menor_Que);
+      "&lt;"      =&gt; Mayor_Que,    --  INVERTIDO ↓ descendente
+      "&gt;"      =&gt; Menor_Que);
 
 
    --  INCISO B — complemento_lista
@@ -10466,7 +10451,7 @@ end Complemento;
                 <b>El truco de Listaordenada invertida</b> es muy elegante y la cátedra lo
                 valora muchísimo. Si te animás a usarlo (sabiendo explicar por qué funciona),
                 ganás un punto extra de prolijidad. Alternativa más simple pero más fea:
-                usar <code>Listanoordenada</code> y al final ordenar manualmente.
+                usar <code>Lista</code> y al final ordenar manualmente.
               </div>
             </div>
           </div>
@@ -10517,11 +10502,11 @@ end Complemento;
                 <table class="dt" style="margin-top:8px">
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
-                    <tr><td>"forma médicos residentes" + "cada residente"</td><td>cantidad variable</td><td>Listanoordenada (record residente)</td></tr>
+                    <tr><td>"forma médicos residentes" + "cada residente"</td><td>cantidad variable</td><td>Lista (record residente)</td></tr>
                     <tr><td>"legajo, apellido, especialidad"</td><td>varios campos del residente</td><td>Record</td></tr>
                     <tr><td>"programa dura EXACTAMENTE 3 años"</td><td>tamaño FIJO y conocido</td><td>Array (1..3) dentro del record</td></tr>
-                    <tr><td>"rota por distintos servicios" (varios por año)</td><td>cantidad variable</td><td>Listanoordenada (record servicio)</td></tr>
-                    <tr><td>"recibe EVALUACIONES" (varias por servicio)</td><td>cantidad variable</td><td>Listanoordenada (record evaluación)</td></tr>
+                    <tr><td>"rota por distintos servicios" (varios por año)</td><td>cantidad variable</td><td>Lista (record servicio)</td></tr>
+                    <tr><td>"recibe EVALUACIONES" (varias por servicio)</td><td>cantidad variable</td><td>Lista (record evaluación)</td></tr>
                     <tr><td>"fecha, nota, evaluador"</td><td>varios campos de la evaluación</td><td>Record</td></tr>
                     <tr><td>"promedio inferior a 6"</td><td>agregado por servicio</td><td>Función auxiliar <code>Promedio_Notas</code></td></tr>
                     <tr><td>"evaluador que MÁS evaluaciones realizó"</td><td>conteo por nombre</td><td>Lista de (Nombre, Count) + supr+insert</td></tr>
@@ -10536,7 +10521,7 @@ end Complemento;
                 <li><b>Instanciar de adentro hacia afuera:</b> Lista_Eval primero, Lista_Serv después, Lista_Resi al final.</li>
               </ul>
 
-              <pre class="code"><span class="filename">hospital_residentes.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">hospital_residentes.adb</span><code class="ada">with Lista;
 
 procedure Hospital_Residentes is
 
@@ -10554,14 +10539,14 @@ procedure Hospital_Residentes is
       Nota      : Float;
       Evaluador : Evaluador_T;
    end record;
-   package Lista_Eval is new Listanoordenada (Tipoelem =&gt; TipoEvaluacion);
+   package Lista_Eval is new Lista (Tipoelem =&gt; TipoEvaluacion);
 
    --  Nivel 2: servicio (contiene la lista de evaluaciones)
    type TipoServicio is record
       Nombre       : Servicio_T;
       Evaluaciones : Lista_Eval.Tipolista;
    end record;
-   package Lista_Serv is new Listanoordenada (Tipoelem =&gt; TipoServicio);
+   package Lista_Serv is new Lista (Tipoelem =&gt; TipoServicio);
 
    --  Nivel 3: array de servicios por año (3 años fijos)
    type TipoServiciosPorAnio is array (TipoAnio) of Lista_Serv.Tipolista;
@@ -10573,7 +10558,7 @@ procedure Hospital_Residentes is
       Especialidad : Especialidad_T;
       Servicios    : TipoServiciosPorAnio;
    end record;
-   package Lista_Resi is new Listanoordenada (Tipoelem =&gt; TipoResidente);
+   package Lista_Resi is new Lista (Tipoelem =&gt; TipoResidente);
 
    --  Tipo resultado del inciso a)
    type TipoEnRiesgo is record
@@ -10582,14 +10567,14 @@ procedure Hospital_Residentes is
       Servicio : Servicio_T;
       Promedio : Float;
    end record;
-   package Lista_Riesgo is new Listanoordenada (Tipoelem =&gt; TipoEnRiesgo);
+   package Lista_Riesgo is new Lista (Tipoelem =&gt; TipoEnRiesgo);
 
    --  Tipo conteo para inciso b)
    type TipoConteoEvaluador is record
       Nombre : Evaluador_T;
       Count  : Integer;
    end record;
-   package Lista_Conteo is new Listanoordenada (Tipoelem =&gt; TipoConteoEvaluador);
+   package Lista_Conteo is new Lista (Tipoelem =&gt; TipoConteoEvaluador);
 
 
    --  AUXILIAR · promedio de notas de una lista de evaluaciones
@@ -10632,14 +10617,14 @@ procedure Hospital_Residentes is
             --  Suprimo el record viejo, lo actualizo en variable local, lo reinserto.
             Lista_Conteo.Suprimir (Lista_C, C);
             C.Count := C.Count + 1;
-            Lista_Conteo.InsertarPpio (Lista_C, C);
+            Lista_Conteo.Insertar (Lista_C, C);
          end if;
          Aux := Lista_Conteo.Sig (Aux);
       end loop;
       if not Encontrado then
          Nuevo.Nombre := Nombre;
          Nuevo.Count  := 1;
-         Lista_Conteo.InsertarPpio (Lista_C, Nuevo);
+         Lista_Conteo.Insertar (Lista_C, Nuevo);
       end if;
    end Sumar_Evaluador;
 
@@ -10657,7 +10642,7 @@ procedure Hospital_Residentes is
       Prom : Float;
       Item : TipoEnRiesgo;
    begin
-      Lista_Riesgo.Crearlista (Result);
+      Lista_Riesgo.Crear (Result);
       AuxR := Residentes;
       while not Lista_Resi.Vacia (AuxR) loop
          R    := Lista_Resi.Info (AuxR);
@@ -10670,7 +10655,7 @@ procedure Hospital_Residentes is
                Item.Apellido := R.Apellido;
                Item.Servicio := S.Nombre;
                Item.Promedio := Prom;
-               Lista_Riesgo.InsertarFin (Result, Item);
+               Lista_Riesgo.Insertar (Result, Item);
             end if;
             AuxS := Lista_Serv.Sig (AuxS);
          end loop;
@@ -10695,7 +10680,7 @@ procedure Hospital_Residentes is
       Conteo    : Lista_Conteo.Tipolista;
       Mayor     : Integer;
    begin
-      Lista_Conteo.Crearlista (Conteo);
+      Lista_Conteo.Crear (Conteo);
       Nombre_Ganador := (others =&gt; ' ');
       Mayor          := 0;
 
@@ -10934,7 +10919,7 @@ end Petrolera_Reemplazar;
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
                     <tr><td>"por CONTINENTE" (5 continentes)</td><td>tamaño FIJO y conocido</td><td>Array indexado por enum (TipoContinente)</td></tr>
-                    <tr><td>"Visitantes" (varios por continente)</td><td>cantidad variable</td><td>Listanoordenada (record visitante)</td></tr>
+                    <tr><td>"Visitantes" (varios por continente)</td><td>cantidad variable</td><td>Lista (record visitante)</td></tr>
                     <tr><td>"navegador, fecha, hora, IP, páginas, búsquedas"</td><td>6 campos por visitante</td><td>Record</td></tr>
                     <tr><td>"Lista ORDENADA por IP"</td><td>resultado ordenado</td><td>Listaordenada con comparación por IP</td></tr>
                     <tr><td>"con &gt;50 solicitudes el MISMO DÍA"</td><td>agrupado por (IP, fecha), contar</td><td>Lista auxiliar de conteo + suprimir+insertar</td></tr>
@@ -10947,7 +10932,7 @@ end Petrolera_Reemplazar;
               en TODA la estructura — eso requiere una <b>lista auxiliar de conteo</b>
               (igual que el Hospital Ej b con el conteo de evaluadores).</p>
 
-              <pre class="code"><span class="filename">google_visitantes.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">google_visitantes.adb</span><code class="ada">with Lista;
 with Listaordenada;
 
 procedure Google_Visitantes is
@@ -10967,7 +10952,7 @@ procedure Google_Visitantes is
       Busquedas : Integer;
    end record;
 
-   package Lista_Vis is new Listanoordenada (Tipoelem =&gt; TipoVisitante);
+   package Lista_Vis is new Lista (Tipoelem =&gt; TipoVisitante);
 
    --  Los continentes son FIJOS → enumerativo + array
    type TipoContinente is (Africa, America, Asia, Europa, Oceania);
@@ -10989,11 +10974,11 @@ procedure Google_Visitantes is
 
    package Lista_Result is new Listaordenada
      (Tipoelem =&gt; TipoUsuarioActivo,
-      menor    =&gt; Menor_IP,
-      mayor    =&gt; Mayor_IP);
+      "&lt;"      =&gt; Menor_IP,
+      "&gt;"      =&gt; Mayor_IP);
 
    --  Lista auxiliar para contar (IP, Fecha) → Cantidad
-   package Lista_Conteo is new Listanoordenada (Tipoelem =&gt; TipoUsuarioActivo);
+   package Lista_Conteo is new Lista (Tipoelem =&gt; TipoUsuarioActivo);
 
 
    --  AUXILIAR — incrementar conteo de (IP, Fecha) o crear con 1
@@ -11015,7 +11000,7 @@ procedure Google_Visitantes is
             --  Truco: suprimir el viejo, sumar 1, reinsertar (no hay Modificar)
             Lista_Conteo.Suprimir (L, C);
             C.Cantidad := C.Cantidad + 1;
-            Lista_Conteo.InsertarPpio (L, C);
+            Lista_Conteo.Insertar (L, C);
          end if;
          Aux := Lista_Conteo.Sig (Aux);
       end loop;
@@ -11023,7 +11008,7 @@ procedure Google_Visitantes is
          Nuevo.IP       := IP;
          Nuevo.Fecha    := Fecha;
          Nuevo.Cantidad := 1;
-         Lista_Conteo.InsertarPpio (L, Nuevo);
+         Lista_Conteo.Insertar (L, Nuevo);
       end if;
    end Sumar_Visita;
 
@@ -11046,7 +11031,7 @@ procedure Google_Visitantes is
       C      : TipoUsuarioActivo;
    begin
       Lista_Result.Crearlistaordenada (Result);
-      Lista_Conteo.Crearlista (Conteo);
+      Lista_Conteo.Crear (Conteo);
 
       --  Recorrer TODA la estructura: por cada continente, por cada visitante,
       --  sumar al conteo (IP, Fecha).
@@ -11088,7 +11073,7 @@ end Google_Visitantes;
                     mismo día" requiere agregar por (IP, Fecha) — no se puede saber con una
                     sola pasada que cuente directo. Hay que acumular.</li>
                   <li><b>¿Por qué <code>Listaordenada</code> para Result y no
-                    <code>Listanoordenada</code>?</b> Porque el enunciado pide "ordenada por
+                    <code>Lista</code>?</b> Porque el enunciado pide "ordenada por
                     IP". <code>Listaordenada</code> lo hace solo en cada <code>Insertar</code>.</li>
                 </ol>
               </div>
@@ -11106,9 +11091,9 @@ end Google_Visitantes;
                 <table class="dt" style="margin-top:8px">
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
-                    <tr><td>"recibe LISTA L1 y PILA P1"</td><td>dos estructuras de entrada</td><td>Listanoordenada + Piladinamica</td></tr>
+                    <tr><td>"recibe LISTA L1 y PILA P1"</td><td>dos estructuras de entrada</td><td>Lista + Piladinamica</td></tr>
                     <tr><td>"INTERSECCIÓN" (elementos en ambas)</td><td>filtro de pertenencia positiva</td><td><code>Esta (L1, X)</code> AND otra cond.</td></tr>
-                    <tr><td>"ordenada ASCENDENTEMENTE"</td><td>orden creciente (menor primero)</td><td>Listaordenada con <code>menor =&gt; Menor_Que</code></td></tr>
+                    <tr><td>"ordenada ASCENDENTEMENTE"</td><td>orden creciente (menor primero)</td><td>Listaordenada con <code>"&lt;" =&gt; Menor_Que</code></td></tr>
                     <tr><td>"sin repeticiones"</td><td>filtrar duplicados</td><td><code>not Esta (L2, X)</code> antes de insertar</td></tr>
                   </tbody>
                 </table>
@@ -11118,14 +11103,14 @@ end Google_Visitantes;
                 <b>ascendente</b> (no descendente) y filtro de <b>intersección</b> (en ambas) en
                 vez de <b>complemento</b> (en pila pero no en lista).</p>
 
-              <pre class="code"><span class="filename">google_interseccion.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">google_interseccion.adb</span><code class="ada">with Lista;
 with Listaordenada;
 with Piladinamica;
 
 procedure Google_Interseccion is
 
    --  INCISO A — Tipos e instanciaciones
-   package Lista_Int is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Int is new Lista (Tipoelem =&gt; Integer);
    package Pila_Int  is new Piladinamica    (Tipoelem =&gt; Integer);
 
    --  Listaordenada ascendente: paso "&lt;" como "menor" (orden normal)
@@ -11137,8 +11122,8 @@ procedure Google_Interseccion is
 
    package Lista_Ord is new Listaordenada
      (Tipoelem =&gt; Integer,
-      menor    =&gt; Menor_Que,    --  ASCENDENTE (los menores primero)
-      mayor    =&gt; Mayor_Que);
+      "&lt;"      =&gt; Menor_Que,    --  ASCENDENTE (los menores primero)
+      "&gt;"      =&gt; Mayor_Que);
 
 
    --  INCISO B — Intersección de L1 y P1
@@ -11183,7 +11168,7 @@ end Google_Interseccion;
               <div class="callout" style="margin-top:12px">
                 <b>Compará con CC P1 2023 Ej 2 (complemento):</b>
                 <ul>
-                  <li><b>Ascendente</b> aquí · <b>descendente</b> allá → cambia <code>menor =&gt; Menor_Que</code> vs <code>menor =&gt; Mayor_Que</code>.</li>
+                  <li><b>Ascendente</b> aquí · <b>descendente</b> allá → cambia <code>"&lt;" =&gt; Menor_Que</code> vs <code>"&lt;" =&gt; Mayor_Que</code>.</li>
                   <li><b>Intersección</b> aquí (en ambas) · <b>complemento</b> allá (en pila, no en lista) → cambia <code>Esta (L1, X)</code> vs <code>not Esta (L1, X)</code>.</li>
                   <li>El resto del esqueleto es <b>idéntico</b>. Memorizá uno, el otro sale solo.</li>
                 </ul>
@@ -11231,7 +11216,7 @@ end Google_Interseccion;
                 <table class="dt" style="margin-top:8px">
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
-                    <tr><td>"lista de palabras"</td><td>cantidad variable</td><td>Listanoordenada (subtype TipoPalabra)</td></tr>
+                    <tr><td>"lista de palabras"</td><td>cantidad variable</td><td>Lista (subtype TipoPalabra)</td></tr>
                     <tr><td>"empiezan con vocal"</td><td>filtro por primer carácter</td><td>Función <code>Es_Vocal (Palabra'First)</code></td></tr>
                     <tr><td>"reemplazar 'x' por 'y'"</td><td>modificar caracteres del string</td><td>For loop sobre <code>P'Range</code></td></tr>
                   </tbody>
@@ -11250,7 +11235,7 @@ end Google_Interseccion;
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
                     <tr><td>"recibe pila... y cola..."</td><td>dos estructuras de entrada</td><td>Piladinamica + Coladinamica</td></tr>
-                    <tr><td>"ordenados MAYOR a MENOR"</td><td>descendente</td><td>Listaordenada con <code>menor =&gt; Mayor_Que</code></td></tr>
+                    <tr><td>"ordenados MAYOR a MENOR"</td><td>descendente</td><td>Listaordenada con <code>"&lt;" =&gt; Mayor_Que</code></td></tr>
                     <tr><td>"sin repetidos"</td><td>filtrar duplicados</td><td><code>not Esta (Result, X)</code></td></tr>
                     <tr><td>"sólo MÚLTIPLOS DE 4"</td><td>filtro por mod</td><td><code>X mod 4 = 0</code></td></tr>
                   </tbody>
@@ -11259,14 +11244,14 @@ end Google_Interseccion;
 
               <p><b>Concepto:</b> manejo de strings con tamaño fijo + recorrido carácter por carácter. Es el único de la noche que toca <code>Character</code> y <code>String</code> directamente.</p>
 
-              <pre class="code"><span class="filename">whatsapp_listapalabras.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">whatsapp_listapalabras.adb</span><code class="ada">with Lista;
 
 procedure WhatsApp_ListaPalabras is
 
    --  INCISO A — Tipos e instanciaciones
    subtype TipoPalabra is String (1 .. 20);  --  tamaño fijo; relleno con espacios
 
-   package Lista_Pal is new Listanoordenada (Tipoelem =&gt; TipoPalabra);
+   package Lista_Pal is new Lista (Tipoelem =&gt; TipoPalabra);
 
 
    --  AUXILIAR — ¿es vocal? (case-insensitive)
@@ -11305,14 +11290,14 @@ procedure WhatsApp_ListaPalabras is
       Palabra    : TipoPalabra;
       Modificada : TipoPalabra;
    begin
-      Lista_Pal.Crearlista (Result);
+      Lista_Pal.Crear (Result);
       Aux := L;
       while not Lista_Pal.Vacia (Aux) loop
          Palabra := Lista_Pal.Info (Aux);
          if Es_Vocal (Palabra (Palabra'First)) then
             Modificada := Palabra;        --  copio para no tocar la original
             Reemplazar_X (Modificada);
-            Lista_Pal.InsertarFin (Result, Modificada);
+            Lista_Pal.Insertar (Result, Modificada);
          end if;
          Aux := Lista_Pal.Sig (Aux);
       end loop;
@@ -11344,13 +11329,13 @@ end WhatsApp_ListaPalabras;
                 que era <code>Vec[Pila[Lista[Int]]]</code> — el orden externo invierte qué patrón
                 usás en cada nivel.</p>
 
-              <pre class="code"><span class="filename">whatsapp_cuentapar.adb</span><code class="ada">with Listanoordenada;
+              <pre class="code"><span class="filename">whatsapp_cuentapar.adb</span><code class="ada">with Lista;
 with Piladinamica;
 
 procedure WhatsApp_CuentaPar is
 
    --  INCISO A — Tipos e instanciaciones (de adentro hacia afuera)
-   package Lista_Int is new Listanoordenada (Tipoelem =&gt; Integer);
+   package Lista_Int is new Lista (Tipoelem =&gt; Integer);
 
    subtype Indice is Integer range 1 .. 10;
    type TipoVec is array (Indice) of Lista_Int.Tipolista;
@@ -11451,8 +11436,8 @@ procedure WhatsApp_Union is
 
    package Lista_Ord is new Listaordenada
      (Tipoelem =&gt; Integer,
-      menor    =&gt; Mayor_Que,    --  INVERTIDO: descendente
-      mayor    =&gt; Menor_Que);
+      "&lt;"      =&gt; Mayor_Que,    --  INVERTIDO: descendente
+      "&gt;"      =&gt; Menor_Que);
 
 
    --  INCISO B — Unión filtrada
@@ -11902,7 +11887,7 @@ end WhatsApp_Union;
         <div class="set-meta">4 ejercicios · días D7-D8 del cronograma</div>
         <div class="set-reglas">
           <b>Reglas del set:</b> Operaciones <code>Insertar</code> y <code>Suprimir</code>.
-          Manejar la excepción <code>Listavacia</code>.
+          Manejar la excepción <code>Lista_Vacia</code>.
         </div>
       </div>
 
