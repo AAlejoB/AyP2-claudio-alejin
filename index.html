@@ -940,12 +940,28 @@
 
     <div class="tp-group">
       <div class="tp-title" data-jump="ejercicios">
-        <span>Sets + Simulacro</span>
-        <span class="pill gris">por charlar</span>
+        <span>Sets de práctica</span>
+        <span class="pill">4 sets</span>
       </div>
-      <p style="font-size:.78rem;color:var(--text-mute);padding:6px 10px;margin:0">
-        Subdivisión interna pendiente — item #2 del backlog.
-      </p>
+      <ul class="ej-list">
+        <li><a href="#set-1">Set 1 · Calentamiento (A1, A2, A3)</a></li>
+        <li><a href="#set-2">Set 2 · Compuestas (B1, B2, B3, B4)</a></li>
+        <li><a href="#set-3">Set 3 · Memoria dinámica (C1, C2, C3, C4)</a></li>
+        <li><a href="#set-4">Set 4 · Listas (D1, D2, D3, D4)</a></li>
+      </ul>
+    </div>
+
+    <div class="tp-group">
+      <div class="tp-title" data-jump="ejercicios">
+        <span>Simulacro 3hs</span>
+        <span class="pill">4 ej.</span>
+      </div>
+      <ul class="ej-list">
+        <li><a href="#sim-1">Sim 1 · Tracing recursivo</a></li>
+        <li><a href="#sim-2">Sim 2 · Buffer_Circular spec</a></li>
+        <li><a href="#sim-3">Sim 3 · Vec[Pila] promedio topes</a></li>
+        <li><a href="#sim-4">Sim 4 · Lista doble-enlazada</a></li>
+      </ul>
     </div>
 
     <div class="legend">
@@ -11514,7 +11530,7 @@ end WhatsApp_Union;
       </div>
 
       <!-- =============== SET 1 =============== -->
-      <div class="set-header" data-temas="excepciones,tad">
+      <div class="set-header" id="set-1" data-temas="excepciones,tad">
         <h2>📋 Set 1 · Calentamiento — Excepciones y TADs</h2>
         <div class="set-meta">3 ejercicios · días D1-D2 del cronograma</div>
         <div class="set-reglas">
@@ -11610,7 +11626,7 @@ end WhatsApp_Union;
       </article>
 
       <!-- =============== SET 2 =============== -->
-      <div class="set-header" data-temas="pilas,colas,compuestas">
+      <div class="set-header" id="set-2" data-temas="pilas,colas,compuestas">
         <h2>📋 Set 2 · Estructuras compuestas — Pilas y Colas</h2>
         <div class="set-meta">4 ejercicios · días D3-D4 del cronograma</div>
         <div class="set-reglas">
@@ -11736,7 +11752,7 @@ end WhatsApp_Union;
       </article>
 
       <!-- =============== SET 3 =============== -->
-      <div class="set-header" data-temas="memoria,tad">
+      <div class="set-header" id="set-3" data-temas="memoria,tad">
         <h2>📋 Set 3 · Memoria dinámica — El salto al heap</h2>
         <div class="set-meta">4 ejercicios · días D5-D6 del cronograma</div>
         <div class="set-reglas">
@@ -11858,7 +11874,7 @@ end WhatsApp_Union;
       </article>
 
       <!-- =============== SET 4 =============== -->
-      <div class="set-header" data-temas="listas,colas">
+      <div class="set-header" id="set-4" data-temas="listas,colas">
         <h2>📋 Set 4 · Listas enlazadas — Estructuras avanzadas</h2>
         <div class="set-meta">4 ejercicios · días D7-D8 del cronograma</div>
         <div class="set-reglas">
@@ -11987,7 +12003,7 @@ end WhatsApp_Union;
         </div>
       </div>
 
-      <article class="thread ejercicio" data-temas="memoria" data-id="ej-sim-1">
+      <article class="thread ejercicio" id="sim-1" data-temas="memoria" data-id="ej-sim-1">
         <div class="thread-header">
           <h3>Simulacro · 1 · Tracing recursivo con punteros (45 min)</h3>
           <span class="tag">memoria</span>
@@ -12013,7 +12029,7 @@ end WhatsApp_Union;
         </div>
       </article>
 
-      <article class="thread ejercicio" data-temas="tad,compuestas" data-id="ej-sim-2">
+      <article class="thread ejercicio" id="sim-2" data-temas="tad,compuestas" data-id="ej-sim-2">
         <div class="thread-header">
           <h3>Simulacro · 2 · Spec de <code>Buffer_Circular</code> (30 min)</h3>
           <span class="tag">tad</span>
@@ -12041,7 +12057,7 @@ end WhatsApp_Union;
         </div>
       </article>
 
-      <article class="thread ejercicio" data-temas="compuestas,pilas" data-id="ej-sim-3">
+      <article class="thread ejercicio" id="sim-3" data-temas="compuestas,pilas" data-id="ej-sim-3">
         <div class="thread-header">
           <h3>Simulacro · 3 · Vector de pilas — promedio de topes (45 min)</h3>
           <span class="tag">compuestas</span>
@@ -12069,7 +12085,7 @@ end WhatsApp_Union;
         </div>
       </article>
 
-      <article class="thread ejercicio" data-temas="listas,memoria" data-id="ej-sim-4">
+      <article class="thread ejercicio" id="sim-4" data-temas="listas,memoria" data-id="ej-sim-4">
         <div class="thread-header">
           <h3>Simulacro · 4 · Lista doblemente enlazada — Insertar (60 min)</h3>
           <span class="tag">listas</span>
