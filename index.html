@@ -2494,6 +2494,109 @@ package Pila_de_Colas  is new Piladinamica
                 bien. Si tenés tiempo, agarrá uno de los 3 modelos pendientes y aplicá los 4
                 pasos por escrito antes de tirar código.
               </p>
+
+              <h3>🔁 Moldes equivalentes · "si te tiran X, mirá Y"</h3>
+
+              <p>
+                El viernes, cuando leas el enunciado, comparalo con esta tabla. Si el ejercicio
+                tiene el <b>mismo molde</b> que uno de los resueltos, ya sabés por dónde
+                arrancar. Aplicás la misma estrategia con los detalles cambiados.
+              </p>
+
+              <table class="dt">
+                <thead><tr><th>Si el ejercicio tiene...</th><th>Mirá este parcial resuelto</th><th>Estrategia clave</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><b>Vector indexado</b> por enum/categoría + listas anidadas adentro</td>
+                    <td><a href="#parcial-2025">📌 ChangoMas (2025)</a> · <a href="#parcial-google">Google (Ej 1)</a></td>
+                    <td>Array por enum + Lista por categoría. Acceso O(1) a cada celda.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Vec[Pila[Lista]]</b> · vector de pilas de listas</td>
+                    <td><a href="#parcial-2024">📌 Parcial 2024 (Ej 2)</a></td>
+                    <td>Recorrer vector + Patrón 2 (Sacar+Meter tope) + Patrón 1 (Aux en lista).</td>
+                  </tr>
+                  <tr>
+                    <td><b>Pila[Vec[Lista]]</b> · pila de vectores de listas (¡orden invertido!)</td>
+                    <td><a href="#parcial-wpp">WhatsApp (Ej 2)</a></td>
+                    <td>Patrón 4 en pila externa + for en vector + Patrón 1 en lista.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Pila[Cola[Lista]]</b> · pila de colas de listas (boss de 3 niveles)</td>
+                    <td><a href="#parcial-recu-2022">📌 Recu 2022 (Ej 2)</a></td>
+                    <td>Patrón 2 (pila) + Patrón 3 (cola al final) + Patrón 1 (lista).</td>
+                  </tr>
+                  <tr>
+                    <td><b>Vec[Cola[Lista]]</b> · vector de colas de listas</td>
+                    <td><a href="#parcial-petrolera-2">📌 Petrolera v2 (Ej 2)</a></td>
+                    <td>for vector + Patrón 3 (cola, capturar el frente) + Patrón 1 (lista).</td>
+                  </tr>
+                  <tr>
+                    <td><b>Matriz[Pila[Lista[Record]]]</b> · matriz de pilas (con BASE)</td>
+                    <td><a href="#parcial-aulas">📌 Aulas (Ej 2)</a></td>
+                    <td>Doble for + Patrón 4 (base de pila, dos whiles) + Patrón 1 (lista).</td>
+                  </tr>
+                  <tr>
+                    <td><b>Intersección / Complemento</b> entre lista y pila</td>
+                    <td><a href="#parcial-google">📌 Google (Ej 2)</a> · <a href="#parcial-2023">📌 CC P1 2023 (Ej 2)</a></td>
+                    <td>Recorrer pila con Patrón 4 + filtrar con <code>Esta</code>/<code>not Esta</code> + Listaordenada (asc o desc).</td>
+                  </tr>
+                  <tr>
+                    <td><b>Unión filtrada</b> de varias estructuras (pila + cola, etc.)</td>
+                    <td><a href="#parcial-wpp">WhatsApp (Ej 3)</a></td>
+                    <td>Aplicar Patrón 4 a pila + Patrón 3 a cola, ambos volcando a Listaordenada con filtros (mod, sin repes, etc.).</td>
+                  </tr>
+                  <tr>
+                    <td><b>Modelado complejo de 4-5 niveles</b> (records con arrays con listas con records)</td>
+                    <td><a href="#parcial-hospital">📌 Hospital · Residentes</a></td>
+                    <td>Instanciar de adentro hacia afuera. Records intermedios con campos compuestos.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Conteo agregado</b> por entidad (más activo, frecuencia, etc.)</td>
+                    <td><a href="#parcial-hospital">📌 Hospital (Ej b)</a></td>
+                    <td>Lista auxiliar de (Entidad, Count) + técnica suprimir+insertar para actualizar.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Reemplazar / modificar campo</b> en estructura anidada</td>
+                    <td><a href="#parcial-petrolera-1">📌 Petrolera v1 (Ej 2)</a></td>
+                    <td>OPERACIÓN MODIFICATORIA: Patrón 3 (vaciar cola) pero actualizando record antes de Inscola.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Buscar máximo</b> en estructura anidada con records</td>
+                    <td><a href="#parcial-2025">📌 Combustibles (Ej 2)</a> · <a href="#parcial-petrolera-2">📌 Petrolera v2 (Ej 2)</a></td>
+                    <td>Inicializar Mayor con el primero, recorrer comparando, guardar el record entero.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Filtro doble</b> (dos listas de salida en una pasada)</td>
+                    <td><a href="#parcial-2024">📌 Ajedrez (Ej 1)</a></td>
+                    <td>Un solo recorrido con <code>if/elsif</code> que clasifica cada elemento.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Manejo de strings</b> (vocales, reemplazo de char, etc.)</td>
+                    <td><a href="#parcial-wpp">WhatsApp (Ej 1)</a></td>
+                    <td><code>Unbounded_String</code> o <code>String(1..N)</code> + for sobre <code>P'Range</code> + comparación de char.</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="callout good" style="margin-top:10px">
+                <b>Cómo se usa esta tabla en el momento del parcial:</b>
+                <ol style="margin:6px 0 0 18px">
+                  <li>Leés el enunciado y identificás las estructuras (Paso 1-2).</li>
+                  <li>Buscás en la columna "Si el ejercicio tiene..." el molde que matchea.</li>
+                  <li>Mentalmente abrís el parcial linkeado y replicás la estrategia.</li>
+                  <li>Cambiás los detalles (nombres de campos, criterio de filtro, orden).</li>
+                </ol>
+                <b>Esto es lo que separa "aprobar" de "no aprobar":</b> reconocer que UN ejercicio
+                nuevo no es nuevo, es una <i>variación</i> de uno que ya viste.
+              </div>
+
+              <div class="callout warn" style="margin-top:10px">
+                <b>Y si el ejercicio NO tiene un molde directo:</b> no entres en pánico. Volvé
+                al Paso 1 (Identificar) y al Paso 2.5 (Mapear). Si los TADs y los niveles son
+                conocidos, vos sabés cómo combinarlos — el ejercicio es nuevo en la forma, pero
+                los ladrillos son los mismos.
+              </div>
             </div>
           </div>
         </div>
