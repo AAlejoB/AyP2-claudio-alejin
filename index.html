@@ -11024,7 +11024,12 @@ end Ejercicio;
                 <ol style="margin:6px 0 0 18px">
                   <li><b><code>Unbounded_String</code></b>: para strings de longitud variable.
                     Te ahorra el padding con espacios de <code>String (1..N)</code>. Se compara
-                    directamente con <code>&lt;</code> y <code>&gt;</code>.</li>
+                    directamente con <code>&lt;</code> y <code>&gt;</code>.
+                    <br><b>Requiere DOS withs:</b>
+                    <pre class="code" style="margin:6px 0 0"><code class="ada">with Ada.Strings.Unbounded, Ada.Strings.Unbounded.Text_IO;
+use  Ada.Strings.Unbounded, Ada.Strings.Unbounded.Text_IO;</code></pre>
+                    El primero da el tipo y operadores. El segundo da las operaciones de I/O
+                    (Put_Line, Get_Line, etc.). Si te falta el segundo y querés imprimir, NO compila.</li>
                   <li><b>Procedures dummy <code>Put_Visitante</code> / <code>Get_Visitante</code></b>:
                     <code>Vec_Simple</code> los exige como formals, pero el enunciado dice "no
                     ingresar datos". Devolver <code>null</code> cumple el contrato sin
