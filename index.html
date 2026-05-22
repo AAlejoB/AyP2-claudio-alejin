@@ -890,7 +890,7 @@
         <li><a href="#parcial-2023">📌 CC P1 2023 (Ej 1 y 2)</a></li>
         <li><a href="#parcial-hospital">📌 Hospital · Residentes</a></li>
         <li><a href="#parcial-petrolera-1">📌 🆕 Petrolera v1 (Ej 2)</a></li>
-        <li><a href="#parcial-google">📌 🆕 Visitantes Google (Ej 2)</a></li>
+        <li><a href="#parcial-google">📌 Visitantes Google (Ej 1 y 2)</a></li>
         <li><a href="#parcial-wpp">📌 🆕 WhatsApp (Ej 1, 2 y 3)</a></li>
       </ul>
     </div>
@@ -10890,14 +10890,14 @@ end Petrolera_Reemplazar;
 
 
       <!-- =============================================================
-           VISITANTES GOOGLE — Ej 2 RESUELTO · Lista + Pila → Lista ordenada asc
+           VISITANTES GOOGLE — Ej 1 y 2 RESUELTOS
            ============================================================= -->
       <article class="thread" id="parcial-google">
         <div class="thread-header">
-          <h2>Visitantes Google — Ej 2 resuelto</h2>
+          <h2>Visitantes Google — Ej 1 y 2 resueltos</h2>
           <span class="tag good">resuelto</span>
           <span class="tag">3 ejercicios</span>
-          <span class="tag warn">Lista + Pila · intersección ascendente</span>
+          <span class="tag warn">Vec[Lista[Record]] + Intersección</span>
         </div>
 
         <div class="post post-prof">
@@ -10906,10 +10906,192 @@ end Petrolera_Reemplazar;
             <div class="post-meta"><strong>Cátedra</strong><span class="role">enunciado</span></div>
             <div class="post-text">
               <ol>
-                <li><b>Visitantes por continente:</b> navegador, fecha, hora, IP, páginas visitadas, búsquedas. a) Instanciar; b) Lista ordenada por IP con &gt;50 solicitudes; c) Conservar.</li>
+                <li><b>Visitantes por continente:</b> navegador, fecha, hora, IP, páginas visitadas, búsquedas. a) Instanciar; b) Lista ordenada por IP con &gt;50 solicitudes; c) Conservar. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
                 <li><b>Intersección:</b> recibe lista <code>L1</code> y pila <code>P1</code>, retorna lista <code>L2</code> con la intersección, ordenada ascendentemente y sin repeticiones. <span class="tag good" style="font-size:.7rem">resuelto abajo ↓</span></li>
                 <li><b>Tracing:</b> función recursiva que suma los pares de una lista. Traza con <code>7 → 8 → 10 → 5 → 9 → 14</code>.</li>
               </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="post post-self">
+          <div class="post-avatar">YO</div>
+          <div class="post-body">
+            <div class="post-meta"><strong>Alejo</strong><span class="role">resolución Ej 1 · Visitantes por continente</span></div>
+            <div class="post-text">
+
+              <div class="callout good" style="margin:0 0 14px">
+                <b>💡 Esta resolución salió del análisis del propio Alejo</b> aplicando el
+                Post #7 a fondo: identificó que los continentes son <i>fijos</i> (5 valores)
+                → Array; que los visitantes son <i>variables</i> por continente → Lista; y
+                que cada visitante tiene <i>6 campos</i> → Record. La estructura
+                <code>Vec[Lista[Record]]</code> es <b>la óptima</b>.
+              </div>
+
+              <div class="callout" style="margin:0 0 14px">
+                <b>🔍 Paso 1 · Identificar — pistas del enunciado → TAD (Ej 1)</b>
+                <table class="dt" style="margin-top:8px">
+                  <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
+                  <tbody>
+                    <tr><td>"por CONTINENTE" (5 continentes)</td><td>tamaño FIJO y conocido</td><td>Array indexado por enum (TipoContinente)</td></tr>
+                    <tr><td>"Visitantes" (varios por continente)</td><td>cantidad variable</td><td>Listanoordenada (record visitante)</td></tr>
+                    <tr><td>"navegador, fecha, hora, IP, páginas, búsquedas"</td><td>6 campos por visitante</td><td>Record</td></tr>
+                    <tr><td>"Lista ORDENADA por IP"</td><td>resultado ordenado</td><td>Listaordenada con comparación por IP</td></tr>
+                    <tr><td>"con &gt;50 solicitudes el MISMO DÍA"</td><td>agrupado por (IP, fecha), contar</td><td>Lista auxiliar de conteo + suprimir+insertar</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p><b>Estructura</b>: <code>Vec[5 continentes] [Lista[Record(6 campos)]]</code>.
+              Para el inciso b) hay que contar cuántas veces aparece cada (IP, Fecha)
+              en TODA la estructura — eso requiere una <b>lista auxiliar de conteo</b>
+              (igual que el Hospital Ej b con el conteo de evaluadores).</p>
+
+              <pre class="code"><span class="filename">google_visitantes.adb</span><code class="ada">with Listanoordenada;
+with Listaordenada;
+
+procedure Google_Visitantes is
+
+   --  INCISO A — Tipos e instanciaciones
+   subtype Nav_T   is String (1 .. 20);
+   subtype Fecha_T is String (1 .. 10);   --  "dd/mm/aaaa"
+   subtype Hora_T  is String (1 .. 8);    --  "hh:mm:ss"
+   subtype IP_T    is String (1 .. 15);   --  "xxx.xxx.xxx.xxx"
+
+   type TipoVisitante is record
+      Navegador : Nav_T;
+      Fecha     : Fecha_T;
+      Hora      : Hora_T;
+      IP        : IP_T;
+      Paginas   : Integer;
+      Busquedas : Integer;
+   end record;
+
+   package Lista_Vis is new Listanoordenada (Tipoelem =&gt; TipoVisitante);
+
+   --  Los continentes son FIJOS → enumerativo + array
+   type TipoContinente is (Africa, America, Asia, Europa, Oceania);
+   type TipoEstructura is array (TipoContinente) of Lista_Vis.Tipolista;
+
+   --  Tipo resultado: usuario (IP+Fecha) con su cantidad de solicitudes
+   type TipoUsuarioActivo is record
+      IP       : IP_T;
+      Fecha    : Fecha_T;
+      Cantidad : Integer;
+   end record;
+
+   --  Funciones de comparación por IP (ascendente)
+   function Menor_IP (X, Y : TipoUsuarioActivo) return Boolean is
+   begin return X.IP &lt; Y.IP; end Menor_IP;
+
+   function Mayor_IP (X, Y : TipoUsuarioActivo) return Boolean is
+   begin return X.IP &gt; Y.IP; end Mayor_IP;
+
+   package Lista_Result is new Listaordenada
+     (Tipoelem =&gt; TipoUsuarioActivo,
+      menor    =&gt; Menor_IP,
+      mayor    =&gt; Mayor_IP);
+
+   --  Lista auxiliar para contar (IP, Fecha) → Cantidad
+   package Lista_Conteo is new Listanoordenada (Tipoelem =&gt; TipoUsuarioActivo);
+
+
+   --  AUXILIAR — incrementar conteo de (IP, Fecha) o crear con 1
+   procedure Sumar_Visita
+     (L     : in out Lista_Conteo.Tipolista;
+      IP    : in     IP_T;
+      Fecha : in     Fecha_T)
+   is
+      Aux        : Lista_Conteo.Tipolista;
+      C, Nuevo   : TipoUsuarioActivo;
+      Encontrado : Boolean;
+   begin
+      Aux        := L;
+      Encontrado := False;
+      while not Lista_Conteo.Vacia (Aux) and then not Encontrado loop
+         C := Lista_Conteo.Info (Aux);
+         if C.IP = IP and then C.Fecha = Fecha then
+            Encontrado := True;
+            --  Truco: suprimir el viejo, sumar 1, reinsertar (no hay Modificar)
+            Lista_Conteo.Suprimir (L, C);
+            C.Cantidad := C.Cantidad + 1;
+            Lista_Conteo.InsertarPpio (L, C);
+         end if;
+         Aux := Lista_Conteo.Sig (Aux);
+      end loop;
+      if not Encontrado then
+         Nuevo.IP       := IP;
+         Nuevo.Fecha    := Fecha;
+         Nuevo.Cantidad := 1;
+         Lista_Conteo.InsertarPpio (L, Nuevo);
+      end if;
+   end Sumar_Visita;
+
+
+   --  INCISO B — Lista ordenada por IP de usuarios con &gt;50 solicitudes
+   --             en el mismo día.
+   --  Objetivo: contar (IP, Fecha) en TODA la estructura. Devolver los
+   --            que superan 50, ordenados por IP.
+   --  Entrada:  Estructura (Vec[Lista[Record]])
+   --  Salida:   Result (Listaordenada por IP)
+   --  Conserva: SÍ — solo lectura con Aux en cada lista de cada continente.
+   procedure Usuarios_Activos
+     (Estructura : in     TipoEstructura;
+      Result     :    out Lista_Result.Tipolista)
+   is
+      Conteo : Lista_Conteo.Tipolista;
+      AuxV   : Lista_Vis.Tipolista;
+      AuxC   : Lista_Conteo.Tipolista;
+      V      : TipoVisitante;
+      C      : TipoUsuarioActivo;
+   begin
+      Lista_Result.Crearlistaordenada (Result);
+      Lista_Conteo.Crearlista (Conteo);
+
+      --  Recorrer TODA la estructura: por cada continente, por cada visitante,
+      --  sumar al conteo (IP, Fecha).
+      for Cont in TipoContinente loop
+         AuxV := Estructura (Cont);
+         while not Lista_Vis.Vacia (AuxV) loop
+            V := Lista_Vis.Info (AuxV);
+            Sumar_Visita (Conteo, V.IP, V.Fecha);
+            AuxV := Lista_Vis.Sig (AuxV);
+         end loop;
+      end loop;
+
+      --  Filtrar los que superan 50 e insertar en Result (ordenado por IP)
+      AuxC := Conteo;
+      while not Lista_Conteo.Vacia (AuxC) loop
+         C := Lista_Conteo.Info (AuxC);
+         if C.Cantidad &gt; 50 then
+            Lista_Result.Insertar (Result, C);
+         end if;
+         AuxC := Lista_Conteo.Sig (AuxC);
+      end loop;
+   end Usuarios_Activos;
+
+   --  INCISO C — Conservación:
+   --    * Estructura: solo se recorre con índices y Aux en cada lista.
+   --    * Lista de visitantes por continente: nunca se toca con Insertar/Suprimir.
+
+begin
+   null;
+end Google_Visitantes;
+</code></pre>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>Las 3 decisiones que tenés que defender en oral:</b>
+                <ol style="margin:6px 0 0 18px">
+                  <li><b>¿Por qué Array y no Lista para continentes?</b> Porque son 5 valores
+                    fijos y conocidos. Array da acceso O(1); Lista sería O(n) y desperdiciar.</li>
+                  <li><b>¿Por qué lista auxiliar de conteo?</b> Porque "&gt;50 solicitudes el
+                    mismo día" requiere agregar por (IP, Fecha) — no se puede saber con una
+                    sola pasada que cuente directo. Hay que acumular.</li>
+                  <li><b>¿Por qué <code>Listaordenada</code> para Result y no
+                    <code>Listanoordenada</code>?</b> Porque el enunciado pide "ordenada por
+                    IP". <code>Listaordenada</code> lo hace solo en cada <code>Insertar</code>.</li>
+                </ol>
+              </div>
             </div>
           </div>
         </div>
