@@ -10906,11 +10906,15 @@ end Petrolera_Reemplazar;
             <div class="post-text">
 
               <div class="callout good" style="margin:0 0 14px">
-                <b>💡 Esta resolución salió del análisis del propio Alejo</b> aplicando el
-                Post #7 a fondo: identificó que los continentes son <i>fijos</i> (5 valores)
-                → Array; que los visitantes son <i>variables</i> por continente → Lista; y
-                que cada visitante tiene <i>6 campos</i> → Record. La estructura
-                <code>Vec[Lista[Record]]</code> es <b>la óptima</b>.
+                <b>💎 Esta resolución la escribieron Alejo + Zahir juntos y compiló.</b>
+                Es la versión REAL que se va a ver el viernes. Aplica 4 técnicas únicas que
+                no aparecen en otros ejercicios del foro:
+                <ol style="margin:6px 0 0 18px">
+                  <li><b><code>Unbounded_String</code></b> para strings de longitud variable (no necesita padding).</li>
+                  <li><b>Procedures dummy</b> para satisfacer formals de <code>Vec_Simple</code> sin usar I/O.</li>
+                  <li><b>Operadores como funciones</b> (<code>"&lt;"</code>, <code>"&gt;"</code>) en vez de funciones con nombre.</li>
+                  <li><b><code>use</code></b> para no calificar cada llamada con el nombre del package.</li>
+                </ol>
               </div>
 
               <div class="callout" style="margin:0 0 14px">
@@ -10918,164 +10922,131 @@ end Petrolera_Reemplazar;
                 <table class="dt" style="margin-top:8px">
                   <thead><tr><th>Frase del enunciado</th><th>Pista</th><th>TAD a usar</th></tr></thead>
                   <tbody>
-                    <tr><td>"por CONTINENTE" (5 continentes)</td><td>tamaño FIJO y conocido</td><td>Array indexado por enum (TipoContinente)</td></tr>
-                    <tr><td>"Visitantes" (varios por continente)</td><td>cantidad variable</td><td>Lista (record visitante)</td></tr>
-                    <tr><td>"navegador, fecha, hora, IP, páginas, búsquedas"</td><td>6 campos por visitante</td><td>Record</td></tr>
-                    <tr><td>"Lista ORDENADA por IP"</td><td>resultado ordenado</td><td>Listaordenada con comparación por IP</td></tr>
-                    <tr><td>"con &gt;50 solicitudes el MISMO DÍA"</td><td>agrupado por (IP, fecha), contar</td><td>Lista auxiliar de conteo + suprimir+insertar</td></tr>
+                    <tr><td>"por CONTINENTE" (6 valores fijos)</td><td>tamaño FIJO y conocido</td><td><code>Vec_Simple</code> instanciado con <code>Rango is 1..6</code></td></tr>
+                    <tr><td>"Visitantes" (varios por continente)</td><td>cantidad variable</td><td><code>Lista</code> de record Visitante</td></tr>
+                    <tr><td>"navegador, fecha, hora, IP, páginas, búsquedas, solicitudes"</td><td>7 campos por visitante</td><td>Record con <code>Unbounded_String</code>/Integer</td></tr>
+                    <tr><td>"Lista ORDENADA por IP"</td><td>resultado ordenado por campo IP</td><td><code>Listaordenada</code> con operadores <code>"&lt;"</code>/<code>"&gt;"</code> por IP</td></tr>
+                    <tr><td>"con &gt;50 solicitudes el MISMO DÍA"</td><td><code>Solicitudes</code> ya es campo del record</td><td>Filtro directo: <code>Reg.Fecha = Dia and Reg.Solicitudes &gt; 50</code></td></tr>
                   </tbody>
                 </table>
               </div>
 
-              <p><b>Estructura</b>: <code>Vec[5 continentes] [Lista[Record(6 campos)]]</code>.
-              Para el inciso b) hay que contar cuántas veces aparece cada (IP, Fecha)
-              en TODA la estructura — eso requiere una <b>lista auxiliar de conteo</b>
-              (igual que el Hospital Ej b con el conteo de evaluadores).</p>
+              <p><b>Estructura</b>: <code>Vec_Simple[1..6] de Lista de Record(7 campos)</code>.
+              <code>Solicitudes</code> es un campo del record (ya viene pre-computado),
+              entonces el filtro es directo: <code>Reg.Fecha = Dia and Reg.Solicitudes &gt; 50</code>.</p>
 
-              <pre class="code"><span class="filename">google_visitantes.adb</span><code class="ada">with Lista;
-with Listaordenada;
+              <pre class="code"><span class="filename">ejercicio.adb</span><code class="ada">with Ada.Strings.Unbounded, Ada.Strings.Unbounded.Text_IO,
+     Ada.Integer_Text_IO, Lista, Listaordenada, Vec_Simple;
+use Ada.Strings.Unbounded, Ada.Strings.Unbounded.Text_IO,
+    Ada.Integer_Text_IO;
 
-procedure Google_Visitantes is
+procedure Ejercicio is
 
-   --  INCISO A — Tipos e instanciaciones
-   subtype Nav_T   is String (1 .. 20);
-   subtype Fecha_T is String (1 .. 10);   --  "dd/mm/aaaa"
-   subtype Hora_T  is String (1 .. 8);    --  "hh:mm:ss"
-   subtype IP_T    is String (1 .. 15);   --  "xxx.xxx.xxx.xxx"
-
-   type TipoVisitante is record
-      Navegador : Nav_T;
-      Fecha     : Fecha_T;
-      Hora      : Hora_T;
-      IP        : IP_T;
-      Paginas   : Integer;
-      Busquedas : Integer;
+   type Visitante is record
+      Navegador   : Unbounded_String;
+      Fecha       : Integer range 1 .. 31;
+      Hora        : Integer range 0 .. 23;
+      Ip          : Unbounded_String;
+      Paginas     : Unbounded_String;
+      Busquedas   : Unbounded_String;
+      Solicitudes : Integer;
    end record;
 
-   package Lista_Vis is new Lista (Tipoelem =&gt; TipoVisitante);
+   package Lista_Visitante is new Lista (Visitante);
+   use Lista_Visitante;
 
-   --  Los continentes son FIJOS → enumerativo + array
-   type TipoContinente is (Africa, America, Asia, Europa, Oceania);
-   type TipoEstructura is array (TipoContinente) of Lista_Vis.Tipolista;
+   --  Operadores para Listaordenada — ordena por campo Ip
+   function "&lt;" (X, Y : Visitante) return Boolean is
+   begin return X.Ip &lt; Y.Ip; end "&lt;";
 
-   --  Tipo resultado: usuario (IP+Fecha) con su cantidad de solicitudes
-   type TipoUsuarioActivo is record
-      IP       : IP_T;
-      Fecha    : Fecha_T;
-      Cantidad : Integer;
-   end record;
+   function "&gt;" (X, Y : Visitante) return Boolean is
+   begin return X.Ip &gt; Y.Ip; end "&gt;";
 
-   --  Funciones de comparación por IP (ascendente)
-   function Menor_IP (X, Y : TipoUsuarioActivo) return Boolean is
-   begin return X.IP &lt; Y.IP; end Menor_IP;
+   package Listaord_Visitante is new Listaordenada (Visitante, "&lt;", "&gt;");
+   use Listaord_Visitante;
 
-   function Mayor_IP (X, Y : TipoUsuarioActivo) return Boolean is
-   begin return X.IP &gt; Y.IP; end Mayor_IP;
+   --  Vector indexado: 6 continentes (Rango 1..6)
+   subtype Rango is Integer range 1 .. 6;
 
-   package Lista_Result is new Listaordenada
-     (Tipoelem =&gt; TipoUsuarioActivo,
-      "&lt;"      =&gt; Menor_IP,
-      "&gt;"      =&gt; Mayor_IP);
+   --  Procedures dummy: Vec_Simple los exige como formals,
+   --  pero como NO se ingresan datos (enunciado lo dice), retornan null.
+   procedure Put_Visitante (X : in Lista_Visitante.Tipolista) is
+   begin null; end Put_Visitante;
 
-   --  Lista auxiliar para contar (IP, Fecha) → Cantidad
-   package Lista_Conteo is new Lista (Tipoelem =&gt; TipoUsuarioActivo);
+   procedure Get_Visitante (X : out Lista_Visitante.Tipolista) is
+   begin null; end Get_Visitante;
+
+   package Vec_Listas is new Vec_Simple
+     (Lista_Visitante.Tipolista, Rango, Put_Visitante, Get_Visitante);
+   use Vec_Listas;
 
 
-   --  AUXILIAR — incrementar conteo de (IP, Fecha) o crear con 1
-   procedure Sumar_Visita
-     (L     : in out Lista_Conteo.Tipolista;
-      IP    : in     IP_T;
-      Fecha : in     Fecha_T)
+   --  INCISO B — Usuarios con &gt;50 solicitudes en el día indicado,
+   --             ordenados por IP.
+   --  Entrada:  Vec (estructura), Dia (1..31)
+   --  Salida:   Lista_Ord (Listaordenada por IP)
+   --  Conserva: SÍ — Ptr_Aux para recorrer cada lista.
+   procedure Incisob
+     (Vec       : in     Vec_Listas.Tipovec;
+      Lista_Ord :    out Listaord_Visitante.Tipolista;
+      Dia       : in     Integer)
    is
-      Aux        : Lista_Conteo.Tipolista;
-      C, Nuevo   : TipoUsuarioActivo;
-      Encontrado : Boolean;
+      Ptr_Aux : Lista_Visitante.Tipolista;
+      Reg_V   : Visitante;
    begin
-      Aux        := L;
-      Encontrado := False;
-      while not Lista_Conteo.Vacia (Aux) and then not Encontrado loop
-         C := Lista_Conteo.Info (Aux);
-         if C.IP = IP and then C.Fecha = Fecha then
-            Encontrado := True;
-            --  Truco: suprimir el viejo, sumar 1, reinsertar (no hay Modificar)
-            Lista_Conteo.Suprimir (L, C);
-            C.Cantidad := C.Cantidad + 1;
-            Lista_Conteo.Insertar (L, C);
-         end if;
-         Aux := Lista_Conteo.Sig (Aux);
-      end loop;
-      if not Encontrado then
-         Nuevo.IP       := IP;
-         Nuevo.Fecha    := Fecha;
-         Nuevo.Cantidad := 1;
-         Lista_Conteo.Insertar (L, Nuevo);
-      end if;
-   end Sumar_Visita;
-
-
-   --  INCISO B — Lista ordenada por IP de usuarios con &gt;50 solicitudes
-   --             en el mismo día.
-   --  Objetivo: contar (IP, Fecha) en TODA la estructura. Devolver los
-   --            que superan 50, ordenados por IP.
-   --  Entrada:  Estructura (Vec[Lista[Record]])
-   --  Salida:   Result (Listaordenada por IP)
-   --  Conserva: SÍ — solo lectura con Aux en cada lista de cada continente.
-   procedure Usuarios_Activos
-     (Estructura : in     TipoEstructura;
-      Result     :    out Lista_Result.Tipolista)
-   is
-      Conteo : Lista_Conteo.Tipolista;
-      AuxV   : Lista_Vis.Tipolista;
-      AuxC   : Lista_Conteo.Tipolista;
-      V      : TipoVisitante;
-      C      : TipoUsuarioActivo;
-   begin
-      Lista_Result.Crearlistaordenada (Result);
-      Lista_Conteo.Crear (Conteo);
-
-      --  Recorrer TODA la estructura: por cada continente, por cada visitante,
-      --  sumar al conteo (IP, Fecha).
-      for Cont in TipoContinente loop
-         AuxV := Estructura (Cont);
-         while not Lista_Vis.Vacia (AuxV) loop
-            V := Lista_Vis.Info (AuxV);
-            Sumar_Visita (Conteo, V.IP, V.Fecha);
-            AuxV := Lista_Vis.Sig (AuxV);
+      Crearlistaordenada (Lista_Ord);
+      for I in Vec'Range loop
+         Ptr_Aux := Vec (I);
+         while not Vacia (Ptr_Aux) loop
+            Reg_V := Info (Ptr_Aux);
+            if Reg_V.Fecha = Dia then
+               if Reg_V.Solicitudes &gt; 50 then
+                  Insertar (Lista_Ord, Reg_V);
+               end if;
+            end if;
+            Ptr_Aux := Sig (Ptr_Aux);
          end loop;
       end loop;
+   end Incisob;
 
-      --  Filtrar los que superan 50 e insertar en Result (ordenado por IP)
-      AuxC := Conteo;
-      while not Lista_Conteo.Vacia (AuxC) loop
-         C := Lista_Conteo.Info (AuxC);
-         if C.Cantidad &gt; 50 then
-            Lista_Result.Insertar (Result, C);
-         end if;
-         AuxC := Lista_Conteo.Sig (AuxC);
-      end loop;
-   end Usuarios_Activos;
-
-   --  INCISO C — Conservación:
-   --    * Estructura: solo se recorre con índices y Aux en cada lista.
-   --    * Lista de visitantes por continente: nunca se toca con Insertar/Suprimir.
+   Vector       : Vec_Listas.Tipovec;
+   Lista_Result : Listaord_Visitante.Tipolista;
+   Fecha        : Integer;
 
 begin
-   null;
-end Google_Visitantes;
+   Fecha := 3;
+   Incisob (Vector, Lista_Result, Fecha);
+end Ejercicio;
 </code></pre>
 
               <div class="callout warn" style="margin-top:12px">
-                <b>Las 3 decisiones que tenés que defender en oral:</b>
+                <b>Las 4 técnicas únicas que tenés que poder explicar en oral:</b>
                 <ol style="margin:6px 0 0 18px">
-                  <li><b>¿Por qué Array y no Lista para continentes?</b> Porque son 5 valores
-                    fijos y conocidos. Array da acceso O(1); Lista sería O(n) y desperdiciar.</li>
-                  <li><b>¿Por qué lista auxiliar de conteo?</b> Porque "&gt;50 solicitudes el
-                    mismo día" requiere agregar por (IP, Fecha) — no se puede saber con una
-                    sola pasada que cuente directo. Hay que acumular.</li>
-                  <li><b>¿Por qué <code>Listaordenada</code> para Result y no
-                    <code>Lista</code>?</b> Porque el enunciado pide "ordenada por
-                    IP". <code>Listaordenada</code> lo hace solo en cada <code>Insertar</code>.</li>
+                  <li><b><code>Unbounded_String</code></b>: para strings de longitud variable.
+                    Te ahorra el padding con espacios de <code>String (1..N)</code>. Se compara
+                    directamente con <code>&lt;</code> y <code>&gt;</code>.</li>
+                  <li><b>Procedures dummy <code>Put_Visitante</code> / <code>Get_Visitante</code></b>:
+                    <code>Vec_Simple</code> los exige como formals, pero el enunciado dice "no
+                    ingresar datos". Devolver <code>null</code> cumple el contrato sin
+                    usar la funcionalidad. La cátedra VALORA esto — muestra que entendés que
+                    los formals son obligatorios aunque no se usen.</li>
+                  <li><b>Operadores <code>"&lt;"</code> y <code>"&gt;"</code> como funciones</b>:
+                    en vez de inventar nombres como <code>Menor_Por_IP</code>, definís
+                    <i>directamente</i> el operador. La instanciación queda
+                    <code>new Listaordenada (Visitante, "&lt;", "&gt;")</code> — más limpio.</li>
+                  <li><b><code>use</code> para no calificar</b>: <code>use Lista_Visitante</code>
+                    permite llamar <code>Crearlistaordenada</code>, <code>Vacia</code>,
+                    <code>Info</code> sin prefijo. Código más legible.</li>
                 </ol>
+              </div>
+
+              <div class="callout good" style="margin-top:12px">
+                <b>Nota didáctica:</b> antes este thread tenía una versión hecha por Claude
+                que asumía que "solicitudes" tenía que <i>contarse</i> con una lista auxiliar
+                (técnica suprimir+insertar). Estaba sobre-pensado. La interpretación correcta
+                es la que ustedes hicieron: <code>Solicitudes</code> ya es un campo del record.
+                <b>Cuando dudes entre una solución simple y una compleja, elegí la simple
+                primero.</b> Si el enunciado da un campo, úsalo.
               </div>
             </div>
           </div>
