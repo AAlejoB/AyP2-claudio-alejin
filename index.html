@@ -2063,6 +2063,25 @@ end;
                 record copia los punteros: C pasa a apuntar a los mismos nodos que Aux.
               </div>
 
+              <div class="callout warn" style="margin-top:8px">
+                <b>🆕 Variante explícita (la que usa Alejo + Zahir):</b> en vez de
+                <code>C := Aux</code>, hacés un <b>SEGUNDO while</b> que vacía Aux y mete cada
+                elemento en C. Más verboso pero <b>más fácil de defender en oral</b> — el
+                profesor ve "ah, está restaurando explícitamente cada nodo".
+                <pre class="code" style="margin:8px 0 0"><code class="ada">--  Variante con doble while (equivalente a C := Aux):
+while not Cola.Vacia (Aux) loop
+   Cola.Supcola (Aux, Lista);    --  saco del frente de Aux
+   Cola.Inscola (C, Lista);      --  meto al final de C
+end loop;
+--  C queda con los mismos elementos en orden original.
+</code></pre>
+                <b>Cuándo elegir cuál:</b> ambas funcionan idéntico. La asignación <code>C := Aux</code>
+                es más concisa y "Ada-idiomática"; el doble while es más explícito y "estilo
+                cátedra". Si dudás cuál prefiere tu profe, andá con la <b>variante explícita</b>
+                (el doble while) — es más segura porque no requiere explicar el detalle del
+                record privado.
+              </div>
+
               <h3>📐 Patrón 4 — Pila: llegar a la <b>base</b> (el fondo)</h3>
               <p>
                 Más rebuscado que el patrón 2. Para encontrar lo que está al fondo de la pila,
@@ -9878,98 +9897,157 @@ end Mayor_de_Topes;
                 </ol>
               </div>
 
-              <pre class="code"><span class="filename">negativos_recu_2022.adb</span><code class="ada">with Lista;
-with Coladinamica;
-with Piladinamica;
+              <div class="callout good" style="margin:0 0 14px">
+                <b>💎 Esta resolución la escribieron Alejo + Zahir y compiló en la PC.</b>
+                Es la versión REAL que se va a usar el viernes. Tiene <b>dos diferencias clave</b>
+                con la versión inicial que armé yo:
+                <ol style="margin:6px 0 0 18px">
+                  <li><b>Doble while EXPLÍCITO</b> para restaurar la cola (en vez de
+                    <code>ColaTope := ColaAux</code> que es una asignación de record). Más
+                    claro, más fácil de defender en oral.</li>
+                  <li><b><code>use</code> en cada package</b> para no calificar las llamadas
+                    (<code>Crear</code> en vez de <code>Lista_Int.Crear</code>).</li>
+                </ol>
+                Además, incluyeron un <code>Cargar_Estructura</code> para probar el código en
+                la PC (aunque el enunciado dice "no ingresar datos", tenerlo te permite
+                ejecutar y debuggear).
+              </div>
 
-procedure Negativos_Recu_2022 is
+              <pre class="code"><span class="filename">ejercicio2.adb</span><code class="ada">with Ada.Text_IO, Ada.Integer_Text_IO,
+     Lista, Piladinamica, Coladinamica;
+use Ada.Text_IO, Ada.Integer_Text_IO;
 
-   --  INCISO A — Tipos e instanciaciones (3 niveles)
+procedure Ejercicio2 is
 
-   --  Nivel 1: lista de enteros (la más interna)
-   package Lista_Int      is new Lista (Tipoelem =&gt; Integer);
+   --  INCISO A — Instanciaciones de adentro hacia afuera
+   package Lista_Int       is new Lista (Integer);
+   use Lista_Int;
 
-   --  Nivel 2: cola cuyos elementos son listas de enteros
-   package Cola_de_Listas is new Coladinamica
-                                 (Tipoelem =&gt; Lista_Int.Tipolista);
+   package Cola_Lista      is new Coladinamica (Lista_Int.Tipolista);
+   use Cola_Lista;
 
-   --  Nivel 3: pila cuyos elementos son colas (la "estructura P")
-   package Pila_de_Colas  is new Piladinamica
-                                 (Tipoelem =&gt; Cola_de_Listas.Tipocoladinamica);
+   package Pila_Cola_Lista is new Piladinamica (Cola_Lista.Tipocoladinamica);
+   use Pila_Cola_Lista;
 
 
-   --  INCISO B — Negativos de la lista al final de la cola
-   --             del tope de la pila P.
-   --
-   --  Objetivo: armar lista con los enteros &lt; 0 de la última lista
-   --            de la cola que está en el tope de P.
-   --  Entrada:  P (in out por requisito técnico; queda IDÉNTICA al salir)
-   --  Salida:   Result (lista de enteros)
-   --  Conserva: SÍ — pila, cola y lista quedan como estaban.
+   --  INCISO B — Negativos de la lista al final de la cola del tope.
    procedure Negativos
-     (P      : in out Pila_de_Colas.Tipopiladinamica;
-      Result :    out Lista_Int.Tipolista)
+     (Pila          : in out Pila_Cola_Lista.Tipopiladinamica;
+      Listanegativos :   out Lista_Int.Tipolista)
    is
-      ColaTope  : Cola_de_Listas.Tipocoladinamica;
-      ColaAux   : Cola_de_Listas.Tipocoladinamica;
-      Lista_F   : Lista_Int.Tipolista;       --  lista del final
-      AuxLista  : Lista_Int.Tipolista;       --  para recorrer Lista_F
-      E         : Integer;
+      Ptr_Aux, Lista : Lista_Int.Tipolista;
+      Cola, Cola_Aux : Cola_Lista.Tipocoladinamica;
+      Num            : Integer;
    begin
-      Lista_Int.Crear (Result);
+      Crear (Listanegativos);
+      Crearcola (Cola_Aux);
 
-      if Pila_de_Colas.Vacia (P) then
-         return;
+      --  1) Sacar la cola del tope (si la pila no está vacía)
+      if not Vacia (Pila) then
+         Sacar (Pila, Cola);
       end if;
 
-      --  1) SACO la cola del tope (la repongo al final).
-      Pila_de_Colas.Sacar (P, ColaTope);
-
-      --  2) VACÍO la cola entera a ColaAux para encontrar la lista
-      --     del final. Lista_F se sobrescribe en cada iteración:
-      --     queda con la ÚLTIMA, que era el final.
-      Cola_de_Listas.Crearcola (ColaAux);
-      while not Cola_de_Listas.Vacia (ColaTope) loop
-         Cola_de_Listas.Supcola (ColaTope, Lista_F);
-         Cola_de_Listas.Inscola (ColaAux,  Lista_F);
+      --  2) Vaciar la cola en Cola_Aux. La última lista sacada queda
+      --     en la variable 'Lista' (es la lista del FINAL).
+      while not Vacia (Cola) loop
+         Supcola (Cola, Lista);
+         Inscola (Cola_Aux, Lista);
       end loop;
 
-      --  Restauro ColaTope: ColaAux tiene los mismos elementos
-      --  en el mismo orden original.
-      ColaTope := ColaAux;
-
-      --  3) Recorro Lista_F filtrando negativos (NO la modifico).
-      AuxLista := Lista_F;
-      while not Lista_Int.Vacia (AuxLista) loop
-         E := Lista_Int.Info (AuxLista);
-         if E &lt; 0 then
-            Lista_Int.Insertar (Result, E);
+      --  3) Recorrer la lista del final con Aux, filtrando negativos
+      Ptr_Aux := Lista;
+      while not Vacia (Ptr_Aux) loop
+         Num := Info (Ptr_Aux);
+         if Num &lt; 0 then
+            Insertar (Listanegativos, Num);
          end if;
-         AuxLista := Lista_Int.Sig (AuxLista);
+         Ptr_Aux := Sig (Ptr_Aux);
       end loop;
 
-      --  4) Restauro la pila: ColaTope vuelve a ser el tope.
-      Pila_de_Colas.Meter (P, ColaTope);
+      --  4) Restaurar la cola: vaciar Cola_Aux de vuelta en Cola
+      --     (doble while EXPLÍCITO en vez de Cola := Cola_Aux)
+      while not Vacia (Cola_Aux) loop
+         Supcola (Cola_Aux, Lista);
+         Inscola (Cola, Lista);
+      end loop;
+
+      --  5) Volver a meter la cola restaurada en el tope de la pila
+      Meter (Pila, Cola);
    end Negativos;
 
 
-   --  INCISO C — Conservación en 3 niveles:
-   --   * Pila P:    Sacar + Meter → idéntica.
-   --   * Cola tope: vaciada a ColaAux y reasignada → idéntica.
-   --   * Lista_F:   solo lectura con AuxLista.
+   --  AUXILIAR — Cargar la estructura desde teclado (para PROBAR en la PC)
+   --  En el parcial NO ingresa datos, pero esto les sirvió para ejecutar
+   --  y debuggear. El enunciado dice "no ingresar datos" así que en hoja
+   --  NO va este procedure.
+   procedure Cargar_Estructura
+     (Pila_Ingreso : out Pila_Cola_Lista.Tipopiladinamica)
+   is
+      Lista_Actual : Lista_Int.Tipolista;
+      Cola_Actual  : Cola_Lista.Tipocoladinamica;
+      Num          : Integer;
+      Resp_Cola, Resp_Lista : Character;
+   begin
+      Crearpila (Pila_Ingreso);
+      Put_Line ("--- INICIO DE CARGA DE DATOS ---");
+      loop
+         Crearcola (Cola_Actual);
+         loop
+            Crear (Lista_Actual);
+            Put_Line ("-&gt; Cargando nueva LISTA. Ingrese enteros (0 para terminar):");
+            loop
+               Get (Num);
+               exit when Num = 0;
+               Insertar (Lista_Actual, Num);
+            end loop;
+            Inscola (Cola_Actual, Lista_Actual);
+            Put ("Desea ingresar OTRA LISTA a esta cola? (s/n): ");
+            Get (Resp_Lista);
+            exit when Resp_Lista = 'n' or Resp_Lista = 'N';
+         end loop;
+         Meter (Pila_Ingreso, Cola_Actual);
+         Put ("Desea ingresar OTRA COLA a la pila? (s/n): ");
+         Get (Resp_Cola);
+         exit when Resp_Cola = 'n' or Resp_Cola = 'N';
+      end loop;
+      Put_Line ("--- CARGA FINALIZADA ---");
+   end Cargar_Estructura;
 
+
+   Pila_Og         : Pila_Cola_Lista.Tipopiladinamica;
+   Lista_Negativos : Lista_Int.Tipolista;
 begin
-   null;
-end Negativos_Recu_2022;
+   Cargar_Estructura (Pila_Og);
+   Negativos (Pila_Og, Lista_Negativos);
+end Ejercicio2;
 </code></pre>
 
               <div class="callout" style="margin-top:12px">
                 <b>Las 3 cosas que tenés que poder explicar en oral:</b>
                 <ol style="margin:6px 0 0 18px">
-                  <li><b>¿Por qué tres instanciaciones?</b> Tres TADs distintos en cascada. Cada uno usa el tipo del anterior como <code>Tipoelem</code>. Es el patrón "tortilla de papas" — capa por capa.</li>
-                  <li><b>¿Por qué <code>ColaTope := ColaAux</code>?</b> En Ada los tipos privados de <code>Coladinamica</code> son records con punteros (<code>Frente</code>, <code>Final</code>). Asignar un record copia los dos punteros, así que ColaTope pasa a apuntar a los mismos nodos que tenía ColaAux. Como ColaTope estaba vacía, no hay leak.</li>
-                  <li><b>¿Por qué <code>in out</code> si "conserva"?</b> Porque <code>Sacar</code> exige <code>in out</code>. La conservación es <b>semántica</b> (al salir queda igual), no sintáctica. El header del procedimiento lo aclara.</li>
+                  <li><b>¿Por qué tres instanciaciones encadenadas?</b> Tres TADs distintos en
+                    cascada. Cada nivel usa el tipo del anterior como <code>Tipoelem</code>:
+                    Lista&lt;Integer&gt; → Cola&lt;Lista&gt; → Pila&lt;Cola&gt;. Patrón "tortilla
+                    de papas": capa por capa.</li>
+                  <li><b>¿Por qué el segundo while (restaurar Cola desde Cola_Aux)?</b> Porque
+                    después de vaciar la cola, está en Cola_Aux pero "Cola" (la variable que
+                    voy a volver a meter en la pila) está vacía. El segundo while transfiere
+                    los elementos de Cola_Aux a Cola, manteniendo el orden FIFO original.
+                    <i>Alternativa equivalente</i>: <code>Cola := Cola_Aux</code> (asignación
+                    de record) — funciona pero es menos explícito.</li>
+                  <li><b>¿Por qué <code>in out</code> si "conserva"?</b> Porque <code>Sacar</code>
+                    exige <code>in out</code>. La conservación es <b>semántica</b> (al salir
+                    queda IGUAL), no sintáctica. Documentarlo en el header del procedure.</li>
                 </ol>
+              </div>
+
+              <div class="callout warn" style="margin-top:12px">
+                <b>Detalle importante de cómo queda <code>Listanegativos</code>:</b> como
+                <code>Insertar</code> en el package <code>Lista</code> mete al PRINCIPIO (es la
+                única operación), los negativos quedan en <b>orden inverso</b> al recorrido. Si
+                la lista era <code>1, -3, 5, -7, 2</code> → Listanegativos queda
+                <code>-7, -3</code> (el último recolectado al frente). El enunciado no pide orden
+                específico, así que está OK.
               </div>
             </div>
           </div>
